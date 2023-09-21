@@ -147,6 +147,9 @@ export const init = async game => {
 ```
 
 These are the results when connecting on two clients. Notice the physics simulation is seamlessly synced:
-<video style={{"width": "100%"}} controls src="/video/testBall demo.mp4"></video>
+
+import TestBallDemoVideo from '@site/static/video/testBall demo.mp4';
+
+<video style={{"width": "100%"}} controls src={TestBallDemoVideo}></video>
 
 ## Complex Example - Hostile Mob with Health Bar
