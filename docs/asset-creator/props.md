@@ -1,0 +1,7 @@
+# Props
+
+Props are items that characters can hold in their hand.
+
+TODO: Insert video of a player using a sword
+
+They can be created in the object section 
