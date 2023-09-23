@@ -28,3 +28,13 @@
   --ifm-color-primary-lightest: #4fddbf;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
 }
+
+.token.comment {
+  color: rgb(31, 126, 19) !important;
+  font-style: normal !important;
+}
+
+[data-theme='dark'] .token.comment {
+  color: rgb(47, 182, 14) !important;
+}
+

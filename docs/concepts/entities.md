@@ -4,12 +4,11 @@ sidebar_position: 1
 
 # Entities
 
-In Dreamlab, Entities are simply any object in the world. They can move, have physics, render sprites, and more.
+In Dreamlab, entities are any object in the world. They can move, have physics and colliders, render sprites, and more.
 
-## Examples
 The best way to learn the anatomy of an entity is an example. Below are some sample entities of varying complexity.
 
-## Bouncing Ball
+## Example 1 - Bouncing Ball
 This is a simple 2D bouncing ball.
 
 ```js
@@ -152,4 +151,5 @@ import TestBallDemoVideo from '@site/static/video/testBall demo.mp4';
 
 <video style={{"width": "100%"}} controls src={TestBallDemoVideo}></video>
 
-## Complex Example - Hostile Mob with Health Bar
+## Example 2 - Mob with Health Bar
+Suppose we want to create a mob which players using the default character controller can attack.
