@@ -1,0 +1,9 @@
+{
+    "label": "Tutorial",
+    "position": 3,
+    "link": {
+      "type": "generated-index",
+      "description": "Get started with Dreamlab by modifying TinyMMO, our MMO example game."
+    }
+  }
+  
