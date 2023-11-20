@@ -7,3 +7,32 @@ It has the following components:
 - Animations. Animation files using the Mixamo bone convention that are used to drive rigs.
 - AI Painter. Generates 2D sprites for each frame of an animation.
 
+## Prompting
+
+<!--
+This doesn't work so I'm removing it
+
+### Concept Isolation
+Dreamlab allows you to associate certain words with certain objects explicitly.
+
+For example, this prompt may lead to colors bleeding across concepts (black applies to pants, green applies to background or shoes, etc.):
+```
+man wearing a black jacket, blue pants, green baseball cap
+```
+We can see that in this result:
+video here
+
+However, we can rewrite our prompt like this:
+```
+man wearing a [black: jacket], [blue: pants], [green: baseball cap]
+```
+video here
+
+Here's another example:
+```
+knight wearing armor, red helmet, black chestplate full body
+```
+...
+
+This solves the problem of having color bleed into the rest of your image.
+-->
