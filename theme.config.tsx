@@ -9,7 +9,7 @@ const config: DocsThemeConfig = {
   chat: {
     link: 'https://discord.gg/nwXFvtJ92g',
   },
-  docsRepositoryBase: 'https://github.com/WorldQL/dreamlab-docs',
+  docsRepositoryBase: 'https://github.com/WorldQL/dreamlab-docs/blob/trunk',
   footer: {
     text: `Copyright © ${new Date().getFullYear()} WorldQL Corporation`,
   },
