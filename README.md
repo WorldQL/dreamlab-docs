@@ -1,17 +1,18 @@
 # Dreamlab Documentation
 
-This website is built using [Docusaurus 2](https://docusaurus.io/), a modern static website generator.
+This website is built using [Nextra](https://nextra.site/), a flexible static site generator built on top of [Next.js](https://nextjs.org/)
 
-### Installation
+## Local Development
 
-```
+```sh
 $ npm install
+$ npm run dev
 ```
 
-### Local Development
+This will start a local development server that live updates as you make edits.
 
-```
-$ npm start
-```
+## Deployment
 
-This command starts a local development server and opens up a browser window. Most changes are reflected live without having to restart the server.
+This repository is automatically deployed on push using GitHub actions.
+
+If you wish to create a local static build, use `$ npm run build`
