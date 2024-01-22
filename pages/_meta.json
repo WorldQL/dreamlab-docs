@@ -1,0 +1,14 @@
+{
+  "index": "Intro",
+  "why": "Why Dreamlab",
+  "tutorial": "Tutorial",
+  "concepts": "Concepts",
+  "asset-creator": "Asset Creator",
+
+  "contact": {
+    "title": "Open Dreamlab",
+    "type": "page",
+    "href": "https://app.dreamlab.gg/",
+    "newWindow": true
+  }
+}
