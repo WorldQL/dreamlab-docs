@@ -28,7 +28,7 @@ They must have a position in the world, they must be able to be created and dest
   define arguments.
 </Callout>
 
-```ts filename="TypeScript" showLineNumbers
+```ts filename="TypeScript"
 import { createSpawnableEntity } from '@dreamlab.gg/core'
 import { z } from '@dreamlab.gg/core/sdk'
 
@@ -144,128 +144,208 @@ export const init: InitServer = game => {
 
 ## Example 1 - Bouncing Ball
 
-This is a simple 2D bouncing ball.
+This script defines a spawnable entity that represents a simple bouncing ball. Refer to [Physics](./physics.mdx) and [Graphics](./graphics.mdx)
+for more in-depth detail on how the physics and rendering work.
 
-```ts filename="TypeScript"
+```ts filename="ball.ts" showLineNumbers
 import { createSpawnableEntity } from '@dreamlab.gg/core'
-import { Vec, toDegrees, toRadians } from '@dreamlab.gg/core/math'
+import type { Physics, SpawnableEntity } from '@dreamlab.gg/core'
+import type { Camera } from '@dreamlab.gg/core/entities'
+import { toRadians, Vec } from '@dreamlab.gg/core/math'
 import { drawCircle } from '@dreamlab.gg/core/utils'
 import Matter from 'matter-js'
-import { Graphics } from 'pixi.js'
+import { Container, Graphics } from 'pixi.js'
+import { z } from 'zod'
 
-export const createTestBall = createSpawnableEntity(
-  ({ transform, zIndex, tags, preview }, radius) => {
-    // Every object gets a transform automatically, this hold position and rotation information.
-    const { position, rotation } = transform
+type Args = typeof ArgsSchema
+const ArgsSchema = z.object({
+  // Radius must be a positive number greater than 1
+  // Defaults to 60 if not passed
+  radius: z.number().positive().min(1).default(60),
+})
 
-    const mass = 20
+// Common data needs a reference to the physics system
+interface Data {
+  physics: Physics
+}
 
-    // Create our bouncy ball's physics body.
-    const body = Matter.Bodies.circle(position.x, position.y, radius, {
+// Render data needs a reference to the camera
+// and defines a container and a graphics object
+interface Render {
+  camera: Camera
+  container: Container
+  gfx: Graphics
+}
+
+export const createTestBall = createSpawnableEntity<
+  Args,
+  SpawnableEntity<Data, Render, Args>,
+  Data,
+  Render
+>(ArgsSchema, ({ transform, preview }, args) => {
+  const mass = 20
+
+  // Create a circular Matter.js physics body
+  const body = Matter.Bodies.circle(
+    transform.position.x,
+    transform.position.y,
+    args.radius,
+    {
       label: 'testBall',
       render: { visible: false },
-      angle: toRadians(rotation),
-      // the "preview" variable is true if the object isn't placed in the world yet but is a floating preview.
-      // This is used to make your object compatible with the in-game level editor, so it doesn't collide while a preview.
+      // Matter.js rotations are in radians, Dreamlab rotations are in degrees
+      angle: toRadians(transform.rotation),
+
+      // The `preview` context variable is set to `true` if the editor is spawning the entity in "preview mode"
+      // This should disable physics, collisions, and other runtime code
       isStatic: preview,
       isSensor: preview,
 
       mass,
       inverseMass: 1 / mass,
-      // The bounciness of the ball.
-      restitution: 0.95,
+      restitution: 0.95, // Bounciness
+    },
+  )
 
-      // You can also set initial inertia but we don't for this example.
-      // inertia: Number.POSITIVE_INFINITY,
-      // inverseInertia: 0,
-    })
+  return {
+    rectangleBounds() {
+      // Return the correct bounds based on the radius
+      return { width: args.radius * 2, height: args.radius * 2 }
+    },
 
-    return {
-      get transform() {
-        return {
-          position: Vec.clone(body.position),
-          rotation: toDegrees(body.angle),
-        }
-      },
+    isPointInside(position) {
+      // Use Matter.js to query if a point is inside the physics body
+      return Matter.Query.point([body], position).length > 0
+    },
 
-      // Tags are used to identify certain entity types. For example, "enemy", "hpPowerUp", etc.
-      // these are similar to Tags in Unity
-      get tags() {
-        return tags
-      },
+    init({ physics }) {
+      // Register the physics body with the Matter.js physics engine
+      physics.register(this, body)
 
-      // Determine whether the camera should render this entity.
-      isInBounds(position) {
-        return Matter.Query.point([body], position).length > 0
-      },
+      // Link the transform to the physics body
+      // Whenever the transform (position / rotation) changes, automatically update the body
+      physics.linkTransform(body, transform)
 
-      // Run when the entity is first initialized on the client or the server.
-      init({ game, physics }) {
-        const debug = game.debug
-        physics.register(this, body)
+      return { physics, body }
+    },
 
-        return { debug, physics, body }
-      },
+    initRenderContext(_, { stage, camera }) {
+      const { radius } = args
 
-      // Run when the entity is initialized ONLY on the client.
-      initRenderContext(_, { stage, camera }) {
-        const gfx = new Graphics()
-        gfx.zIndex = zIndex + 1
-        drawCircle(gfx, { radius })
+      // Create a pixi container to house our circle
+      // We can use this to group many pixi elements together should we want to draw complex shapes
+      const container = new Container()
+      container.sortableChildren = true
+      container.zIndex = transform.zIndex
 
-        stage.addChild(gfx)
+      // Create a new Pixi graphics primitive and draw a circle with it
+      const gfx = new Graphics()
+      drawCircle(gfx, { radius })
 
-        return { camera, gfx }
-      },
+      // Add the circle graphics to the container, and add the container to the main Pixi stage
+      container.addChild(gfx)
+      stage.addChild(container)
 
-      // Run when entity is destroyed.
-      teardown({ physics, body }) {
-        physics.unregister(this, body)
-      },
-      // Run when entity is destroyed, only run on client.
-      teardownRenderContext({ gfx }) {
-        gfx.destroy()
-      },
+      // Update the container's z-index when the transform changes
+      transform.addZIndexListener(() => {
+        container.zIndex = transform.zIndex
+      })
 
-      onRenderFrame(_, { body }, { camera, gfx }) {
-        // Get the position of the entity relative to the camera.
-        const pos = Vec.add(body.position, camera.offset)
-        // update the position and rotation in screen space terms.
-        gfx.position = pos
-        gfx.rotation = body.angle
-        gfx.alpha = 1
-      },
-    }
-  },
-)
+      return { camera, container, gfx }
+    },
+
+    onArgsUpdate(path, previous, _data, render) {
+      // Only run the following code if the `radius` is being changed
+      if (path === 'radius') {
+        const originalRadius = previous.radius
+        const radius = args.radius
+
+        // Update the physics body
+        // We need to undo rotation before scaling to prevent weird issues
+        const scale = radius / originalRadius
+        Matter.Body.setAngle(body, 0)
+        Matter.Body.scale(body, scale, scale)
+        Matter.Body.setAngle(body, toRadians(transform.rotation))
+        Matter.Body.setMass(body, mass)
+
+        // If we are running on the client (`render` is not undefined)
+        // Re-draw the circle with the new radius
+        if (render) drawCircle(render.gfx, { radius })
+      }
+    },
+
+    onResize({ width, height }) {
+      // Update the radius when the width or height changes
+      args.radius = Math.max(width / 2, height / 2)
+    },
+
+    teardown({ physics }) {
+      // Remove the physics body from the physics system
+      physics.unregister(this, body)
+      // Unlink the transform from the physics body
+      physics.unlinkTransform(body, transform)
+    },
+
+    teardownRenderContext({ container }) {
+      // Remove the container and any children
+      container.destroy({ children: true })
+    },
+
+    onRenderFrame({ smooth }, _, { camera, container }) {
+      // Get the interpolated position from the physics body
+      const smoothed = Vec.add(body.position, Vec.mult(body.velocity, smooth))
+      // Get the position of the body relative to the camera
+      // This gives us a screen-space position
+      const pos = Vec.add(smoothed, camera.offset)
+
+      // Update the screen-space position and rotation of the container
+      container.position = pos
+      container.rotation = body.angle
+    },
+  }
+})
 ```
 
 ### Spawning Entities
 
 For this example, we want our bouncy ball to be synced between the client and server and also spawn over time.
 
-```ts filename="TypeScript"
-import { sharedInit } from './shared.js'
+```ts filename="shared.ts" showLineNumbers
+import { createTestBall } from './ball.ts'
 
-function randInt(min, max) {
+export const sharedInit = async game => {
+  game.register('@example/test-ball', createTestBall)
+}
+```
+
+```ts filename="server.ts" showLineNumbers
+import type { InitServer } from '@dreamlab.gg/core/sdk'
+import { sharedInit } from './shared.ts'
+
+/**
+ * Return a random whole number between `min` and `max`
+ */
+const randomInt = (min: number, max: number): number => {
   return Math.floor(Math.random() * (max - min)) + min
 }
 
-/** @type {import('@dreamlab.gg/core/sdk').InitServer} */
-export const init = async game => {
+export const init: InitServer = game => {
   await sharedInit(game)
 
-  // Spawn 50 balls, one per second.
+  // Spawn 50 balls, one per second
   for (let i = 0; i < 50; i++) {
     setTimeout(() => {
       game.spawn({
-        entity: 'testBall',
-        // Give the ball a random radius between 20 and 150.
-        // This is the "radius" positional argument on createTestBall
-        args: [randInt(20, 150)],
+        // Reference the spawnable entity by name
+        entity: '@example/test-ball',
+
+        // Give the ball a random radius between 20 and 150
+        args: { radius: randomInt(20, 150) },
+
         // Spawn the ball at a random x coordinate between -600 and 600
-        transform: { position: [randInt(-600, 600), -700] },
-        // Give the ball a "net/replicated" tag to automatically sync it between clients
+        transform: { position: [randomInt(-600, 600), -700] },
+
+        // Give the ball a 'net/replicated' tag to automatically sync it between clients
         tags: ['net/replicated'],
       })
     }, i * 1000)
@@ -275,11 +355,7 @@ export const init = async game => {
 
 These are the results when connecting on two clients. Notice the physics simulation is seamlessly synced:
 
-<video
-  style={{ width: '100%' }}
-  controls
-  src='/video/testBall demo.mp4'
-></video>
+<video style={{ width: '100%' }} controls src='/video/testBall demo.mp4' />
 
 ## Example 2 - Mob with Health Bar
 
