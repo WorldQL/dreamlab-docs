@@ -1,11 +1,11 @@
 {
   "entities": "Entities",
-  "animated-sprites": "Animated Sprites",
-  "events": "Events",
+  "physics": "Physics",
   "graphics": "Graphics",
+  "events": "Events",
   "input": "Input",
+  "animated-sprites": "Animated Sprites",
   "key-value": "Saving Data",
   "multiplayer": "Multiplayer",
-  "physics": "Physics",
   "ui": "User Interfaces"
 }
