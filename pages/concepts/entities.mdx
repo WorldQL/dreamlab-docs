@@ -18,20 +18,40 @@ They must have a position in the world, they must be able to be created and dest
 
 ### Defining
 
+- Note about args
+- Note about types
+- Note about context
+
 <Callout>
   The export `z` from `@dreamlab.gg/core/sdk` is actually a re-export of
   [Zod](https://zod.dev). Refer to their documentation for more info on how to
   define arguments.
 </Callout>
 
-```ts filename="TypeScript"
+```ts filename="TypeScript" showLineNumbers
 import { createSpawnableEntity } from '@dreamlab.gg/core'
 import { z } from '@dreamlab.gg/core/sdk'
 
 // Define the arguments for this entity
+type Args = typeof ArgsSchema
 const ArgsSchema = z.object({})
 
-const createExampleEntity = createSpawnableEntity(ArgsSchema, context => ({
+interface Data {
+  // ... common data
+}
+
+interface Render {
+  // ... client-side render data
+}
+
+// The code between < > are generic types
+// They strongly type the spawnable entity and enable better IDE integration
+const createExampleEntity = createSpawnableEntity<
+  Args,
+  SpawnableEntity<Data, Render, Args>,
+  Data,
+  Render
+>(ArgsSchema, context => ({
   // ... implement all required members
 }))
 ```
@@ -106,14 +126,19 @@ export const init: InitServer = game => {
 
 {/* TODO: Flesh out */}
 
-- `init` -> called on spawn, client & server
-- `initRenderContext` -> called after init, client only
+- `init` -> called on spawn, required, client & server
+- `initRenderContext` -> called after init, required, client only
 - `onArgsUpdate` -> called when args change, client & server
 - `onResize` -> called from `game.resize()`
 - `onPhysicsStep` -> called every physics step, client & server
 - `onRenderFrame` -> called every frame, client only
-- `teardownRenderContext` -> called on destroy, client only
-- `teardown` -> called after `teardownRenderContext`, client & server
+- `teardownRenderContext` -> called on destroy, required, client only
+- `teardown` -> called after `teardownRenderContext`, required, client & server
+
+### Other Methods
+
+- `rectangleBounds`
+- `isPointInside`
 
 ---
 
