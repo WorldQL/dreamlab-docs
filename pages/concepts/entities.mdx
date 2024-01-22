@@ -36,6 +36,8 @@ const createExampleEntity = createSpawnableEntity(ArgsSchema, context => ({
 }))
 ```
 
+{/* TODO: Add docs on how data dependencies work */}
+
 ### Registering
 
 Spawnable Entities must be registered with the `game` instance in order for them to be created by name.
@@ -99,6 +101,19 @@ export const init: InitServer = game => {
   })
 }
 ```
+
+### Lifecycle
+
+{/* TODO: Flesh out */}
+
+- `init` -> called on spawn, client & server
+- `initRenderContext` -> called after init, client only
+- `onArgsUpdate` -> called when args change, client & server
+- `onResize` -> called from `game.resize()`
+- `onPhysicsStep` -> called every physics step, client & server
+- `onRenderFrame` -> called every frame, client only
+- `teardownRenderContext` -> called on destroy, client only
+- `teardown` -> called after `teardownRenderContext`, client & server
 
 ---
 
