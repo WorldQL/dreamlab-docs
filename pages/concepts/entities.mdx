@@ -9,6 +9,7 @@ In Dreamlab, entities are any object in the world. They can move, have physics a
 The best way to learn the anatomy of an entity is an example. Below are some sample entities of varying complexity.
 
 ## Example 1 - Bouncing Ball
+
 This is a simple 2D bouncing ball.
 
 ```js
@@ -104,8 +105,11 @@ export const createTestBall = createSpawnableEntity(
   },
 )
 ```
+
 ### Registering Entities
+
 All entities need to be registered with the Dreamlab engine before they can be used. This is done in the `sharedInit` function that runs on both the client and the server.
+
 ```js
 export const sharedInit = async game => {
   // register testBall
@@ -114,13 +118,16 @@ export const sharedInit = async game => {
   await game.spawnMany(...level)
 }
 ```
+
 ### Spawning Entities
+
 For this example, we want our bouncy ball to be synced between the client and server and also spawn over time.
+
 ```js
 import { sharedInit } from './shared.js'
 
 function randInt(min, max) {
-  return Math.floor(Math.random() * (max - min)) + min;
+  return Math.floor(Math.random() * (max - min)) + min
 }
 
 /** @type {import('@dreamlab.gg/core/sdk').InitServer} */
@@ -137,20 +144,21 @@ export const init = async game => {
         args: [randInt(20, 150)],
         // Spawn the ball at a random x coordinate between -600 and 600
         transform: { position: [randInt(-600, 600), -700] },
-        // Give the ball a "net/replicated" tag to automatically sync it between clients 
+        // Give the ball a "net/replicated" tag to automatically sync it between clients
         tags: ['net/replicated'],
       })
-    }, i * 1000);
+    }, i * 1000)
   }
 }
 ```
 
 These are the results when connecting on two clients. Notice the physics simulation is seamlessly synced:
 
-import TestBallDemoVideo from '@site/static/video/testBall demo.mp4';
+import TestBallDemoVideo from '@site/static/video/testBall demo.mp4'
 
-<video style={{"width": "100%"}} controls src={TestBallDemoVideo}></video>
+<video style={{ width: '100%' }} controls src={TestBallDemoVideo}></video>
 
 ## Example 2 - Mob with Health Bar
+
 Suppose we want to create a mob which players using the default character controller can attack.
 TODO: Finish

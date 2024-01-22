@@ -24,32 +24,32 @@ You can use custom events for any scenario in your game. For example, let's say 
 // write an interface to type your custom event
 interface MyExampleGameEvents {
   // you can optionally prefix your event names to make sure they don't collide with other content
-  "@MyGame/iceBossDeath": [lastHit: Player];
-  "@MyGame/playerEarnedXP": [player: Player, amount: number];
+  '@MyGame/iceBossDeath': [lastHit: Player]
+  '@MyGame/playerEarnedXP': [player: Player, amount: number]
 }
 
 // Declare a variable to represent your custom events.
-const myEvents = game.events.custom as EventEmitter<MyExampleGameEvents>;
+const myEvents = game.events.custom as EventEmitter<MyExampleGameEvents>
 
 // Listen for the boss death event
-myEvents.on("@MyGame/iceBossDeath", (player) => {
+myEvents.on('@MyGame/iceBossDeath', player => {
   // give the player 100 xp
-  myEvents.emit("@MyGame/playerEarnedXP", player, 1000);
-});
+  myEvents.emit('@MyGame/playerEarnedXP', player, 1000)
+})
 
 // Listen for the player earning XP event.
-myEvents.on("@MyGame/playerEarnedXP", async (player, amount) => {
+myEvents.on('@MyGame/playerEarnedXP', async (player, amount) => {
   // Update player's XP.
   // Events are great here because this requires async key-value DB operations
-  
-  let playerXP = amount;
-  const oldXP = await kv.player(player.id).get("XP");
+
+  let playerXP = amount
+  const oldXP = await kv.player(player.id).get('XP')
   if (oldXP) {
-    playerXP += parseFloat(oldXP);
+    playerXP += parseFloat(oldXP)
   }
 
-  await kv.player(player.id).set("XP", xpReward);
+  await kv.player(player.id).set('XP', xpReward)
 
   // Now we can update UI, etc...
-});
+})
 ```
