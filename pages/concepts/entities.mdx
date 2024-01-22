@@ -8,7 +8,7 @@ The best way to learn the anatomy of an entity is an example. Below are some sam
 
 This is a simple 2D bouncing ball.
 
-```js
+```ts filename="TypeScript"
 import { createSpawnableEntity } from '@dreamlab.gg/core'
 import { Vec, toDegrees, toRadians } from '@dreamlab.gg/core/math'
 import { drawCircle } from '@dreamlab.gg/core/utils'
@@ -106,7 +106,7 @@ export const createTestBall = createSpawnableEntity(
 
 All entities need to be registered with the Dreamlab engine before they can be used. This is done in the `sharedInit` function that runs on both the client and the server.
 
-```js
+```ts filename="TypeScript"
 export const sharedInit = async game => {
   // register testBall
   game.register('testBall', createTestBall)
@@ -119,7 +119,7 @@ export const sharedInit = async game => {
 
 For this example, we want our bouncy ball to be synced between the client and server and also spawn over time.
 
-```js
+```ts filename="TypeScript"
 import { sharedInit } from './shared.js'
 
 function randInt(min, max) {

@@ -4,8 +4,8 @@ Key/value storage for your game makes it easy to persist data about players and 
 
 Suppose you want to implement an XP system for an RPG.
 
-```js
+```ts filename="TypeScript"
 function onPlayerKilledMob() {
-    await kv.world.set(KV_KEY, newGlobalPlays.toString())
+  await kv.world.set(KV_KEY, newGlobalPlays.toString())
 }
 ```
