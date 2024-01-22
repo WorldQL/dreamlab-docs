@@ -3,6 +3,11 @@ import { DocsThemeConfig } from 'nextra-theme-docs'
 
 const config: DocsThemeConfig = {
   logo: <b>Dreamlab Documentation</b>,
+  useNextSeoProps() {
+    return {
+      titleTemplate: '%s – Dreamlab Docs',
+    }
+  },
   project: {
     link: 'https://github.com/WorldQL/dreamlab-core',
   },
