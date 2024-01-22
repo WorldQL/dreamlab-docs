@@ -1,53 +1,53 @@
 // @ts-check
 // Note: type annotations allow type checking and IDEs autocompletion
 
-const lightCodeTheme = require('prism-react-renderer/themes/github');
-const darkCodeTheme = require('prism-react-renderer/themes/dracula');
+const { themes } = require("prism-react-renderer");
+const lightCodeTheme = themes.github;
+const darkCodeTheme = themes.dracula;
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
-  title: 'Dreamlab Documentation',
-  tagline: 'Create multiplayer games fast!',
-  favicon: 'img/favicon.ico',
+  title: "Dreamlab Documentation",
+  tagline: "Create multiplayer games fast!",
+  favicon: "img/favicon.ico",
 
   // Set the production url of your site here
-  url: 'https://docs.dreamlab.gg',
+  url: "https://docs.dreamlab.gg",
   // Set the /<baseUrl>/ pathname under which your site is served
   // For GitHub pages deployment, it is often '/<projectName>/'
-  baseUrl: '/',
+  baseUrl: "/",
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
   // organizationName: 'facebook', // Usually your GitHub org/user name.
   // projectName: 'docusaurus', // Usually your repo name.
 
-  onBrokenLinks: 'throw',
-  onBrokenMarkdownLinks: 'warn',
+  onBrokenLinks: "throw",
+  onBrokenMarkdownLinks: "warn",
 
   // Even if you don't use internalization, you can use this field to set useful
   // metadata like html lang. For example, if your site is Chinese, you may want
   // to replace "en" with "zh-Hans".
   i18n: {
-    defaultLocale: 'en',
-    locales: ['en'],
+    defaultLocale: "en",
+    locales: ["en"],
   },
 
   presets: [
     [
-      'classic',
+      "classic",
       /** @type {import('@docusaurus/preset-classic').Options} */
       ({
         docs: {
-          routeBasePath: '/',
-          sidebarPath: require.resolve('./sidebars.js'),
+          routeBasePath: "/",
+          sidebarPath: require.resolve("./sidebars.js"),
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
-          editUrl:
-            'https://github.com/WorldQL/dreamlab-docs/tree/trunk',
+          editUrl: "https://github.com/WorldQL/dreamlab-docs/tree/trunk",
         },
         blog: false,
         theme: {
-          customCss: require.resolve('./src/css/custom.css'),
+          customCss: require.resolve("./src/css/custom.css"),
         },
       }),
     ],
@@ -57,43 +57,43 @@ const config = {
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
       // Replace with your project's social card
-      image: 'img/docusaurus-social-card.jpg',
+      image: "img/docusaurus-social-card.jpg",
       navbar: {
-        title: 'Dreamlab Documentation',
+        title: "Dreamlab Documentation",
         logo: {
-          alt: 'My Site Logo',
-          src: 'img/logo.svg',
+          alt: "My Site Logo",
+          src: "img/logo.svg",
         },
         items: [
           {
-            href: 'https://app.dreamlab.gg/',
-            label: 'Open Dreamlab Editor',
-            position: 'right',
+            href: "https://app.dreamlab.gg/",
+            label: "Open Dreamlab Editor",
+            position: "right",
           },
         ],
       },
       footer: {
-        style: 'dark',
+        style: "dark",
         links: [
           {
-            title: 'Community',
+            title: "Community",
             items: [
               {
-                label: 'Discord',
-                href: 'https://discordapp.com/invite/docusaurus',
+                label: "Discord",
+                href: "https://discordapp.com/invite/docusaurus",
               },
               {
-                label: 'Twitter',
-                href: 'https://twitter.com/docusaurus',
+                label: "Twitter",
+                href: "https://twitter.com/docusaurus",
               },
             ],
           },
           {
-            title: 'More',
+            title: "More",
             items: [
               {
-                label: 'GitHub',
-                href: 'https://github.com/WorldQL/dreamlab-core',
+                label: "GitHub",
+                href: "https://github.com/WorldQL/dreamlab-core",
               },
             ],
           },
