@@ -4,8 +4,7 @@ Draw still images, parallax backgrounds, and basic geometry with Dreamlab's grap
 
 To draw a box, you can insert the following into `initRenderContext` for an entity:
 
-```typescript
-
+```ts filename="TypeScript"
 initRenderContext (_, { camera, stage }) {
   const container = new Container();
   container.sortableChildren = true;
