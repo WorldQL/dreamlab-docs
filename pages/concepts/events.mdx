@@ -1,55 +1,63 @@
+import { Callout } from 'nextra/components'
+
 # Events
 
-Dreamlab's engine uses events to notify code of things happening in the game world.
+## Built-in Events
 
-There are several events built-in. Here are some examples and when they're emitted:
+In addition to using Entities, you can also respond to events emitted by Dreamlab in order to run code in the world.
+These can be accessed using the Event Manager at `game.events`.
 
-- Client only
-  - `onRenderFrame`, a frame is rendered
-- Server only
-  - `onPlayerJoin`, a player connects
-  - `onPlayerQuit`, a player disconnects
-- Common (client and server)
-  - `onInstantiate`, an entity is instantiated. Only used for camera, cursor, and the default player entities
-  - `onSpawn`, an entity is spawned that was defined using `createSpawnableEntity`
-  - `onDestroy`, an entity is destroyed and removed from the level
+Events are split into three categories: client, server, and common. Client and Server events only fire on their respective platform,
+whereas common events are triggered on both.
 
-[You can view a full list of all built-in events and their payload types here](https://github.com/WorldQL/dreamlab-core/blob/trunk/src/events.ts).
+Some common events include:
+
+| Event           | Category | Description                                                    |
+| --------------- | -------- | -------------------------------------------------------------- |
+| `onInstantiate` | Common   | Fires when entities (including spawnable entities) are created |
+| `onSpawn`       | Common   | Fires when Spawnable Entities are created                      |
+| `onDestroy`     | Common   | Fires when entities are destroyed                              |
+| `onRenderFrame` | Client   | Fires on every frame (after all entities have run)             |
+| `onPhysicsStep` | Common   | Fires on every physics tick (after all entities have run)      |
+
+<Callout>
+  You can view a full list of built-in events and their types in the
+  [@dreamlab.gg/core](https://github.com/WorldQL/dreamlab-core/blob/trunk/src/events.ts)
+  repo.
+</Callout>
 
 ## Custom Events
 
-You can use custom events for any scenario in your game. For example, let's say you had an RPG with an "Ice Boss" monster and you wanted to give the player that delivered the final blow some XP.
+We recommend using the event pattern in your world scripts to allow easy communication between entities.
+Be aware that event emitters are not synced over the network and events will only be able to be read on
+the platform they were emitted on.
 
-```ts filename="TypeScript"
-// write an interface to type your custom event
-interface MyExampleGameEvents {
-  // you can optionally prefix your event names to make sure they don't collide with other content
-  '@MyGame/iceBossDeath': [lastHit: Player]
-  '@MyGame/playerEarnedXP': [player: Player, amount: number]
+```ts filename="events.ts"
+import { EventEmitter } from '@dreamlab.gg/core/events'
+
+interface Events {
+  // Define your events in an interface
+  onCustomEvent: [arg: string, arg2: number]
 }
 
-// Declare a variable to represent your custom events.
-const myEvents = game.events.custom as EventEmitter<MyExampleGameEvents>
+// Export your event emitter for use in your world scripts
+export const events = new EventEmitter<Events>()
+```
 
-// Listen for the boss death event
-myEvents.on('@MyGame/iceBossDeath', player => {
-  // give the player 100 xp
-  myEvents.emit('@MyGame/playerEarnedXP', player, 1000)
-})
+```ts filename="entity.ts"
+import { events } from './events.ts'
 
-// Listen for the player earning XP event.
-myEvents.on('@MyGame/playerEarnedXP', async (player, amount) => {
-  // Update player's XP.
-  // Events are great here because this requires async key-value DB operations
+// Emit events
+events.emit('onCustomEvent', 'myString', 10)
 
-  let playerXP = amount
-  const oldXP = await kv.player(player.id).get('XP')
-  if (oldXP) {
-    playerXP += parseFloat(oldXP)
-  }
-
-  await kv.player(player.id).set('XP', xpReward)
-
-  // Now we can update UI, etc...
+// Respond to event
+events.addListener('onCustomEvent', (arg1, arg2) => {
+  // ...
 })
 ```
+
+<Callout>
+  Dreamlab's `EventEmitter` is a re-export of from the
+  [`eventemitter3`](https://www.npmjs.com/package/eventemitter3) package. For
+  more information refer to their documentation.
+</Callout>
