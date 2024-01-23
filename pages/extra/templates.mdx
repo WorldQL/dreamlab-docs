@@ -57,3 +57,75 @@ export const createExampleEntity = () => {
   return entity
 }
 ```
+
+## Blank Spawnable Entity
+
+```ts filename="TypeScript" showLineNumbers
+import { createSpawnableEntity } from '@dreamlab.gg/core'
+import type { SpawnableEntity } from '@dreamlab.gg/core'
+import { z } from 'zod'
+
+type Args = typeof ArgsSchema
+const ArgsSchema = z.object({
+  /// ... define args
+})
+
+interface Data {
+  // ...
+}
+
+interface Render {
+  // ...
+}
+
+export const createExampleSpawnableEntity = createSpawnableEntity<
+  Args,
+  SpawnableEntity<Data, Render, Args>,
+  Data,
+  Render
+>(ArgsSchema, (ctx, args) => ({
+  rectangleBounds() {
+    // TODO: implement this correctly
+    return undefined
+  },
+
+  isPointInside(position) {
+    // TODO: implement this correctly
+    return false
+  },
+
+  init(ctx) {
+    // ... initialize and return common data
+    return {}
+  },
+
+  initRenderContext(ctx, render) {
+    // ... initialize graphics and return render data
+    return {}
+  },
+
+  onArgsUpdate(path, previous, data, render) {
+    // ... respond to args changing
+  },
+
+  onResize({ width, height }) {
+    // ... respond to width / height changing
+  },
+
+  teardown({}) {
+    // ... teardown common data
+  },
+
+  teardownRenderContext({}) {
+    // ... teardown render data
+  },
+
+  onPhysicsStep(time, data) {
+    // ...
+  },
+
+  onRenderFrame(time, data, render) {
+    // ...
+  },
+}))
+```
