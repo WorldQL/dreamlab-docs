@@ -1,4 +1,59 @@
+import { Callout } from 'nextra/components'
+
 # Templates
 
-- basic entity
-- basic spawnable entity
+## Blank Entity
+
+<Callout>
+  See the concepts page for [Entities](../concepts/entities.mdx) for the
+  difference between **Entities** and **_Spawnable_ Entitites**.
+</Callout>
+
+```ts filename="TypeScript" showLineNumbers
+import { createEntity } from '@dreamlab.gg/core'
+import type { Entity } from '@dreamlab.gg/core'
+
+interface Data {
+  // ...
+}
+
+interface Render {
+  // ...
+}
+
+interface ExampleEntity extends Entity<Data, Render> {
+  // ...
+}
+
+export const createExampleEntity = () => {
+  const entity: ExampleEntity = createEntity({
+    init(ctx) {
+      // ... initialize and return common data
+      return {}
+    },
+
+    initRenderContext(ctx, render) {
+      // ... initialize graphics and return render data
+      return {}
+    },
+
+    teardown({}) {
+      // ... teardown common data
+    },
+
+    teardownRenderContext({}) {
+      // ... teardown render data
+    },
+
+    onPhysicsStep(time, data) {
+      // ...
+    },
+
+    onRenderFrame(time, data, render) {
+      // ...
+    },
+  })
+
+  return entity
+}
+```
