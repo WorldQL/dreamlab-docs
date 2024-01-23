@@ -3,9 +3,11 @@ import { DocsThemeConfig } from 'nextra-theme-docs'
 
 const config: DocsThemeConfig = {
   logo: <b>Dreamlab Documentation</b>,
+  head: null,
   useNextSeoProps() {
     return {
       titleTemplate: '%s – Dreamlab Docs',
+      description: 'Create multiplayer games fast!',
     }
   },
   project: {
