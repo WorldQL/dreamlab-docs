@@ -3,7 +3,7 @@
   "physics": "Physics",
   "graphics": "Graphics",
   "events": "Events",
-  "input": "Input",
+  "inputs": "Inputs",
   "animated-sprites": "Animated Sprites",
   "key-value": "Saving Data",
   "multiplayer": "Multiplayer",
