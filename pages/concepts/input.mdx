@@ -1,3 +1,62 @@
-# Input
+import { Callout } from 'nextra/components'
 
-Respond to player input with a familiar API.
+# Inputs
+
+{/* TODO: Word this better */}
+Dreamlab offers a flexible system for responding to player input, providing a simple way to listen to incoming input events and
+automatically adds your game's inputs to our input binding UI.
+
+## Registering Inputs
+
+Inputs can be referenced either by Input Code, which corresponds to keyboard or mouse inputs, or by registering a named input with the input system.
+The advantage of named inputs is that they are automatically picked up by Dreamlab's UI and allows players to set custom key binds.
+
+<Callout>
+  View a full list of available input codes
+  [here](https://github.com/WorldQL/dreamlab-core/blob/trunk/src/input/inputcode.ts).
+</Callout>
+
+Registering an input should be done as early as possible, usually this is done inside of an entities `init()` function.
+**Since the input system is only available on the client, you need to check that it is available first.**
+
+Registering an input requires a unique identifier, a human readable label, and a default keybind. The human readable name will be used for the automatic rebinding UI.
+As with Spawnable Entities, we recommend namespacing input identifiers using a similar `@entity/input` format, but again this is just a convention.
+
+<Callout type='info'>
+  We recommend using a [string
+  enum](https://www.typescriptlang.org/docs/handbook/enums.html#string-enums) to
+  define input identifiers in a type-safe way.
+</Callout>
+
+```ts filename="TypeScript"
+// Define inputs with a string enum
+enum ExampleInput {
+  MyInput = '@example/my-input',
+  MyOtherInput = '@example/my-other-input',
+}
+
+export const createExampleInputs = createSpawnableEntity(
+  z.object({}),
+  (ctx, args) => ({
+    // ... clipped
+
+    init({ game }) {
+      const inputs = game.client?.inputs
+      if (inputs) {
+        inputs.registerInput(ExampleInput.MyInput, 'My Input', 'KeyG')
+        inputs.registerInput(ExampleInput.MyOtherInput, 'Other Input', 'KeyH')
+
+        // ... register more inputs
+      }
+    },
+
+    // ... clipped
+  }),
+)
+```
+
+## Responding to Inputs
+
+### Event Based
+
+### Tick Based
