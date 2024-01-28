@@ -1,3 +1,42 @@
 # User Interfaces
 
-Create user interfaces with React!
+Dreamlab allows you to create a UI layer on top of the game window using web technologies. You can use familiar DOM manipulation
+to create and update your UI.
+
+## Creating a UI Layer
+
+{/* TODO: Flavour text */}
+
+```ts filename="TypeScript"
+import type { InitClient } from '@dreamlab.gg/core/sdk'
+
+export const init: InitClient = async game => {
+  // ... initialize client
+
+  // Create a Shadow DOM root
+  const root = game.client.ui.create()
+
+  // Create a div and append it to the Shadow DOM
+  const container = document.createElement('div')
+  container.style.width = '100%'
+  container.style.height = '100%'
+  root.append(container)
+
+  // ... setup your UI and event listeners
+}
+```
+
+## Drealab UI
+
+{/* TODO: @dreamlab.gg/ui details */}
+
+https://npm.im/@dreamlab.gg/ui
+
+- exposes useful hooks
+- sets up game context
+
+## Examples
+
+### React
+
+{/* TODO: React example */}
