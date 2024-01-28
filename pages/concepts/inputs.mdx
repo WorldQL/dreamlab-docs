@@ -57,6 +57,37 @@ export const createExampleInputs = createSpawnableEntity(
 
 ## Responding to Inputs
 
+You can either poll the state of an input directly, or attatch an event listener to the input system to run code when an input state changes.
+Usually you should use event listeners, unless you want to run code that deals with physics bodies.
+
 ### Event Based
 
+{/* TODO: info about callback */}
+
+```ts filename="TypeScript"
+// ... clipped
+
+init({ game }) {
+  const inputs = game.client?.inputs
+  if (inputs) {
+    inputs.registerInput(ExampleInput.MyInput, 'My Input', 'KeyG')
+
+    // Listen to keys directly
+    inputs.addListener('Space', (pressed: boolean) => {
+      // ...
+    })
+
+    // Listen to named inputs
+    // Inputs must be registered first
+    inputs.addListener(ExampleInput.MyInput, (pressed: boolean) => {
+      // ...
+    })
+  }
+},
+
+// ... clipped
+```
+
 ### Tick Based
+
+{/* TODO: Tick based event example */}
