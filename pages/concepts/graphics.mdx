@@ -7,29 +7,109 @@ import { Callout } from 'nextra/components'
   Anything you can draw with Pixi you can draw in Dreamlab.
 </Callout>
 
-Draw still images, parallax backgrounds, and basic geometry with Dreamlab's graphics library.
+## Best Practices
 
-To draw a box, you can insert the following into `initRenderContext` for an entity:
+For best performance, you should avoid re-drawing any graphical elements that don't change from one frame to the next other than their position or rotation,
+and instead draw them when they are initialized or when they change, and update their position every frame.
+
+If you have multiple graphics elements that share the same position relative to each other, you should group them using a [`Container`](https://pixijs.download/dev/docs/PIXI.Container.html).
+
+<Callout type='warning'>
+  Make sure you call `destroy()` on any graphics objects in
+  `teardownRenderContext()` to free any resources used, otherwise you may run
+  into memory leaks or other performance issues.
+</Callout>
 
 ```ts filename="TypeScript"
-initRenderContext (_, { camera, stage }) {
-  const container = new Container();
-  container.sortableChildren = true;
-  container.zIndex = zIndex;
-  const graphics = new Graphics();
-  graphics.zIndex = zIndex;
+import { Vec } from '@dreamlab.gg/core/math'
+import { Container } from 'pixi.js'
 
-  drawBox(graphics, { width, height }, { stroke: "#00f" });
-  container.addChild(graphics);
+export const createExampleInputs = createSpawnableEntity(
+  z.object({}),
+  ({ transform, zIndex }, args) => ({
+    // ... clipped
 
-  stage.addChild(container);
-  return {
-    camera,
-    container,
-    graphics,
-    sprite,
-  };
-}
+    initRenderContext(_, { camera, stage }) {
+      // Create a Container to group any graphics objects
+      const container = new Container()
+      // Enable sorting and set the container z-index
+      container.sortableChildren = true
+      container.zIndex = zIndex
+
+      // Update the container z-index when it changes
+      transform.addZIndexListener(() => {
+        container.zIndex = transform.zIndex
+      })
+
+      // Add the container to the main graphics stage
+      stage.addChild(container)
+
+      // ... create any other graphics objects and add them to the stage
+      // ... with container.addChild(..)
+
+      // Return a reference to all graphics objects (and the camera)
+      return { camera, container }
+    },
+
+    onRenderFrame({ delta, time, smooth }, _, { camera, container }) {
+      // Calculate the position in screen-space
+      const pos = Vec.add(transform.position, camera.offset)
+
+      // Set the position and rotation
+      container.position = pos
+      container.angle = transform.rotation
+    },
+
+    teardownRenderContext({ container }) {
+      // Destroy the container and its children
+      container.destroy({ children: true })
+    },
+
+    // ... clipped
+  }),
+)
 ```
 
-`drawBox` is a utility function that is passed a pixi.js Graphics object. You can see all the graphics utility functions [here](https://github.com/WorldQL/dreamlab-core/blob/trunk/src/utils/draw.ts).
+## Utilities
+
+Dreamlab has a handful of utility functions to allow you to more easily draw basic shapes, and instantiate Pixi.js sprites.
+
+### Basic Shapes
+
+Utility functions to draw basic shapes into Pixi.js [`Graphics`]() primitives.
+You can see the full list of them and their arguments [here](https://github.com/WorldQL/dreamlab-core/blob/trunk/src/utils/draw.ts).
+
+```ts
+import { drawBox, drawCircle } from '@dreamlab.gg/core'
+import { Container, Graphics } from 'pixi.js'
+
+// ... clipped
+
+initRenderContext(_, { camera, stage }) {
+  const container = new Container()
+  // ... clipped
+
+  // Draw a basic rectangle outline
+  const box = new Graphics()
+  container.addChild(box)
+  drawBox(box, { width: 100, height: 50 })
+
+  // Draw a blue filled-in circle
+  const circle = new Graphics()
+  container.addChild(circle)
+  drawCircle(
+    circle,
+    { radius: 25 },
+    { strokeAlpha: 0, fillAlpha: 1, fill = 'blue' },
+  )
+
+  // ... clipped
+  return { camera, container, box, circle }
+},
+
+// ... clipped
+```
+
+### Sprites
+
+{/* TODO: Sprites */}
