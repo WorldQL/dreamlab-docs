@@ -79,11 +79,11 @@ Dreamlab has a handful of utility functions to allow you to more easily draw bas
 
 ### Basic Shapes
 
-Utility functions to draw basic shapes into Pixi.js [`Graphics`]() primitives.
+Utility functions to draw basic shapes into Pixi.js [`Graphics`](https://pixijs.download/dev/docs/PIXI.Graphics.html) primitives.
 You can see the full list of them and their arguments [here](https://github.com/WorldQL/dreamlab-core/blob/trunk/src/utils/draw.ts).
 
-```ts
-import { drawBox, drawCircle } from '@dreamlab.gg/core'
+```ts filename="TypeScript"
+import { drawBox, drawCircle } from '@dreamlab.gg/core/utils'
 import { Container, Graphics } from 'pixi.js'
 
 // ... clipped
@@ -115,4 +115,40 @@ initRenderContext(_, { camera, stage }) {
 
 ### Sprites
 
-{/* TODO: Sprites */}
+While creating Pixi.js [Sprites](https://pixijs.download/dev/docs/PIXI.Sprite.html) is fairly trivial to do manually, Dreamlab has a helper
+that can handle sprite tiling and anchoring with a quick one-liner.
+
+<Callout>
+  Animated Sprites have their own dedicated [docs page](./animated-sprites.mdx).
+</Callout>
+
+```ts filename="TypeScript"
+import { createSprite } from '@dreamlab.gg/core/textures'
+import { Container, Graphics } from 'pixi.js'
+
+// ... clipped
+
+initRenderContext(_, { camera, stage }) {
+  const container = new Container()
+  // ... clipped
+
+  // Create a sprite from a URL
+  const sprite = createSprite(
+    {
+      url: '...',
+      // tile: true,
+      // tileScale: 1,
+    },
+    {
+      width: 100,
+      height: 100,
+      // zIndex: 0,
+    },
+  )
+
+  // ... clipped
+  return { camera, container, sprite }
+},
+
+// ... clipped
+```
