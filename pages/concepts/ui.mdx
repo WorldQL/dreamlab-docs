@@ -1,3 +1,4 @@
+import { Callout } from 'nextra/components'
 import { UnderConstruction } from '~/components/under-construction'
 
 # User Interfaces
@@ -32,15 +33,64 @@ export const init: InitClient = async game => {
 
 ## Drealab UI
 
-{/* TODO: @dreamlab.gg/ui details */}
+Dreamlab UI is a separate package dedicated to making common UI patterns easier. **Currently only React is supported.**
+The package is published on npm as [`@dreamlab.gg/ui`](https://www.npmjs.com/package/@dreamlab.gg/ui)
+and is available by default in the Dreamlab scripting runtime.
 
-https://npm.im/@dreamlab.gg/ui
+Dreamlab UI React exposes many hooks that allow you to get references to game state in a react-safe way, such that they trigger
+re-renders when their state changes. This requires some setup internally, so it also provides a `renderUI` function that takes
+care of all the UI setup and state tracking for you.
 
-- exposes useful hooks
-- sets up game context
+<Callout>See the React example [below](#react).</Callout>
+
+### React Hooks
+
+{/* TODO: Flavour text */}
+
+<Callout type='info'>
+  For a full list of hooks, consult the
+  [source](https://github.com/WorldQL/dreamlab-ui/tree/trunk/src/react/hooks).
+</Callout>
+
+| Hook Signature                                       | Description                                                           |
+| ---------------------------------------------------- | --------------------------------------------------------------------- |
+| `useGame(): Game`                                    | Returns a reference to the current `Game`                             |
+| `usePlayer(): Player`                                | Returns a reference to the player                                     |
+| `useCamera(): Camera`                                | Returns a reference to the camera                                     |
+| `useEntities(): readonly Entity[]`                   | Returns a list of all current entities (including spawnable entities) |
+| `useSpawnableEntities(): readonly SpawnableEntity[]` | Returns a list of **only** spawnable entities                         |
 
 ## Examples
 
 ### React
 
-{/* TODO: React example */}
+```tsx filename="TSX"
+import type { InitClient } from '@dreamlab.gg/core/sdk'
+import { renderUI } from '@dreamlab.gg/ui/react'
+
+const Root = () => {
+  return <div>Hello React!</div>
+}
+
+export const init: InitClient = async game => {
+  // ... initialize client
+
+  // Render React using Dreamlab UI
+  renderUI(game, <Root />)
+}
+```
+
+### React with Styled Components
+
+Using CSS-in-JS libraries can drastically reduce complexity introduced by styling your UI.
+
+{/* TODO: React + Styled Components example */}
+
+## Native UI
+
+It is also possible to create UI using Pixi.js natively, although this is not recommended due to the complexity with
+drawing using Pixi.js and managing inputs.
+
+<Callout>
+  See the dedicated page on [Graphics](./graphics.mdx) for more info.
+</Callout>
