@@ -60,6 +60,48 @@ care of all the UI setup and state tracking for you.
 | `useEntities(): readonly Entity[]`                   | Returns a list of all current entities (including spawnable entities) |
 | `useSpawnableEntities(): readonly SpawnableEntity[]` | Returns a list of **only** spawnable entities                         |
 
+## Styling
+
+### CSS Files
+
+You can use CSS files included in your world scripts in order to style your UI. Dreamlab UI provides a simple `css` utility
+to add a CSS file to the shadow DOM.
+
+<Callout>
+  See the [Scripting](./scripting.mdx#static-assets) page for more information
+  on using static assets with `world://` URLs.
+</Callout>
+
+```css filename="public/styles.css"
+h1 {
+  font-family: 'Comic Sans MS';
+}
+```
+
+```ts filename="src/client.ts"
+import type { InitClient } from '@dreamlab.gg/core/sdk'
+import { css } from '@dreamlab.gg/ui'
+
+export const init: InitClient = async game => {
+  // ... initialize client
+
+  const root = game.client.ui.create()
+  // Add your CSS file to the shadow DOM
+  css(root, 'world://public/styles.css')
+
+  const header = document.createElement('h1')
+  header.textContent = 'Hello World!'
+  root.append(header)
+
+  // ...
+}
+```
+
+### CSS-in-JS
+
+You can also use CSS-in-JS libraries to make styling easier when using UI libraries such as React.
+{/* TODO: css in js info */}
+
 ## Examples
 
 ### React
