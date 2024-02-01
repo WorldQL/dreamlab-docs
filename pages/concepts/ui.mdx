@@ -12,7 +12,7 @@ to create and update your UI.
 
 {/* TODO: Flavour text */}
 
-```ts filename="TypeScript"
+```ts filename="TypeScript" {1,6-7,9-13}
 import type { InitClient } from '@dreamlab.gg/core/sdk'
 
 export const init: InitClient = async game => {
@@ -83,7 +83,7 @@ h1 {
 }
 ```
 
-```ts filename="src/client.ts"
+```ts filename="src/client.ts" {2,8-9}
 import type { InitClient } from '@dreamlab.gg/core/sdk'
 import { css } from '@dreamlab.gg/ui'
 
@@ -111,7 +111,7 @@ You can also use CSS-in-JS libraries to make styling easier when using UI librar
 
 ### React
 
-```tsx filename="TSX"
+```tsx filename="TSX" {2,4-6,11-12}
 import type { InitClient } from '@dreamlab.gg/core/sdk'
 import { renderUI } from '@dreamlab.gg/ui/react'
 
