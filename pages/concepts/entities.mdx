@@ -127,14 +127,34 @@ export const init: InitServer = game => {
 
 ### Lifecycle
 
-{/* TODO: Flesh out */}
+Spawnable entities have a number of methods related to their lifecycle that will be called by Dreamlab that you are required to implement.
 
-- `init` -> called on spawn, required, client & server
-- `initRenderContext` -> called after init, required, client only
+#### Initialization
+
+Entity initialization is split into two methods, `init()` for common code across both client and server, and `initRenderContext()` for client-only code.
+You should initialize physics and other general data required on both client and server inside of `init()`, and initialize anything that can only run
+on the client (most notably [Graphics](./graphics.mdx)) inside of `initRenderContext()`.
+
+Both return an object that can contain references to any data you initialize, and this will be passed in automatically to other lifecycle methods.
+These can be strongly typed using the `Data` and `Render` generic types on `createSpawnableEntity()`. See [Defining](#defining) for more info.
+
+<Callout>
+  You can also access these data references using the `dataManager` utility.
+  More documentation on this will be coming soon.
+</Callout>
+
+#### Updates
+
 - `onArgsUpdate` -> called when args change, client & server
 - `onResize` -> called from `game.resize()`
+
+#### Tick Loops
+
 - `onPhysicsStep` -> called every physics step, client & server
 - `onRenderFrame` -> called every frame, client only
+
+#### Destruction
+
 - `teardownRenderContext` -> called on destroy, required, client only
 - `teardown` -> called after `teardownRenderContext`, required, client & server
 
