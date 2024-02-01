@@ -31,7 +31,7 @@ As with Spawnable Entities, we recommend namespacing input identifiers using a s
   define input identifiers in a type-safe way.
 </Callout>
 
-```ts filename="TypeScript"
+```ts filename="TypeScript" {1-5,13-19}
 // Define inputs with a string enum
 enum ExampleInput {
   MyInput = '@example/my-input',
@@ -70,7 +70,7 @@ Usually you should use event listeners, unless you want to run code that deals w
 Input events are fired when the input `pressed` state changes, and this state is passed in to event handlers as a boolean argument.
 Make sure you only respond to the event for one state or your code will execute twice, once when the input is pressed and once when gets released.
 
-```ts filename="TypeScript"
+```ts filename="TypeScript" {6,8-14,16-20}
 // ... clipped
 
 init({ game }) {
@@ -101,7 +101,7 @@ init({ game }) {
 
 ### Tick Based
 
-```ts filename="TypeScript"
+```ts filename="TypeScript" {6-7,9-10}
 // ... clipped
 
 function onPhysicsStep({ time, delta }, { game }) {
