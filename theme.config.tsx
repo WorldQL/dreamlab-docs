@@ -1,14 +1,25 @@
 import React from 'react'
-import { DocsThemeConfig } from 'nextra-theme-docs'
+import { useConfig } from 'nextra-theme-docs'
+import type { DocsThemeConfig } from 'nextra-theme-docs'
 
 const config: DocsThemeConfig = {
   logo: <b>Dreamlab Documentation</b>,
-  head: null,
-  useNextSeoProps() {
-    return {
-      titleTemplate: '%s – Dreamlab Docs',
-      description: 'Create multiplayer games fast!',
-    }
+  head: () => {
+    const config = useConfig()
+    const siteName = 'Dreamlab Docs'
+
+    const title = `${config.title} - ${siteName}`
+    const description = 'Create multiplayer games fast!'
+
+    return (
+      <>
+        <title>{title}</title>
+        <meta name='description' content={description} />
+
+        <meta property='og:title' content={title} />
+        <meta property='og:description' content={description} />
+      </>
+    )
   },
   project: {
     link: 'https://github.com/WorldQL/dreamlab-core',
@@ -18,7 +29,7 @@ const config: DocsThemeConfig = {
   },
   docsRepositoryBase: 'https://github.com/WorldQL/dreamlab-docs/blob/trunk',
   footer: {
-    text: `Copyright © ${new Date().getFullYear()} WorldQL Corporation`,
+    content: `Copyright © ${new Date().getFullYear()} WorldQL Corporation`,
   },
 }
 
