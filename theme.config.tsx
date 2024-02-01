@@ -2,14 +2,17 @@ import React from 'react'
 import { useConfig } from 'nextra-theme-docs'
 import type { DocsThemeConfig } from 'nextra-theme-docs'
 
+const siteName = 'Dreamlab Docs'
+const defaultDescription = 'Create multiplayer games fast!'
+
 const config: DocsThemeConfig = {
   logo: <b>Dreamlab Documentation</b>,
   head: () => {
     const config = useConfig()
-    const siteName = 'Dreamlab Docs'
+    const frontmatter = config.frontMatter
 
     const title = `${config.title} - ${siteName}`
-    const description = 'Create multiplayer games fast!'
+    const description = frontmatter.description ?? defaultDescription
 
     return (
       <>
