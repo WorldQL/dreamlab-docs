@@ -10,122 +10,96 @@ import { Callout } from 'nextra/components'
 </Callout>
 
 ```ts filename="TypeScript" showLineNumbers
-import { createEntity } from '@dreamlab.gg/core'
-import type { Entity } from '@dreamlab.gg/core'
+import { Entity } from '@dreamlab.gg/core'
 
-interface Data {
-  // ...
-}
+export class ExampleEntity extends Entity {
+  public constructor() {
+    super()
 
-interface Render {
-  // ...
-}
+    // initialize entity resources
+  }
 
-interface ExampleEntity extends Entity<Data, Render> {
-  // ...
-}
+  public teardown(): void {
+    // free any used resources (eg: graphics primitives)
+  }
 
-export const createExampleEntity = () => {
-  const entity: ExampleEntity = createEntity({
-    init(ctx) {
-      // ... initialize and return common data
-      return {}
-    },
+  public override onPhysicsStep(time: Time): void {
+    // ...
+  }
 
-    initRenderContext(ctx, render) {
-      // ... initialize graphics and return render data
-      return {}
-    },
-
-    teardown({}) {
-      // ... teardown common data
-    },
-
-    teardownRenderContext({}) {
-      // ... teardown render data
-    },
-
-    onPhysicsStep(time, data) {
-      // ...
-    },
-
-    onRenderFrame(time, data, render) {
-      // ...
-    },
-  })
-
-  return entity
+  public override onRenderFrame(time: RenderTime): void {
+    // ...
+  }
 }
 ```
 
 ## Blank Spawnable Entity
 
 ```ts filename="TypeScript" showLineNumbers
-import { createSpawnableEntity } from '@dreamlab.gg/core'
-import type { SpawnableEntity } from '@dreamlab.gg/core'
-import { z } from 'zod'
+import type {
+  PreviousArgs,
+  RenderTime,
+  SpawnableContext,
+  Time,
+} from '@dreamlab.gg/core'
+import { SpawnableEntity } from '@dreamlab.gg/core'
+import type { Bounds, Vector } from '@dreamlab.gg/core/math'
+import { z } from '@dreamlab.gg/core/sdk'
 
 type Args = typeof ArgsSchema
 const ArgsSchema = z.object({
   // ... define args
 })
 
-interface Data {
-  // ...
-}
+export class ExampleEntity extends SpawnableEntity<Args> {
+  public constructor(ctx: SpawnableContext<Args>) {
+    super(ctx)
 
-interface Render {
-  // ...
-}
+    // initialize entity resources
+  }
 
-export const createExampleSpawnableEntity = createSpawnableEntity<
-  Args,
-  SpawnableEntity<Data, Render, Args>,
-  Data,
-  Render
->(ArgsSchema, (ctx, args) => ({
-  rectangleBounds() {
+  public teardown(): void {
+    // free any used resources (eg: graphics primitives)
+  }
+
+  public bounds(): Bounds | undefined {
+    // return the bounding box size for this entity
+    // used in the dreamlab editor
+    // return undefined to signify this entity has no physical dimensions
+
     // TODO: implement this correctly
     return undefined
-  },
+  }
 
-  isPointInside(position) {
+  public isPointInside(point: Vector): boolean {
+    // test to check if a point is inside the entities hitbox
+    // used for click handling and editor selection
+
     // TODO: implement this correctly
     return false
-  },
+  }
 
-  init(ctx) {
-    // ... initialize and return common data
-    return {}
-  },
-
-  initRenderContext(ctx, render) {
-    // ... initialize graphics and return render data
-    return {}
-  },
-
-  onArgsUpdate(path, previous, data, render) {
+  public override onArgsUpdate(
+    path: string,
+    previousArgs: PreviousArgs<Args>,
+  ): void {
     // ... respond to args changing
-  },
+  }
 
-  onResize({ width, height }) {
+  public override onResize({ width, height }: Bounds): void {
     // ... respond to width / height changing
-  },
+  }
 
-  teardown({}) {
-    // ... teardown common data
-  },
+  public override onClick(position: Vector): void {
+    // ... click handler
+  }
 
-  teardownRenderContext({}) {
-    // ... teardown render data
-  },
-
-  onPhysicsStep(time, data) {
+  public override onPhysicsStep(time: Time): void {
     // ...
-  },
+  }
 
-  onRenderFrame(time, data, render) {
+  public override onRenderFrame(time: RenderTime): void {
     // ...
-  },
-}))
+  }
+}
 ```
