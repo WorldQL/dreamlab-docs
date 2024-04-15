@@ -18,59 +18,70 @@ and instead draw them when they are initialized or when they change, and update 
 If you have multiple graphics elements that share the same position relative to each other, you should group them using a [`Container`](https://pixijs.download/dev/docs/PIXI.Container.html).
 
 <Callout type='warning'>
-  Make sure you call `destroy()` on any graphics objects in
-  `teardownRenderContext()` to free any resources used, otherwise you may run
-  into memory leaks or other performance issues.
+  Make sure you call `destroy()` on any graphics objects in `teardown()` to free
+  any resources used, otherwise you may run into memory leaks or other
+  performance issues.
 </Callout>
 
 ```ts filename="TypeScript"
+import type { SpawnableContext, RenderTime } from '@dreamlab.gg/core'
+import { SpawnableEntity } from '@dreamlab.gg/core'
 import { Vec } from '@dreamlab.gg/core/math'
+import { camera, game, stage } from '@dreamlab.gg/core/labs'
+import { z } from '@dreamlab.gg/core/sdk'
 import { Container } from 'pixi.js'
 
-export const createExampleInputs = createSpawnableEntity(
-  z.object({}),
-  ({ transform, zIndex }, args) => ({
-    // ... clipped
+type Args = typeof ArgsSchema
+const ArgsSchema = z.object({})
 
-    initRenderContext(_, { camera, stage }) {
+export class ExampleGraphics extends SpawnableEntity<Args> {
+  // Field to reference the container
+  // Might be undefined when running this entity on the server
+  private readonly container: Container | undefined
+
+  public constructor(ctx: SpawnableContext<Args>) {
+    super(ctx)
+
+    // Get a client-only reference to the current game instance
+    const $game = game('client')
+    if ($game) {
+      // Run client-only init
+
       // Create a Container to group any graphics objects
-      const container = new Container()
+      this.container = new Container()
       // Enable sorting and set the container z-index
-      container.sortableChildren = true
-      container.zIndex = zIndex
+      this.container.sortableChildren = true
+      this.container.zIndex = this.transform.zIndex
 
       // Update the container z-index when it changes
-      transform.addZIndexListener(() => {
-        container.zIndex = transform.zIndex
+      this.transform.addZIndexListener(() => {
+        if (this.container) this.container.zIndex = this.transform.zIndex
       })
 
       // Add the container to the main graphics stage
-      stage.addChild(container)
+      stage().addChild(this.container)
 
       // ... create any other graphics objects and add them to the stage
-      // ... with container.addChild(..)
+      // ... with this.container.addChild(..)
+    }
+  }
 
-      // Return a reference to all graphics objects (and the camera)
-      return { camera, container }
-    },
+  public teardown(): void {
+    // Destroy the container and its children (if it exists)
+    this.container?.destroy({ children: true })
+  }
 
-    onRenderFrame({ delta, time, smooth }, _, { camera, container }) {
-      // Calculate the position in screen-space
-      const pos = Vec.add(transform.position, camera.offset)
+  public override onRenderFrame({ delta, time, smooth }: RenderTime): void {
+    // Calculate the position in screen-space
+    const pos = Vec.add(this.transform.position, camera().offset)
 
+    if (this.container) {
       // Set the position and rotation
-      container.position = pos
-      container.angle = transform.rotation
-    },
-
-    teardownRenderContext({ container }) {
-      // Destroy the container and its children
-      container.destroy({ children: true })
-    },
-
-    // ... clipped
-  }),
-)
+      this.container.position = pos
+      this.container.angle = this.transform.rotation
+    }
+  }
+}
 ```
 
 ## Utilities
@@ -83,34 +94,59 @@ Utility functions to draw basic shapes into Pixi.js [`Graphics`](https://pixijs.
 You can see the full list of them and their arguments [here](https://github.com/WorldQL/dreamlab-core/blob/trunk/src/utils/draw.ts).
 
 ```ts filename="TypeScript"
+import type { SpawnableContext } from '@dreamlab.gg/core'
+import { SpawnableEntity } from '@dreamlab.gg/core'
+import { game, stage } from '@dreamlab.gg/core/labs'
+import { z } from '@dreamlab.gg/core/sdk'
+import type { BoxGraphics, CircleGraphics } from '@dreamlab.gg/core/utils'
 import { drawBox, drawCircle } from '@dreamlab.gg/core/utils'
-import { Container, Graphics } from 'pixi.js'
+import { Container } from 'pixi.js'
 
-// ... clipped
+type Args = typeof ArgsSchema
+const ArgsSchema = z.object({})
 
-initRenderContext(_, { camera, stage }) {
-  const container = new Container()
+export { ArgsSchema as PhysicsBallArgs }
+export class GraphicsEntity extends SpawnableEntity<Args> {
+  private readonly container: Container | undefined
+  private readonly box: BoxGraphics | undefined
+  private readonly circle: CircleGraphics | undefined
+
+  public constructor(ctx: SpawnableContext<Args>) {
+    super(ctx)
+
+    // Ensure graphics components are only created on the client
+    const $game = game('client')
+    if ($game) {
+      this.container = new Container()
+      // ... clipped
+
+      // Draw a basic rectangle outline
+      this.box = drawBox({ width: 100, height: 50 })
+
+      // Draw a blue filled-in circle
+      this.circle = drawCircle(
+        { radius: 25 },
+        {
+          strokeAlpha: 0,
+          fillAlpha: 1,
+          fill: 'blue',
+        },
+      )
+
+      // Add to graphics stage
+      this.container.addChild(this.box)
+      this.container.addChild(this.circle)
+      stage().addChild(this.container)
+    }
+  }
+
+  public teardown(): void {
+    // Cleanup resources on teardown
+    this.container?.destroy({ children: true })
+  }
+
   // ... clipped
-
-  // Draw a basic rectangle outline
-  const box = new Graphics()
-  container.addChild(box)
-  drawBox(box, { width: 100, height: 50 })
-
-  // Draw a blue filled-in circle
-  const circle = new Graphics()
-  container.addChild(circle)
-  drawCircle(
-    circle,
-    { radius: 25 },
-    { strokeAlpha: 0, fillAlpha: 1, fill = 'blue' },
-  )
-
-  // ... clipped
-  return { camera, container, box, circle }
-},
-
-// ... clipped
+}
 ```
 
 ### Sprites
@@ -123,32 +159,54 @@ that can handle sprite tiling and anchoring with a quick one-liner.
 </Callout>
 
 ```ts filename="TypeScript"
+import type { SpawnableContext } from '@dreamlab.gg/core'
+import { SpawnableEntity } from '@dreamlab.gg/core'
+import { game, stage } from '@dreamlab.gg/core/labs'
+import { z } from '@dreamlab.gg/core/sdk'
 import { createSprite } from '@dreamlab.gg/core/textures'
-import { Container, Graphics } from 'pixi.js'
+import { Container } from 'pixi.js'
 
-// ... clipped
+type Args = typeof ArgsSchema
+const ArgsSchema = z.object({})
 
-initRenderContext(_, { camera, stage }) {
-  const container = new Container()
+export { ArgsSchema as PhysicsBallArgs }
+export class SpriteEntity extends SpawnableEntity<Args> {
+  private readonly container: Container | undefined
+  private readonly sprite: Container | undefined
+
+  public constructor(ctx: SpawnableContext<Args>) {
+    super(ctx)
+
+    // Ensure graphics components are only created on the client
+    const $game = game('client')
+    if ($game) {
+      this.container = new Container()
+      // ... clipped
+
+      // Create a sprite from an image URL
+      this.sprite = createSprite(
+        {
+          url: '...',
+          tile: true,
+          tileScale: 1,
+        },
+        {
+          width: 100,
+          height: 100,
+        },
+      )
+
+      // Add sprite and container to graphics stage
+      if (this.sprite) this.container.addChild(this.sprite)
+      stage().addChild(this.container)
+    }
+  }
+
+  public teardown(): void {
+    // Cleanup resources on teardown
+    this.container?.destroy({ children: true })
+  }
+
   // ... clipped
-
-  // Create a sprite from a URL
-  const sprite = createSprite(
-    {
-      url: '...',
-      // tile: true,
-      // tileScale: 1,
-    },
-    {
-      width: 100,
-      height: 100,
-      // zIndex: 0,
-    },
-  )
-
-  // ... clipped
-  return { camera, container, sprite }
-},
-
-// ... clipped
+}
 ```

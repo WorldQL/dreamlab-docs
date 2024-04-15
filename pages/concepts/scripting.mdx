@@ -8,11 +8,6 @@ import { UnderConstruction } from '~/components/under-construction'
 Dreamlab scripts are written in TypeScript and all new projects are created from one of our pre-made templates.
 These templates are setup to work with Dreamlab correctly out of the box, so you don't need to worry about configuring anything yourself.
 
-<Callout>
-  Although we **heavily** recommend using TypeScript, writing your scripts in
-  plain JavaScript is also supported.
-</Callout>
-
 ## Entrypoints
 
 All scripts must implement three entrypoints for client code, server code, and level data. These are `client.ts`, `server.ts`, and `level.ts` respectively.
@@ -23,22 +18,22 @@ any common code shared between client and server. A good example of such code wo
 
 <Callout>
   All new projects created from our templates already have these entrypoints set
-  up correctly and are fully typed.
+  up correctly and are fully type-safe.
 </Callout>
 
 ```ts filename="shared.ts"
-import { InitShared } from '@dreamlab.gg/core/sdk'
+import type { InitShared } from '@dreamlab.gg/core/sdk'
 
-export const sharedInit = async game => {
+export const sharedInit: InitShared = async game => {
   // ...
 }
 ```
 
 ```ts filename="client.ts"
-import { InitClient } from '@dreamlab.gg/core/sdk'
+import type { InitClient } from '@dreamlab.gg/core/sdk'
 import { sharedInit } from './shared.ts'
 
-export const init: InitClient = game => {
+export const init: InitClient = async game => {
   await sharedInit(game)
 
   // ...
@@ -49,7 +44,7 @@ export const init: InitClient = game => {
 import type { InitServer } from '@dreamlab.gg/core/sdk'
 import { sharedInit } from './shared.ts'
 
-export const init: InitServer = game => {
+export const init: InitServer = async game => {
   await sharedInit(game)
 
   // ...
@@ -65,9 +60,10 @@ export const init: InitServer = game => {
   - `@dreamlab.gg/ui`
   - `matter-js`
   - `pixi.js`
+  - `react`
 - esm.sh
   - add note about types
 
 ## Static Assets
 
-- Info about `resolve()` and `world://`
+- Info about `resolve()` and `world://` and `s3://`
