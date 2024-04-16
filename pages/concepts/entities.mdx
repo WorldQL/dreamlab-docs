@@ -1,4 +1,5 @@
 import { Callout } from 'nextra/components'
+import { Tooltip } from '~/components/tooltip'
 import { UnderConstruction } from '~/components/under-construction'
 
 # Entities
@@ -141,8 +142,11 @@ initialization only on the client.
 
 ### Other Methods
 
-- `bounds`
-- `isPointInside`
+- `bounds` -> required, return `undefined` if an entity is boundless (ie: entities that have no physical representation in the world)
+- `isPointInside` -> required, return `false` if an entity is boundless
+
+`bounds` represents the <Tooltip title="Axis Aligned Bounding Box">AABB</Tooltip> of the entity, and is used to render editor selection highlights, as well as to do quick and dirty intersection tests.
+`isPointInside` is used for precise intersection tests, such as mouse events.
 
 ---
 
