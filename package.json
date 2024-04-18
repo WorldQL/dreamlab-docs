@@ -22,6 +22,7 @@
     "react-dom": "18.2.0"
   },
   "devDependencies": {
+    "@dreamlab.gg/core": "0.0.84-dev-4237cf2",
     "@types/node": "^20.12.7",
     "prettier": "^3.2.5",
     "typescript": "^5.4.5"
