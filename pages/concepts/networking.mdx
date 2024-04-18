@@ -1,11 +1,61 @@
+import { Callout } from 'nextra/components'
 import { UnderConstruction } from '~/components/under-construction'
 
-# Multiplayer
+# Networking
 
 <UnderConstruction />
 
-Script the client and server in one codebase with Dreamlab. Since everything is JavaScript, our runtime can seamlessly deploys your code to browsers and simultaneously start a server to host the game.
+{/* TODO: Better copy */}
 
-## Channels
+Script the client and server in one codebase with Dreamlab. Since everything gets, our runtime can seamlessly deploys your code to browsers and simultaneously start a server to host the game.
 
-## Client handoff for physics simulation
+## Networking Primitives
+
+<Callout type='warning'>
+  Any data you sync over the network must be able to be serialized to JSON and
+  survive a round trip. MDN's documentation on
+  [`JSON.stringify()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#description)
+  has more information on this subject.
+
+This also means you cannot use any data structures with [circular references](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#issue_with_serializing_circular_references), as they cannot be serialized and will throw.
+
+</Callout>
+
+### Custom Messages
+
+For any lower-lever control over networking, we provide the Custom Message API which allows you to send arbitrary data between the server and connected clients.
+Messages can be sent in both directions, client to server and server to client. The server is also able to broadcast messages to all connected clients.
+
+```ts filename="TypeScript" showLineNumbers
+import { network } from '@dreamlab.gg/core/labs'
+
+// Send some data to the server over the `my-game` channel
+network('client')?.sendCustomMessage('my-game', {})
+
+// Recieve data from the server from the `my-game` channel
+network('client')?.addCustomMessageListener('my-game', (channel, data) => {
+  // TODO: Handle message
+})
+
+// Send data to `connectionId` over the `my-game` channel
+network('server')?.sendCustomMessage('connectionId', 'my-game', {})
+
+// Send data to all connected clients over the `my-game` channel
+network('server')?.broadcastCustomMessage('my-game', {})
+
+// Recieve data from a client from the `my-game` channel
+network('server')?.addCustomMessageListener(
+  'my-game',
+  (client, channel, data) => {
+    // TODO: Handle message
+  },
+)
+```
+
+### Synced Values
+
+```ts filename="TypeScript" showLineNumbers
+// TODO
+```
+
+### Client Handoff for Physics Simulation
