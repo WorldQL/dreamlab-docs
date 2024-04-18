@@ -5,8 +5,8 @@ export default {
   graphics: 'Graphics',
   events: 'Events',
   inputs: 'Inputs',
-  'animated-sprites': 'Animated Sprites',
+  networking: 'Networking',
   'key-value': 'Saving Data',
-  multiplayer: 'Multiplayer',
   ui: 'User Interfaces',
+  'animated-sprites': 'Animated Sprites',
 }
