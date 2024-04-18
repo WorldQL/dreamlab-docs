@@ -51,6 +51,42 @@ export class ExampleEntity extends SpawnableEntity<Args> {
 }
 ```
 
+#### Args
+
+You can think of entity args as analogous to constructor parameters, as they represent input data for your entity.
+You must define a "schema" for your args using [Zod](https://zod.dev) (see above for more info) which describes all your args
+and their types. This schema is used to ensure any args passed in to `game.spawn({ ... })` are valid, and is also used to
+generate the inspector in Dreamlab's edit mode.
+
+```ts filename="TypeScript" twoslash
+// @moduleResolution: bundler
+// @noErrors
+// @noStaticSemanticInfo
+import { SpawnableEntity, SpawnableContext } from '@dreamlab.gg/core'
+import { z } from '@dreamlab.gg/core/sdk'
+
+// Define a type alias for your args based on the schema below
+// This will be passed to SpawnableEntity classes to enable correct typing in your IDE
+type Args = typeof ArgsSchema
+
+// Define an object schema using Zod that describes your args
+const ArgsSchema = z.object({
+  // Define an arg named `width` that is a number between 1 and 100
+  width: z.number().min(1).max(100),
+})
+
+// We pass in the `Args` type as a generic to tell the class about our args
+export class ExampleEntity extends SpawnableEntity<Args> {
+  public constructor(ctx: SpawnableContext<Args>) {
+    super(ctx)
+
+    // You can access the args in your class and they will be strongly typed
+    const width = this.args.width
+    //     ^?
+  }
+}
+```
+
 ### Registering
 
 Spawnable Entities must be registered with the `game` instance in order for them to be created by name.
