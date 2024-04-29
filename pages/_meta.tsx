@@ -5,6 +5,7 @@ export default {
   concepts: 'Concepts',
   'asset-creator': 'Asset Creator',
   extra: 'Extra',
+  discord: 'Discord Activities',
 
   contact: {
     title: 'Open Dreamlab',
