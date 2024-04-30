@@ -1,0 +1,97 @@
+import { Callout } from 'nextra/components'
+import DetailsDiscord from '~/assets/images/discordapp_details_discord.png'
+import DetailsDreamlab from '~/assets/images/discordapp_details_dreamlab.png'
+import OAuth2 from '~/assets/images/discordapp_oauth2.png'
+import Redirects from '~/assets/images/discordapp_redirects.png'
+import UrlMappings from '~/assets/images/discordapp_url_mappings.png'
+import { Image } from '~/components/image'
+
+# Publishing Your Game as a Discord Activity
+
+Publishing your Dreamlab game as an Application on Discord is a fairly straightforward process.
+
+## Step 1: Create a Application on Discord Developers
+
+To create an application, go to https://discord.com/developers/applications and click `New Application` in the top-right.
+You will want to give it a cool name that matches the Dreamlab game you wish to publish.
+
+Once created you can set an app icon, description, and tags to better identify your game and allow people to find it more easily.
+Right now this is strictly optional, but once Discord rolls out the App Discovery page this will be important for discoverability.
+
+## Step 2: Link your Discord Application to Dreamlab
+
+To link your Discord application to Dreamlab you will need to add its OAuth2 details to your Dreamlab world.
+These can be found in the **OAuth2** tab in the sidebar on the Discord Developers page for your application.
+
+<Image
+  src={OAuth2}
+  style={{ width: 'auto', maxHeight: '45rem' }}
+  alt="Sidebar of the Discord Developers page for an application named 'My Dreamlab Game', the OAuth2 section under the subheading 'Settings' is selected."
+/>
+
+You will need both the **Client ID** and **Client Secret**. In Dreamlab, go to your Library and find the world you want to link to your Discord app.
+Click the Edit Details button and scroll to the Discord Activities Settings section and paste in the Client ID and Secret from Discord.
+Make sure these match exactly and then click the save button at the top.
+
+<Callout type='error' emoji='⚠️'>
+  **Keep these credentials safe and do not share them with anyone except Dreamlab.** These are potentially dangerous as it can let anyone with them perform actions as your application.
+
+Dreamlab will only use these credentials to authenticate the Discord SDK for your application.
+
+</Callout>
+
+<Image
+  src={DetailsDiscord}
+  alt="Top section of the OAuth2 page on Discord Developers showing the app's Client ID and Client Secret, copy buttons are visible under both."
+/>
+
+<Image
+  src={DetailsDreamlab}
+  alt="Bottom section of the Edit World page on Dreamlab titled 'Discord Activities Settings', showing two input boxes labelled 'Discord Client ID' and 'Discord Client Secret'. These have been filled with the information from the above image."
+/>
+
+## Step 3: Setup OAuth2 Redirects
+
+Discord requires your app to have at least one OAuth2 Redirect configured in order to enable authentication.
+While the Activity SDK is still in preview these are not validated so you can enter any valid URL, such as `http://localhost:3000`.
+
+<Image
+  src={Redirects}
+  alt='Screenshot of the URL Mappings table filled in with the above data.'
+/>
+
+## Step 4: Setup the Activity URL Mappings
+
+Discord Activities run in a sandboxed environment and must specify all required external dependencies manually. Dreamlab will take care of
+
+In the Discord Developers page sidebar, select the **URL Mappings** page. If you have not yet created an activity for your application go to the **Getting Started** page and click the **Enable** button.
+Fill in the following URL mappings exactly.
+
+| Prefix        | Target                           |
+| ------------- | -------------------------------- |
+| `/`           | `discord-activities.dreamlab.gg` |
+| `/mp`         | `mp1.dreamlab.gg`                |
+| `/s3`         | `s3-assets.dreamlab.gg`          |
+| `/esm`        | `esm.sh`                         |
+| `/v135`       | `esm.sh/v135`                    |
+| `/stable`     | `esm.sh/stable`                  |
+| `/jsdelivr  ` | `cdn.jsdelivr.net`               |
+
+Your final page should look like the following. Make sure to save!
+
+<Image
+  src={UrlMappings}
+  alt='Screenshot of the URL Mappings table filled in with the above data.'
+/>
+
+## Step 5: Test inside Discord
+
+To test your activity inside of Discord, you must first enable Developer Mode to be able to see your activity.
+This can be found in `User Settings -> App Settings -> Advanced` in the Discord Client.
+
+Once enabled, you should be able to see your activity at the top of the list when starting an activity in any voice channel.
+When starting an activity as a developer, only you will be able to join and interact with it.
+
+While the Activity SDK is still in preview you will need to manually add any testers in the Discord Developer Portal.
+This can be done in the **App Testers** section in your application settings. Anyone you add will receive an email from Discord
+inviting them to test your app.
