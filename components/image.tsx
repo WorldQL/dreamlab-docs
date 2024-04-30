@@ -6,7 +6,7 @@ export const Image = ({
   ...props
 }: ComponentProps<typeof NextImage>) => (
   <NextImage
-    style={{ padding: '2rem', borderRadius: '1rem', ...style }}
+    style={{ marginTop: '1.25rem', borderRadius: '.5rem', ...style }}
     {...props}
   />
 )
