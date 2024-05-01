@@ -10,5 +10,6 @@
     "editor.renderFinalNewline": "off",
     "editor.formatOnSave": true,
     "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.quickSuggestions": { "other": "off" }
   },
 }
