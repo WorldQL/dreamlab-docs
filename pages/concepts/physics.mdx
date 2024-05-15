@@ -11,3 +11,25 @@ import { UnderConstruction } from '~/components/under-construction'
 </Callout>
 
 ## Detecting Collisions
+
+## Importing Modules from Matter.js
+
+If you want to import a specific class from Matter, you cannot use the normal import syntax:
+
+```ts
+// wrong
+import { Body } from 'matter-js'
+```
+
+Because matter is a cjs module, you must use this less convenient syntax:
+
+```ts
+import Matter from 'matter-js'
+const { Body } = Matter
+```
+
+If you simply want to access the Vector class, you can import it like this:
+
+```ts
+import { Vec } from '@dreamlab.gg/core/math'
+```
