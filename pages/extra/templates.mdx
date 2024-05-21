@@ -2,37 +2,6 @@ import { Callout } from 'nextra/components'
 
 # Templates
 
-## Blank Entity
-
-<Callout>
-  See the concepts page for [Entities](../concepts/entities.mdx) for the
-  difference between **Entities** and **_Spawnable_ Entitites**.
-</Callout>
-
-```ts filename="TypeScript" showLineNumbers
-import { Entity } from '@dreamlab.gg/core'
-
-export class ExampleEntity extends Entity {
-  public constructor() {
-    super()
-
-    // initialize entity resources
-  }
-
-  public teardown(): void {
-    // free any used resources (eg: graphics primitives)
-  }
-
-  public override onPhysicsStep(time: Time): void {
-    // ...
-  }
-
-  public override onRenderFrame(time: RenderTime): void {
-    // ...
-  }
-}
-```
-
 ## Blank Spawnable Entity
 
 ```ts filename="TypeScript" showLineNumbers

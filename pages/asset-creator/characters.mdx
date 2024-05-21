@@ -1,8 +1,8 @@
-import { UnderConstruction } from '~/components/under-construction'
+import { Image } from '~/components/image'
+
+import CharactersDemo from '~/assets/images/characters_demo.png'
 
 # Characters
-
-<UnderConstruction />
 
 Dreamlab's character generator is used to create animated sprites.
 
@@ -12,36 +12,8 @@ It has the following components:
 - Animations. Animation files using the Mixamo bone convention that are used to drive rigs.
 - AI Painter. Generates 2D sprites for each frame of an animation.
 
-## Prompting
+## How To Use
 
-{
-// This doesn't work so I'm removing it
+<Image src={CharactersDemo} alt='Demo of character creator.' />
 
-// ### Concept Isolation
-
-// Dreamlab allows you to associate certain words with certain objects explicitly.
-
-// For example, this prompt may lead to colors bleeding across concepts (black applies to pants, green applies to background or shoes, etc.):
-
-// `// man wearing a black jacket, blue pants, green baseball cap
-//`
-
-// We can see that in this result:
-// video here
-
-// However, we can rewrite our prompt like this:
-
-// `// man wearing a [black: jacket], [blue: pants], [green: baseball cap]
-//`
-
-// video here
-
-// Here's another example:
-
-// `// knight wearing armor, red helmet, black chestplate full body
-//`
-
-// ...
-
-// This solves the problem of having color bleed into the rest of your image.
-}
+To generate an animated character, simply enter your prompt, select your skeleton, and press "Generate Preview"! Once you're happy with your creation, you can click "Generate Full Animation" to generate a complete set of spritesheets for all animations.

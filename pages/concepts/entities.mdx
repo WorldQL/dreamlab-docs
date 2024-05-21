@@ -9,11 +9,7 @@ import { UnderConstruction } from '~/components/under-construction'
 In Dreamlab, an entity is a distinct object that can be created, updated, or destroyed.
 They can respond to events such as physics ticks or network packets and run logic in the game world.
 
-<Callout>
-  You will most likely not want to work with Entities directly. Dreamlab has an
-  abstraction called Spawnable Entities that you should use to represent objects
-  in the world.
-</Callout>
+To implement objects in the world, you inherit from the SpawnableEntity class.
 
 ## Spawnable Entities
 
