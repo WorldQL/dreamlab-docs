@@ -8,5 +8,4 @@ export default {
   networking: 'Networking',
   'key-value': 'Saving Data',
   ui: 'User Interfaces',
-  'animated-sprites': 'Animated Sprites',
 }
