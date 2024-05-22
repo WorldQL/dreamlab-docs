@@ -10,6 +10,13 @@ to create and update your UI.
 
 ## Creating a UI Layer
 
+<Callout type='warning'>
+  UI layers are **not interactable** by default. This allows the underlying game
+  canvas to respond to click events correctly.  
+Set `pointer-events` to `all` for any elements you wish to be interactable.
+
+</Callout>
+
 {/* TODO: Flavour text */}
 
 ```ts filename="TypeScript"
@@ -107,6 +114,63 @@ You can also use CSS-in-JS libraries to make styling easier when using UI librar
 {/* TODO: css in js info */}
 
 ## Examples
+
+### Vanilla JS
+
+```html filename="ui.html"
+<div id="title">Counter</div>
+<button id="button" type="button">Click Me</button>
+<div>You have clicked <span id="counter">0</span> times.</div>
+```
+
+```css filename="ui.css"
+/* Make the title text slightly larger and bolder */
+#title {
+  font-size: 1.5rem;
+  font-weight: 500;
+}
+
+/* Make the button interactable */
+#button {
+  pointer-events: all;
+}
+```
+
+```ts filename="client.ts"
+import type { InitClient } from '@dreamlab.gg/core/sdk'
+
+// Import the HTML and CSS files as raw strings
+import html from './ui.html'
+import css from './ui.css'
+
+export const init: InitClient = async game => {
+  // Create UI layer
+  const ui = game.client.ui.create()
+
+  // Assign HTML to UI root
+  ui.innerHTML = html
+
+  // Create style tag from CSS and append to UI
+  const styles = document.createElement('style')
+  styles.appendChild(document.createTextNode(css))
+  ui.appendChild(styles)
+
+  // Get references to elements by ID
+  const button = ui.querySelector<HTMLButtonElement>('#button')
+  const counter = ui.querySelector<HTMLSpanElement>('#counter')
+
+  // Guard against elements being `null`
+  if (!button) throw new Error('cannot find element with id: button')
+  if (!counter) throw new Error('cannot find element with id: counter')
+
+  // Increment count on click
+  let count = 0
+  button.onclick = () => {
+    count += 1
+    counter.innerText = count.toString()
+  }
+}
+```
 
 ### React
 
