@@ -3,7 +3,7 @@ import { useConfig } from 'nextra-theme-docs'
 import type { DocsThemeConfig } from 'nextra-theme-docs'
 
 const siteName = 'Dreamlab Docs'
-const defaultDescription = 'Create multiplayer games fast!'
+const defaultDescription = ''
 
 const config: DocsThemeConfig = {
   logo: <b>Dreamlab Documentation</b>,
