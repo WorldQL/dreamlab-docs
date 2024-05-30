@@ -6,7 +6,9 @@ import { UnderConstruction } from '~/components/under-construction'
 
 # Modify an Entity
 
-Finally, we're going to be adding a new custom enemy
+<UnderConstruction />
+
+Finally, we're going to be adding a new custom enemy.
 
 ## Generate Art
 

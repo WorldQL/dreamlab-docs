@@ -3,7 +3,158 @@ title: 'Add a Power-Up'
 ---
 
 import { UnderConstruction } from '~/components/under-construction'
+import assetcreator from './assetcreator.png'
+import gennewasset from './gennewasset.png'
+import speedpill from './speedpill.png'
+import { Image } from '~/components/image'
 
 # Add a Super-Speed Power-Up
 
 We're going to be implementing a new entity that when your player collides with it, it increases their speed for ten seconds when they collide with it.
+
+## Creating Art
+
+You can use the Dreamlab asset creator to create art for your powerup. You can access it from the editor menu (openable with backtick \`)
+
+<Image src={gennewasset} />
+
+On this page, you can make a sketch and type a prompt to generate an image using AI.
+I made a pill with a lightning bolt but you can do whatever you want!
+
+<Image src={assetcreator} />
+
+After you've created it, it will appear in your "Assets" tab in the Dreamlab sidebar.
+
+<Image src={speedpill} />
+
+## Writing the Scripts
+
+### Create a New Entity
+
+```typescript filename="SpeedBoost.ts"
+import type { SpawnableContext, Time } from '@dreamlab.gg/core'
+import { game } from '@dreamlab.gg/core/labs'
+import { z } from '@dreamlab.gg/core/sdk'
+import { Solid, SolidArgs } from '@dreamlab.gg/core/entities'
+
+export const SpeedBoostArgs = SolidArgs.extend({
+  amount: z.number().default(4),
+  duration: z.number().default(10),
+})
+
+export class SpeedBoost extends Solid<typeof SpeedBoostArgs> {
+  private lifeTime = 1000
+  public constructor(ctx: SpawnableContext<typeof SpeedBoostArgs>) {
+    super(ctx)
+    this.transform.zIndex = -10
+    if (this.body) {
+      this.body.isSensor = true
+    }
+
+    if (!this.tags.includes('net/replicated')) {
+      this.tags.push('net/replicated')
+    }
+    if (!this.tags.includes('editor/doNotSave'))
+      this.tags.push('editor/doNotSave')
+
+    // replace this with the URL you copied when creating your own art
+    this.args.spriteSource = {
+      url: 'https://s3-assets.dreamlab.gg/uploaded-from-editor/speed-pill-1717034434636.png',
+    }
+  }
+
+  public die(): void {
+    const $game = game('server')
+    if (!$game) return
+    $game.destroy(this)
+    return
+  }
+
+  public expire() {
+    this.lifeTime -= 1
+    if (this.lifeTime <= 0) {
+      this.die()
+      return
+    }
+  }
+  override onPhysicsStep(_: Time) {
+    this.expire()
+  }
+}
+```
+
+### Register Your Entity
+
+```typescript filename="shared.ts"
+import { SpeedBoost, SpeedBoostArgs } from './entities/SpeedBoost.ts'
+
+// this gets run on both the client and the server
+export const sharedInit: InitShared = game => {
+  // disable gravity since this game is top-down
+  game.physics.engine.gravity.scale = 0
+
+  // other entities being registered ...
+
+  // register our speedboost powerup entity
+  game.register('SpeedBoost', SpeedBoost, SpeedBoostArgs)
+}
+```
+
+### Add Ability For Player to Pick Up Speedboost
+
+Inside the `onCollide` function in the `BulletHeavenPlayer` class, we can add the following snippet
+
+```typescript filename="BulletHeavenPlayer.ts"
+onCollide([a, b]: readonly [SpawnableEntity, SpawnableEntity]) {
+  // ...
+
+  if (other instanceof SpeedBoost) {
+    // only run pick-up code on client.
+    const $game = game('client')
+    if (!$game) return
+
+    // destroy picked up SpeedBoost on server to make it disappear for other players
+    network('client')?.sendCustomMessage('DESTROY_BY_ID', { uid: other.uid })
+    // destroy on client
+    $game.destroy(other)
+
+    // add our speed buff
+    this.args.speed += other.args.amount
+
+    // if we have a timer running down, cancel it
+    if (this.speedBuffTimer) {
+      clearTimeout(this.speedBuffTimer)
+    }
+
+    // clear the speed buff after the specified duration.
+    this.speedBuffTimer = setTimeout(() => {
+      this.args.speed = this.baseSpeed;
+    }, other.args.duration * 1000)
+  }
+
+}
+
+```
+
+You'll also need to add a `speedBuffTimer` property to the class to store the timer.
+
+### Making Enemies Drop Speed Buffs
+
+In the `die` function, we can give our enemies a 20% chance of dropping our new SpeedBoost item.
+
+```typescript filename="Enemy.ts"
+public die(): void {
+  // ...
+    if (Math.random() < 0.2) {
+      $game?.spawn({
+        entity: "SpeedBoost",
+        args: {
+          spriteSource: { url: "world://assets/symboo.png" },
+          amount: 4,
+          duration: 10
+        },
+        transform: { position: this.transform.position }
+      })
+    }
+}
+```
