@@ -1,57 +1,83 @@
-import { Behavior, Vector2, Vector2Adapter } from "@dreamlab/engine";
-import { MAP_BOUNDARY } from "./_constants.ts";
+import { Behavior, Vector2, Vector2Adapter } from '@dreamlab/engine'
+import { MAP_BOUNDARY } from './_constants.ts'
+
+/*
+  In "@dreamlab/engine", a `Behavior` represents a modular piece of logic that can be attached to an entity.
+  This allows you to encapsulate functionality, such as movement, health management, or AI, in reusable components.
+
+  Key Components:
+  - **Lifecycle Methods:**
+    - `onInitialize`: Called once when the behavior is first attached to an entity, used for setup tasks.
+    - `onTick`: Called on every game tick, ideal for updating logic like movement or state changes.
+    - `onPreTick`, `onPostTick`, `onFrame`: Additional lifecycle hooks for more granular control over update timing.
+
+  - **Values:** Behaviors can have properties (values) that are synchronized across the network or exposed to
+    an inspector GUI. These values are defined using `defineValue` or `defineValues` methods and can be of various
+    types, including primitives and complex types with adapters.
+
+  - **Signals:** Behaviors can listen for signals (events) from the game or other entities and respond accordingly.
+    This is done using the `listen` method for subscribing to signals, and `fire` to emit them.
+
+  - **Destruction:** Behaviors can be destroyed manually using `destroy()` or automatically via the entity lifecycle.
+    This cleanup process ensures all listeners and values are properly disposed of.
+
+  The `Behavior` class is highly flexible, supporting complex game mechanics through a combination of values, signals,
+  and lifecycle hooks. It serves as the foundation for defining how entities behave in the game world.
+*/
 
 // example Behavior that allows for WASD movement as well as a pattern for firing projectiles.
 // this serves as an example for the general structure of a behavior
 class Movement extends Behavior {
   // the speed of the player
-  speed = 5.0;
+  speed = 5.0
   // the current velocity of the player
-  velocity = Vector2.ZERO;
+  velocity = Vector2.ZERO
 
-  #up = this.inputs.create("@movement/up", "Move Up", "KeyW");
-  #down = this.inputs.create("@movement/down", "Move Down", "KeyS");
-  #left = this.inputs.create("@movement/left", "Move Left", "KeyA");
-  #right = this.inputs.create("@movement/right", "Move Right", "KeyD");
+  #up = this.inputs.create('@movement/up', 'Move Up', 'KeyW')
+  #down = this.inputs.create('@movement/down', 'Move Down', 'KeyS')
+  #left = this.inputs.create('@movement/left', 'Move Left', 'KeyA')
+  #right = this.inputs.create('@movement/right', 'Move Right', 'KeyD')
 
   onInitialize(): void {
     // definevalue calls make the public class variables visible in the inspector GUI and also sync over the network
-    this.defineValue(Movement, "speed");
-    this.defineValue(Movement, "velocity", { type: Vector2Adapter });
+    this.defineValue(Movement, 'speed')
+    this.defineValue(Movement, 'velocity', { type: Vector2Adapter })
   }
 
   onTick(): void {
-    const movement = new Vector2(0, 0);
-    const currentSpeed = this.speed;
+    const movement = new Vector2(0, 0)
+    const currentSpeed = this.speed
 
-    if (this.#up.held) movement.y += 1;
-    if (this.#down.held) movement.y -= 1;
-    if (this.#right.held) movement.x += 1;
-    if (this.#left.held) movement.x -= 1;
+    if (this.#up.held) movement.y += 1
+    if (this.#down.held) movement.y -= 1
+    if (this.#right.held) movement.x += 1
+    if (this.#left.held) movement.x -= 1
 
     this.velocity = movement
       .normalize()
-      .mul((this.game.physics.tickDelta / 100) * currentSpeed);
+      .mul((this.game.physics.tickDelta / 100) * currentSpeed)
 
-    const newPosition = this.entity.transform.position.add(this.velocity);
+    const newPosition = this.entity.transform.position.add(this.velocity)
 
-    const halfWidth = this.entity.transform.scale.x / 2;
-    const halfHeight = this.entity.transform.scale.y / 2;
+    const halfWidth = this.entity.transform.scale.x / 2
+    const halfHeight = this.entity.transform.scale.y / 2
 
     // don't move beyond the map boundaries
-    if (newPosition.x - halfWidth <= -MAP_BOUNDARY) newPosition.x = -MAP_BOUNDARY;
-    if (newPosition.x + halfWidth >= MAP_BOUNDARY) newPosition.x = MAP_BOUNDARY;
+    if (newPosition.x - halfWidth <= -MAP_BOUNDARY)
+      newPosition.x = -MAP_BOUNDARY
+    if (newPosition.x + halfWidth >= MAP_BOUNDARY) newPosition.x = MAP_BOUNDARY
 
-    if (newPosition.y - halfHeight <= -MAP_BOUNDARY) newPosition.y = -MAP_BOUNDARY;
-    if (newPosition.y + halfHeight >= MAP_BOUNDARY) newPosition.y = MAP_BOUNDARY;
+    if (newPosition.y - halfHeight <= -MAP_BOUNDARY)
+      newPosition.y = -MAP_BOUNDARY
+    if (newPosition.y + halfHeight >= MAP_BOUNDARY) newPosition.y = MAP_BOUNDARY
 
     // make the entity this behavior is attached to face the player
-    const world = this.inputs.cursor.world;
-    if (!world) return;
+    const world = this.inputs.cursor.world
+    if (!world) return
 
-    const rotation = this.entity.transform.position.lookAt(world);
-    this.entity.transform.rotation = rotation;
+    const rotation = this.entity.transform.position.lookAt(world)
+    this.entity.transform.rotation = rotation
 
-    this.entity.transform.position = newPosition;
+    this.entity.transform.position = newPosition
   }
 }
