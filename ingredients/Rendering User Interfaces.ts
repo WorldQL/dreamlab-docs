@@ -41,16 +41,11 @@ import { spawnPlayer } from "./start-screen.ts";
 export default class DeathScreen extends Behavior {
   // Reference to the UI layer associated with the entity
   #ui = this.entity.cast(UILayer);
-
-  // A private variable to hold the death screen HTML element
   #element!: HTMLDivElement;
-
-  // The player's score, initialized to 0
   score: number = 0;
 
   constructor(ctx: BehaviorContext) {
     super(ctx);
-    // Define the value `score` as a behavior attribute
     this.defineValues(DeathScreen, "score");
   }
 
@@ -129,9 +124,7 @@ export default class DeathScreen extends Behavior {
     this.#ui.element.appendChild(this.#element);
   }
 
-  // Private method to handle the player respawning
   #respawnPlayer() {
-    // Call the spawnPlayer function to respawn the player in the game
     spawnPlayer(this.game);
 
     // Destroy the current entity, removing the death screen from the UI
