@@ -9,9 +9,8 @@ export default class AsteroidMovement extends Behavior {
 
   speed = 0.2;
 
-  constructor(ctx: BehaviorContext) {
-    super(ctx);
-    this.defineValues(AsteroidMovement, "speed");
+  onInitialize() {
+    this.defineValue(AsteroidMovement, "speed");
   }
 
   /*
