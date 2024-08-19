@@ -1,4 +1,4 @@
-import { Behavior, BehaviorContext, Vector2 } from "@dreamlab/engine";
+import { Behavior, Vector2 } from "@dreamlab/engine";
 
 /*
   Handling Values in Behaviors:
@@ -34,9 +34,7 @@ export default class PlayerMovement extends Behavior {
   #right = this.inputs.create("@movement/right", "Move Right", "KeyD");
   #boost = this.inputs.create("@movement/boost", "Speed Boost", "ShiftLeft");
 
-  constructor(ctx: BehaviorContext) {
-    super(ctx);
-
+  onInitialize() {
     /*
       Defining the `speed` value to be managed by the behavior.
       - The `defineValues` method is used to specify which properties should be treated as values.

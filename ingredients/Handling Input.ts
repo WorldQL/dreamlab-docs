@@ -1,4 +1,4 @@
-import { Behavior, BehaviorContext, Vector2 } from "@dreamlab/engine";
+import { Behavior, Vector2 } from "@dreamlab/engine";
 import PlayerBehavior from "./player.ts";
 
 /*
@@ -43,8 +43,7 @@ export default class Movement extends Behavior {
 
   velocity = Vector2.ZERO;
 
-  constructor(ctx: BehaviorContext) {
-    super(ctx);
+  onInitialize() {
     this.defineValues(Movement, "speed");
   }
 

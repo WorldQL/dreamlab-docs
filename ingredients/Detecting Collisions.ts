@@ -2,7 +2,21 @@ import { Behavior, Entity, EntityCollision } from "@dreamlab/engine";
 import HealthBar from "./health-bar.ts";
 import PlayerBehavior from "./player.ts";
 
-// Example of entity collision
+/*
+  Handling Collisions in Game Entities:
+
+  The `EntityCollision` signal in "@dreamlab/engine"
+  helps detect when two entities collide. This signal provides details like whether the collision
+  has just started and the other entity involved.
+
+  Key Points:
+  - **Listening for Collisions:** Use the `listen` method to react to collision events.
+  - **Collision Filtering:** Handle collisions only with specific entities by checking their properties.
+  - **Responding to Collisions:** For example, decrease health or destroy an entity when a collision occurs.
+
+  Below is an `EnemyBehavior` that reduces health when hit by a bullet and increases the player's score if the enemy is destroyed.
+*/
+
 export default class EnemyBehavior extends Behavior {
   private healthBar!: HealthBar;
 

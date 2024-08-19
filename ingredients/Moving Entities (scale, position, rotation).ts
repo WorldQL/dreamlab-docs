@@ -1,6 +1,13 @@
 // Example of changing an entities position through a behavior. This one is more basic.
-import { Behavior, BehaviorContext, Vector2 } from "@dreamlab/engine";
+import { Behavior, Vector2 } from "@dreamlab/engine";
 
+/*
+  Key Points:
+  - **Basic Movement:** Calculate the new position by adding a direction vector to the current position.
+  - **Transform Properties:** Use properties like `position`, `rotation`, and `scale` to control entity movement and appearance.
+
+  This example moves an asteroid in a random direction at a constant speed.
+*/
 export default class AsteroidMovement extends Behavior {
   readonly #direction = new Vector2(
     Math.random() * 2 - 1,

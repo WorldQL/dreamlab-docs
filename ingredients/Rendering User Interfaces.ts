@@ -1,4 +1,4 @@
-import { Behavior, BehaviorContext, UILayer } from "@dreamlab/engine";
+import { Behavior, UILayer } from "@dreamlab/engine";
 import { element } from "@dreamlab/ui";
 import { spawnPlayer } from "./start-screen.ts";
 
@@ -44,8 +44,7 @@ export default class DeathScreen extends Behavior {
   #element!: HTMLDivElement;
   score: number = 0;
 
-  constructor(ctx: BehaviorContext) {
-    super(ctx);
+  onInitialize() {
     this.defineValues(DeathScreen, "score");
   }
 
