@@ -65,9 +65,5 @@ export default class PlayerMovement extends Behavior {
 
     this.entity.transform.position = this.entity.transform.position.add(velocity);
 
-    const cursorPos = this.inputs.cursor.world;
-    if (cursorPos) {
-      this.entity.transform.rotation = this.entity.pos.lookAt(cursorPos);
-    }
   }
 }

@@ -23,6 +23,31 @@ import PlayerBehavior from "./player.ts";
     position in the game world.
 
   Below is the implementation of the `Movement` behavior that handles player movement and firing based on input.
+
+  If you are using this.entity.transform.position.lookAt(this.inputs.cursor.world) you should ALWAYS do this before updating the transform position for the next frame.
+
+  This is correct:
+  const world = this.inputs.cursor.world;
+  if (!world) return;
+  // EXTREMELY IMPORTANT: Use the value of this.inputs.cursor.world before applying newPosition to the transform
+  const rotation = this.entity.transform.position.lookAt(world);
+  this.entity.transform.rotation = rotation;
+
+  // Apply the new position to the entity
+  this.entity.transform.position = newPosition;
+
+  This is wrong:
+  // Apply the new position to the entity
+  this.entity.transform.position = newPosition;
+
+  const world = this.inputs.cursor.world;
+  if (!world) return;
+  // EXTREMELY IMPORTANT: Use the value of this.inputs.cursor.world before applying newPosition to the transform
+  const rotation = this.entity.transform.position.lookAt(world);
+  this.entity.transform.rotation = rotation;
+
+  Please pay careful attention to this. It's tricky and important to remember when using cursor.world while also moving the entity and making it look at the cursor.
+
 */
 
 export default class Movement extends Behavior {
@@ -83,9 +108,10 @@ export default class Movement extends Behavior {
     }
 
     // Rotate the entity to face the cursor's position
+
     const world = this.inputs.cursor.world;
     if (!world) return;
-
+    // EXTREMELY IMPORTANT: Use the value of this.inputs.cursor.world before applying newPosition to the transform
     const rotation = this.entity.transform.position.lookAt(world);
     this.entity.transform.rotation = rotation;
 

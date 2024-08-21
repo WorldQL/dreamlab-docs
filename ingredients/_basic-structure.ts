@@ -30,6 +30,8 @@ import { MAP_BOUNDARY } from './_constants.ts'
 class Movement extends Behavior {
   // the speed of the player
   speed = 5.0
+  // example value
+  anotherValue = 42.0
   // the current velocity of the player
   velocity = Vector2.ZERO
 
@@ -40,7 +42,8 @@ class Movement extends Behavior {
 
   onInitialize(): void {
     // definevalue calls make the public class variables visible in the inspector GUI and also sync over the network
-    this.defineValue(Movement, 'speed')
+    // define multiple values at once by passing them as more arguments. do not pass a list.
+    this.defineValues(Movement, 'speed', 'anotherValue')
     this.defineValue(Movement, 'velocity', { type: Vector2Adapter })
   }
 
@@ -71,13 +74,5 @@ class Movement extends Behavior {
       newPosition.y = -MAP_BOUNDARY
     if (newPosition.y + halfHeight >= MAP_BOUNDARY) newPosition.y = MAP_BOUNDARY
 
-    // make the entity this behavior is attached to face the player
-    const world = this.inputs.cursor.world
-    if (!world) return
-
-    const rotation = this.entity.transform.position.lookAt(world)
-    this.entity.transform.rotation = rotation
-
-    this.entity.transform.position = newPosition
   }
 }
