@@ -25,7 +25,7 @@ def collect_files():
 
 def create_js_dictionary(file_dict):
     js_dict = json.dumps(file_dict, indent=2)
-    js_output = f"const fileContents = {js_dict};"
+    js_output = f"export const fileContents = {js_dict};"
 
     with open('file_contents.js', 'w', encoding='utf-8') as js_file:
         js_file.write(js_output)
