@@ -36,7 +36,7 @@ export default class AsteroidMovement extends Behavior {
 }
 
 // Example of moving an entity based on another entities position. A more advanced example
-import { Behavior, Rigidbody2D, Sprite2D } from "@dreamlab/engine";
+import { Behavior, RectCollider2D, Sprite2D } from "@dreamlab/engine";
 import BulletBehavior from "./bullet.ts";
 
 export default class EnemyMovement extends Behavior {
@@ -83,7 +83,7 @@ export default class EnemyMovement extends Behavior {
     const rotation = this.entity.transform.rotation + Math.PI / 2;
 
     this.entity.game.world.spawn({
-      type: Rigidbody2D,
+      type: RectCollider2D,
       name: "EnemyBullet",
       transform: {
         position: this.entity.transform.position.clone(),
@@ -91,7 +91,6 @@ export default class EnemyMovement extends Behavior {
         scale: { x: 0.25, y: 0.25 },
       },
       behaviors: [{ type: BulletBehavior, values: { speed: 8 } }],
-      values: { type: "fixed" },
       children: [
         {
           type: Sprite2D,

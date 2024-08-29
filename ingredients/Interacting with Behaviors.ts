@@ -53,7 +53,7 @@ import {
   BehaviorContext,
   Entity,
   GamePostTick,
-  Rigidbody2D,
+  RectCollider2D,
   Sprite2D,
   Vector2,
 } from '@dreamlab/engine'
@@ -105,7 +105,7 @@ export default class HealthBar extends Behavior {
 
     for (let i = 0; i < pieceCount; i++) {
       this.entity.game.world.spawn({
-        type: Rigidbody2D,
+        type: Sprite2D,
         name: 'ExplosionPiece',
         transform: {
           position: this.entity.transform.position.clone(),
