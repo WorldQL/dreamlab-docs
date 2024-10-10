@@ -1,10 +1,10 @@
 export default {
   index: 'Intro',
-  why: 'Why Dreamlab',
-  tutorial: 'Tutorial',
-  concepts: 'Concepts',
+  // tutorial: 'Getting Started',
+  // concepts: 'Concepts',
+  ingredients: 'Script Ingredients',
   'asset-creator': 'Asset Creator',
-  extra: 'Extra',
+  // extra: 'Extra',
   discord: 'Discord Activities',
 
   contact: {

@@ -15,16 +15,13 @@
     "url": "git+https://github.com/WorldQL/dreamlab-docs.git"
   },
   "dependencies": {
-    "next": "14.2.3",
-    "nextra": "3.0.0-alpha.24",
-    "nextra-theme-docs": "3.0.0-alpha.24",
-    "react": "18.3.1",
-    "react-dom": "18.3.1"
+    "next": "^14.2.15",
+    "nextra": "^3.0.8",
+    "nextra-theme-docs": "^3.0.8",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
   },
   "devDependencies": {
-    "@dreamlab.gg/core": "0.0.84-dev-d8d2662",
-    "@types/node": "^20.12.12",
-    "prettier": "^3.2.5",
-    "typescript": "^5.4.5"
+    "@types/node": "22.7.5"
   }
 }
