@@ -1,0 +1,20 @@
+---
+sidebar_position: 0.1
+---
+
+# Welcome to the Dreamlab Docs!
+
+
+Dreamlab is your open-source game engine for creating and playing multiplayer games with your friends.
+
+### What is Dreamlab?
+
+Dreamlab empowers you to bring your game ideas to life with ease.
+
+- **Multiplayer-First:** Every game you create in Dreamlab is multiplayer-ready by default. No complicated setups, no additional plugins—just instant multiplayer experiences at your fingertips.
+
+- **Web-Based:** Dreamlab runs entirely in the browser. You can share your games with a link, and your friends can join in seconds—no downloads or installations required.
+
+- **AI-Powered Creativity:** Leverage AI tools to generate unique assets, characters, and environments with just a few words.
+
+We recommend you use the AI chatbot in the script editor to help you write code. It will use resources from this documentation.

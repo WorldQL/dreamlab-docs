@@ -1,0 +1,13 @@
+{
+  "imports": {
+    "@dreamlab/engine": "../../dreamlab-engine/engine/mod.ts",
+    "@dreamlab/engine/internal": "../../dreamlab-engine/engine/internal.ts",
+    "@dreamlab/vendor/": "../../dreamlab-engine/engine/_deps/",
+    "@dreamlab/proto/": "../../dreamlab-engine/proto/",
+    "@dreamlab/scene": "../../dreamlab-engine/scene-graph/mod.ts"
+  },
+  "compilerOptions": {
+    "lib": ["deno.window", "dom"],
+    "noImplicitOverride": true
+  }
+}
