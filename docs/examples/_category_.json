@@ -1,0 +1,8 @@
+{
+  "label": "Examples",
+  "position": 1,
+  "link": {
+    "type": "generated-index",
+    "description": "These examples demonstrate how to use Dreamlab features in a simple and easy-to-understand way. Click an entry below to run it in your browser and view the source code. You can even clone these examples into a new project and play around with them!"
+  }
+}
