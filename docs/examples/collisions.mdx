@@ -73,11 +73,6 @@ export default class BallBehavior extends Behavior {
 
     const movement = this.direction.mul((this.time.delta / 100) * this.speed);
     this.entity.globalTransform.position = this.entity.globalTransform.position.add(movement);
-    if (
-      this.entity.globalTransform.position.x === 3 &&
-      this.entity.globalTransform.position.y === 1
-    )
-      console.log(movement);
   }
 
   private onCollide(e: EntityCollision): void {
