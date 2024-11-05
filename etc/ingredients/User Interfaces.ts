@@ -123,7 +123,7 @@ export default class DeathScreen extends Behavior {
   }
 
   #respawnPlayer() {
-    spawnPlayer(this.game)
+    // spawnPlayer(this.game)
 
     // Destroy the current entity, removing the death screen from the UI
     this.entity.destroy()
