@@ -1,6 +1,20 @@
 import os
 import json
 
+available_topics = {
+    "Detecting Collisions": "Running code when one entity collides with another",
+    "Handling Input": "Handling user input, keypresses and mouse input",
+    "Handling Transforms": "Moving, scaling, and rotating objects",
+    "Handling Values": "Updating the public variables associated with behaviors. These should be used to store state that can be inspected in the editor.",
+    "Interacting with Behaviors": "Fetching other behaviors attached to an entity.",
+    "Looking Up and Referencing Entities": "Getting entities by ID or keeping track of entities associated with a behavior.",
+    "Vector2 API": "Essential vector operations like addition, subtraction, and normalization using Vector2.",
+    "User Interfaces": "Creating GUIs (HUDs, health bars, etc)",
+    "Spawning Entities": "Spawning new entities into the world and attaching behaviors.",
+    "Character Controller": "Using the built-in character controller which handles collision detection. Great for any movement style.",
+    "Behavior Structure": "Behavior classes are used to implement all game functionality."
+}
+
 
 def collect_files():
     current_dir = os.getcwd()
@@ -31,7 +45,8 @@ def collect_files():
 
 def create_js_dictionary(file_dict):
     js_dict = json.dumps(file_dict, indent=2)
-    js_output = f"export const fileContents = {js_dict};"
+    js_output = f"export const fileContents = {js_dict};\n"
+    js_output += "const available_topics = `" + '\n'.join([f"{key} - {value}" for key, value in available_topics.items()]) + "`"
 
     with open("file_contents.js", "w", encoding="utf-8") as js_file:
         js_file.write(js_output)
@@ -59,8 +74,9 @@ def create_mdx_files(file_dict):
         mdx_filepath = os.path.join(mdx_dir, mdx_filename)
         mdx_content = 'import useBaseUrl from "@docusaurus/useBaseUrl";\n\n'
         mdx_content += f"# {title}\n"
+        mdx_content += available_topics[title] + '\n'
         mdx_content+= ''':::info
-These docs can be queried by Dreamlab Assistant, our AI chatbot that helps you code your game.
+These docs power Dreamlab Assistant, an AI chatbot that helps you code your game.
 
 <img
   src={useBaseUrl("/img/scriptstab.png")}

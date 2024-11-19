@@ -1,8 +1,9 @@
 import useBaseUrl from "@docusaurus/useBaseUrl";
 
 # User Interfaces
+Creating GUIs (HUDs, health bars, etc)
 :::info
-These docs can be queried by Dreamlab Assistant, our AI chatbot that helps you code your game.
+These docs power Dreamlab Assistant, an AI chatbot that helps you code your game.
 
 <img
   src={useBaseUrl("/img/scriptstab.png")}
@@ -140,7 +141,7 @@ export default class DeathScreen extends Behavior {
   }
 
   #respawnPlayer() {
-    spawnPlayer(this.game)
+    // spawnPlayer(this.game)
 
     // Destroy the current entity, removing the death screen from the UI
     this.entity.destroy()

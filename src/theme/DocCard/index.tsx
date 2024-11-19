@@ -71,8 +71,9 @@ function CardLayout({
         <img
           src={useBaseUrl(image)}
           style={{
-            maxHeight: "200px",
-            width: "auto",
+            height: "200px", // Set a fixed height
+            width: "auto", // Allow width to adjust to maintain aspect ratio
+            objectFit: "cover", // Ensure the image covers the area uniformly
             display: "block",
             margin: "0 auto 1rem",
           }}

@@ -1,11 +1,12 @@
 ---
 sidebar_custom_props:
   cardImage: /img/example-thumbs/simplecollisions.png
+sidebar_position: 3
 ---
 
 # Simple Collisions
 
-Colored squares bounce around the scene and collide with the walls, changing their color.
+Balls bounce around and collide with the walls, changing their color.
 
 **[Click here to open project and view code](#)**
 
@@ -30,7 +31,7 @@ Colored squares bounce around the scene and collide with the walls, changing the
     }}
   ></iframe>
 </div>
-<br/>
+<br />
 :::info
 
 This demo is multiplayer! Try opening another browser tab to this page!
@@ -40,7 +41,9 @@ This demo is multiplayer! Try opening another browser tab to this page!
 ## Code Samples
 
 ### BallBehavior
+
 This code makes the balls move and collide with the walls.
+
 ```ts
 import {
   Behavior,
@@ -60,7 +63,7 @@ export default class BallBehavior extends Behavior {
     // start with a random direction
     this.direction = new Vector2(
       Math.cos(Math.random() * Math.PI * 2),
-      Math.sin(Math.random() * Math.PI * 2),
+      Math.sin(Math.random() * Math.PI * 2)
     ).normalize();
 
     this.listen(this.entity, EntityCollision, (e) => {
@@ -72,7 +75,8 @@ export default class BallBehavior extends Behavior {
     if (this.game.isClient()) return;
 
     const movement = this.direction.mul((this.time.delta / 100) * this.speed);
-    this.entity.globalTransform.position = this.entity.globalTransform.position.add(movement);
+    this.entity.globalTransform.position =
+      this.entity.globalTransform.position.add(movement);
   }
 
   private onCollide(e: EntityCollision): void {
