@@ -27,6 +27,8 @@ import { Behavior, Vector2, Vector2Adapter } from '@dreamlab/engine'
   this.game.renderer.app is a Pixi application. When making calls to pixi, you must import it as:
   import * as PIXI from "@dreamlab/vendor/pixi.ts";
 
+  onTick() is called 60 times per second.
+
 */
 
 // example Behavior that allows for WASD movement as well as a pattern for firing projectiles.
