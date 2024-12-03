@@ -61,8 +61,8 @@ On The Bottom:
 
 Navigate around your project with your mouse or touchpad.
 
-- **Scroll** to move up or down 
-- **Shift Scroll** to zoom in or out
+- **Scroll** to zoom in or out
+- **Ctrl Scroll** to pane up or down
 - **Left Click** to select and entity
 - **Middle Click** to pane around
 
