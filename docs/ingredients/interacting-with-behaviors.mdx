@@ -17,7 +17,7 @@ the right-hand side.
 
 ```typescript
 import { Behavior, Entity, EntityCollision } from '@dreamlab/engine'
-import PlayerBehavior from './player.ts'
+import PlayerBehavior from './player.ts' // this import is not an api, the user will have to have or create a player behavior for this example.
 
 /*
   Example: Using `getBehavior()` to Access Behaviors
@@ -66,7 +66,7 @@ export default class AsteroidBehavior extends Behavior {
 }
 
 // Health bar behavior for reference
-import { Behavior, BehaviorContext, Entity, GamePostTick, RectCollider, Sprite, Vector2, syncedValue } from '@dreamlab/engine'
+import { Behavior, BehaviorContext, Entity, GamePostTick, Sprite, Vector2, syncedValue } from '@dreamlab/engine'
 
 export default class HealthBar extends Behavior {
   

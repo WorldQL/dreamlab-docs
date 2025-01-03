@@ -18,11 +18,11 @@ the right-hand side.
 ```typescript
 // This is an example of how to implement a platformer controller using the KinematicCharacterController
 
-import { Behavior, EntityDestroyed, RectCollider, Vector2, syncedValue } from '@dreamlab/engine'
+import { Behavior, EntityDestroyed, Collider, Vector2, syncedValue } from '@dreamlab/engine'
 import { KinematicCharacterController } from '@dreamlab/vendor/rapier.ts'
 
 export default class PlatformMovement extends Behavior {
-  #collider: RectCollider = this.entity.cast(RectCollider)
+  #collider: Collider = this.entity.cast(Collider)
   #controller: KinematicCharacterController | undefined
 
   @syncedValue()

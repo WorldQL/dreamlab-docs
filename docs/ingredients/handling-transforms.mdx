@@ -46,8 +46,8 @@ export default class AsteroidMovement extends Behavior {
 }
 
 // Example of moving an entity based on another entities position. A more advanced example
-import { Behavior, RectCollider, Sprite } from '@dreamlab/engine'
-import BulletBehavior from './bullet.ts'
+import { Behavior, Collider, Sprite } from '@dreamlab/engine'
+import BulletBehavior from './bullet.ts' // this import is not an api, the user will have to make this behavior for this example
 
 export default class EnemyMovement extends Behavior {
   speed = Math.random() * 0.5 + 0.5
@@ -91,7 +91,7 @@ export default class EnemyMovement extends Behavior {
     const rotation = this.entity.transform.rotation + Math.PI / 2
 
     this.entity.game.world.spawn({
-      type: RectCollider,
+      type: Collider,
       name: 'EnemyBullet',
       transform: {
         position: this.entity.transform.position.clone(),

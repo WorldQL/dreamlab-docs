@@ -16,8 +16,8 @@ the right-hand side.
 :::
 
 ```typescript
-import { Behavior, RectCollider, Sprite } from '@dreamlab/engine'
-import BulletBehavior from './bullet.ts'
+import { Behavior, Collider, Sprite } from '@dreamlab/engine'
+import BulletBehavior from './bullet.ts' // this import is not an API, the user will need to make this behavior
 
 /*
   Spawning Entities Overview:
@@ -118,9 +118,9 @@ export default class EnemyMovement extends Behavior {
   shootAtPlayer(): void {
     const rotation = this.entity.transform.rotation + Math.PI / 2
 
-    // Spawning a bullet entity with custom components and behaviors
+    // Spawning a bullet entity with custom transform, behaviors, and children entities
     this.entity.game.world.spawn({
-      type: RectCollider,
+      type: Collider,
       name: 'EnemyBullet',
       transform: {
         position: this.entity.transform.position.clone(),
