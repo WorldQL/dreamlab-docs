@@ -16,7 +16,7 @@ the right-hand side.
 :::
 
 ```typescript
-import { Behavior, UILayer } from '@dreamlab/engine'
+import { Behavior, UILayer, syncedValue } from '@dreamlab/engine'
 import { element } from '@dreamlab/ui'
 
 /*
@@ -59,11 +59,9 @@ export default class DeathScreen extends Behavior {
   // Reference to the UI layer associated with the entity
   #ui = this.entity.cast(UILayer)
   #element!: HTMLDivElement
-  score: number = 0
-
-  setup() {
-    this.defineValues(DeathScreen, 'score')
-  }
+  
+  syncedValue()
+  score = 0
 
   onInitialize() {
     // CSS for the death screen UI element

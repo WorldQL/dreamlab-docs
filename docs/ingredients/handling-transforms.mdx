@@ -17,7 +17,7 @@ the right-hand side.
 
 ```typescript
 // Example of changing an entities position through a behavior. This one is more basic.
-import { Behavior, Vector2 } from '@dreamlab/engine'
+import { Behavior, Vector2, syncedValue } from '@dreamlab/engine'
 
 /*
   Key Points:
@@ -29,11 +29,8 @@ import { Behavior, Vector2 } from '@dreamlab/engine'
 export default class AsteroidMovement extends Behavior {
   readonly #direction = new Vector2(Math.random() * 2 - 1, Math.random() * 2 - 1).normalize()
 
+  syncedValue()
   speed = 0.2
-
-  setup() {
-    this.defineValue(AsteroidMovement, 'speed')
-  }
 
   /*
   Properties available under entity.transform are:

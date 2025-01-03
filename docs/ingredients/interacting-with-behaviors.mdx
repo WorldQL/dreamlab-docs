@@ -66,17 +66,17 @@ export default class AsteroidBehavior extends Behavior {
 }
 
 // Health bar behavior for reference
-import { Behavior, BehaviorContext, Entity, GamePostTick, RectCollider, Sprite, Vector2 } from '@dreamlab/engine'
+import { Behavior, BehaviorContext, Entity, GamePostTick, RectCollider, Sprite, Vector2, syncedValue } from '@dreamlab/engine'
 
 export default class HealthBar extends Behavior {
-  maxHealth: number = 100
-  currentHealth: number = 100
-  healthBarEntity!: Entity
+  
+  syncedValue()
+  maxHealth = 100
 
-  constructor(ctx: BehaviorContext) {
-    super(ctx)
-    this.defineValues(HealthBar, 'maxHealth', 'currentHealth')
-  }
+  syncedValue()
+  currentHealth = 100
+  
+  healthBarEntity!: Entity
 
   onInitialize(): void {
     this.healthBarEntity = this.game.world.spawn({

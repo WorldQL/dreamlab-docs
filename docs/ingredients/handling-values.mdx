@@ -16,7 +16,7 @@ the right-hand side.
 :::
 
 ```typescript
-import { Behavior, Vector2 } from '@dreamlab/engine'
+import { Behavior, Vector2, syncedValue } from '@dreamlab/engine'
 
 /*
   Handling Values in Behaviors:
@@ -43,7 +43,13 @@ import { Behavior, Vector2 } from '@dreamlab/engine'
 */
 
 export default class PlayerMovement extends Behavior {
-  // Define a synced value for the player's speed
+  /*
+    Define a synced value for the player's speed
+    - The `defineValues` method is used to specify which properties should be treated as values.
+    - Once defined, `speed` will be managed by the internal value system, allowing it to be
+      synchronized across the network if needed.
+  */
+  syncedValue()
   speed = 5.0
 
   #up = this.inputs.create('@movement/up', 'Move Up', 'KeyW')
@@ -51,16 +57,6 @@ export default class PlayerMovement extends Behavior {
   #left = this.inputs.create('@movement/left', 'Move Left', 'KeyA')
   #right = this.inputs.create('@movement/right', 'Move Right', 'KeyD')
   #boost = this.inputs.create('@movement/boost', 'Speed Boost', 'ShiftLeft')
-
-  setup() {
-    /*
-      Defining the `speed` value to be managed by the behavior.
-      - The `defineValues` method is used to specify which properties should be treated as values.
-      - Once defined, `speed` will be managed by the internal value system, allowing it to be
-        synchronized across the network if needed.
-    */
-    this.defineValues(PlayerMovement, 'speed')
-  }
 
   onTick(): void {
     // Ensure that only the entity's owner can control it
