@@ -18,81 +18,92 @@ the right-hand side.
 ```typescript
 // This is an example of how to implement a platformer controller using the KinematicCharacterController
 
-import { Behavior, EntityDestroyed, Collider, Vector2, syncedValue } from '@dreamlab/engine'
-import { KinematicCharacterController } from '@dreamlab/vendor/rapier.ts'
+import {
+  Behavior,
+  EntityDestroyed,
+  Collider,
+  Vector2,
+  syncedValue,
+} from "@dreamlab/engine";
+import { KinematicCharacterController } from "@dreamlab/vendor/rapier.ts";
 
 export default class PlatformMovement extends Behavior {
-  #collider: Collider = this.entity.cast(Collider)
-  #controller: KinematicCharacterController | undefined
+  #collider: Collider = this.entity.cast(Collider);
+  #controller: KinematicCharacterController | undefined;
 
   @syncedValue()
-  speed = 10.0
+  speed = 10.0;
 
   @syncedValue()
-  jumpForce = 20.0
-  
-  @syncedValue()
-  jumpAcceleration = 40
-  
-  @syncedValue()
-  gravity = 90.0
-  
-  @syncedValue()
-  maxJumpTime = 1 // Maximum duration the jump key affects the jump
+  jumpForce = 20.0;
 
-  #verticalVelocity = 0
-  #isGrounded = false
-  #jumpTimeCounter = 0
+  @syncedValue()
+  jumpAcceleration = 40;
 
-  #up = this.inputs.create('@movement/up', 'Move Up', 'KeyW')
-  #down = this.inputs.create('@movement/down', 'Move Down', 'KeyS')
-  #left = this.inputs.create('@movement/left', 'Move Left', 'KeyA')
-  #right = this.inputs.create('@movement/right', 'Move Right', 'KeyD')
-  #jump = this.inputs.create('@movement/jump', 'Jump', 'Space')
+  @syncedValue()
+  gravity = 90.0;
+
+  @syncedValue()
+  maxJumpTime = 1; // Maximum duration the jump key affects the jump
+
+  #verticalVelocity = 0;
+  #isGrounded = false;
+  #jumpTimeCounter = 0;
+
+  #up = this.inputs.create("@movement/up", "Move Up", "KeyW");
+  #down = this.inputs.create("@movement/down", "Move Down", "KeyS");
+  #left = this.inputs.create("@movement/left", "Move Left", "KeyA");
+  #right = this.inputs.create("@movement/right", "Move Right", "KeyD");
+  #jump = this.inputs.create("@movement/jump", "Jump", "Space");
 
   onInitialize(): void {
     if (this.game.isClient()) {
-      this.#controller = this.game.physics.world.createCharacterController(0.01)
+      this.#controller =
+        this.game.physics.world.createCharacterController(0.01);
     }
 
     this.listen(this.entity, EntityDestroyed, () => {
-      if (this.#controller) this.game.physics.world.removeCharacterController(this.#controller)
-    })
+      if (this.#controller)
+        this.game.physics.world.removeCharacterController(this.#controller);
+    });
   }
 
   onTick(): void {
-    if (!this.#controller) return
+    if (!this.#controller) return;
 
-    const deltaTime = this.game.physics.tickDelta / 1000 // Convert to seconds
+    const deltaTime = this.game.physics.tickDelta / 1000; // Convert to seconds
 
-    let horizontalInput = 0
-    if (this.#right.held) horizontalInput += 1
-    if (this.#left.held) horizontalInput -= 1
+    let horizontalInput = 0;
+    if (this.#right.held) horizontalInput += 1;
+    if (this.#left.held) horizontalInput -= 1;
 
-    const horizontalVelocity = horizontalInput * this.speed
+    const horizontalVelocity = horizontalInput * this.speed;
 
     // Jumping logic
     if (this.#jump.pressed && this.#isGrounded) {
-      this.#verticalVelocity = this.jumpForce
-      this.#jumpTimeCounter = 0
+      this.#verticalVelocity = this.jumpForce;
+      this.#jumpTimeCounter = 0;
     }
 
     if (this.#jump.held && this.#jumpTimeCounter < this.maxJumpTime) {
       // Apply upward acceleration while the jump key is held
-      this.#verticalVelocity += this.jumpAcceleration * deltaTime
-      this.#jumpTimeCounter += deltaTime
+      this.#verticalVelocity += this.jumpAcceleration * deltaTime;
+      this.#jumpTimeCounter += deltaTime;
     }
 
     // Create movement vector
-    const movement = new Vector2(horizontalVelocity * deltaTime, this.#verticalVelocity * deltaTime)
+    const movement = new Vector2(
+      horizontalVelocity * deltaTime,
+      this.#verticalVelocity * deltaTime
+    );
 
-    this.#controller.computeColliderMovement(this.#collider.collider, movement)
-    const corrected = this.#controller.computedMovement()
+    this.#controller.computeColliderMovement(this.#collider.collider, movement);
+    const corrected = this.#controller.computedMovement();
 
-    this.#isGrounded = this.#controller.computedGrounded()
-    if (!this.#isGrounded) this.#verticalVelocity -= this.gravity * deltaTime
+    this.#isGrounded = this.#controller.computedGrounded();
+    if (!this.#isGrounded) this.#verticalVelocity -= this.gravity * deltaTime;
 
-    this.entity.pos = this.entity.pos.add(corrected)
+    this.entity.pos = this.entity.pos.add(corrected);
   }
 }
 

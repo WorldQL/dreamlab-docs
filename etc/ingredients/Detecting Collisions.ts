@@ -1,6 +1,6 @@
-import { Behavior, Entity, EntityCollision } from '@dreamlab/engine'
-import HealthBar from './health-bar.ts'
-import PlayerBehavior from './player.ts'
+import { Behavior, Entity, EntityCollision } from "@dreamlab/engine";
+import HealthBar from "./health-bar.ts"; // this import is not an api, the user will have to have or create a healthbar behavior for this example.
+import PlayerBehavior from "./player.ts"; // this import is not an api, the user will have to have or create a player behavior for this example.
 
 /*
   Handling Collisions in Game Entities:
@@ -18,30 +18,30 @@ import PlayerBehavior from './player.ts'
 */
 
 export default class EnemyBehavior extends Behavior {
-  private healthBar!: HealthBar
+  private healthBar!: HealthBar;
 
   onInitialize(): void {
-    const health = Math.floor(Math.random() * 3) + 3
+    const health = Math.floor(Math.random() * 3) + 3;
     this.healthBar = this.entity.addBehavior({
       type: HealthBar,
       values: { maxHealth: health, currentHealth: health },
-    })
+    });
 
     // Listen for collision event
-    this.listen(this.entity, EntityCollision, e => {
-      if (e.started) this.onCollide(e.other)
-    })
+    this.listen(this.entity, EntityCollision, (e) => {
+      if (e.started) this.onCollide(e.other);
+    });
   }
 
   // Example of collision usage. We only want this entity to collide with the "Bullet" entity
   onCollide(other: Entity) {
-    if (!other.name.startsWith('Bullet')) return
+    if (!other.name.startsWith("Bullet")) return;
 
-    other.destroy()
-    this.healthBar.takeDamage(1)
+    other.destroy();
+    this.healthBar.takeDamage(1);
     if (this.healthBar.currentHealth <= 0) {
-      const player = this.entity.game.world._.Player
-      player.getBehavior(PlayerBehavior).score += 100
+      const player = this.entity.game.world._.Player;
+      player.getBehavior(PlayerBehavior).score += 100;
     }
   }
 }

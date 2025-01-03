@@ -16,8 +16,8 @@ the right-hand side.
 :::
 
 ```typescript
-import { Behavior, Vector2, syncedValue } from '@dreamlab/engine'
-import PlayerBehavior from './player.ts' // this import is not an api, the user will have to have or create a player behavior for this example.
+import { Behavior, Vector2, syncedValue } from "@dreamlab/engine";
+import PlayerBehavior from "./player.ts"; // this import is not an api, the user will have to have or create a player behavior for this example.
 
 /*
   Handling Inputs in a Behavior:
@@ -70,66 +70,68 @@ import PlayerBehavior from './player.ts' // this import is not an api, the user 
 
 export default class Movement extends Behavior {
   @syncedValue()
-  speed = 5.0
+  speed = 5.0;
 
   // Input bindings for movement
-  #up = this.inputs.create('@movement/up', 'Move Up', 'KeyW')
-  #down = this.inputs.create('@movement/down', 'Move Down', 'KeyS')
-  #left = this.inputs.create('@movement/left', 'Move Left', 'KeyA')
-  #right = this.inputs.create('@movement/right', 'Move Right', 'KeyD')
+  #up = this.inputs.create("@movement/up", "Move Up", "KeyW");
+  #down = this.inputs.create("@movement/down", "Move Down", "KeyS");
+  #left = this.inputs.create("@movement/left", "Move Left", "KeyA");
+  #right = this.inputs.create("@movement/right", "Move Right", "KeyD");
 
   // Input binding for firing
-  #fire = this.inputs.create('@clickFire/fire', 'Fire', 'MouseLeft')
+  #fire = this.inputs.create("@clickFire/fire", "Fire", "MouseLeft");
 
   // Cooldown management for firing
-  readonly #cooldown = 0
-  #lastFired = 0
+  readonly #cooldown = 0;
+  #lastFired = 0;
 
-  velocity = Vector2.ZERO
+  velocity = Vector2.ZERO;
 
   onTick(): void {
-    const movement = new Vector2(0, 0)
-    const currentSpeed = this.speed
+    const movement = new Vector2(0, 0);
+    const currentSpeed = this.speed;
 
     // Handle movement inputs
-    if (this.#up.held) movement.y += 1
-    if (this.#down.held) movement.y -= 1
-    if (this.#right.held) movement.x += 1
-    if (this.#left.held) movement.x -= 1
+    if (this.#up.held) movement.y += 1;
+    if (this.#down.held) movement.y -= 1;
+    if (this.#right.held) movement.x += 1;
+    if (this.#left.held) movement.x -= 1;
 
     // Calculate the velocity based on movement input and speed
-    this.velocity = movement.normalize().mul((this.game.physics.tickDelta / 100) * currentSpeed)
+    this.velocity = movement
+      .normalize()
+      .mul((this.game.physics.tickDelta / 100) * currentSpeed);
 
     // Update entity's position
-    const newPosition = this.entity.transform.position.add(this.velocity)
+    const newPosition = this.entity.transform.position.add(this.velocity);
 
     // Boundary checks can be added here to restrict movement within certain limits
 
     // Handle firing input with cooldown management
     if (this.#lastFired > 0) {
-      this.#lastFired -= 1
+      this.#lastFired -= 1;
     } else {
       if (this.#fire.held) {
-        const playerBehavior = this.entity.getBehavior(PlayerBehavior)
-        const fireRateMultiplier = playerBehavior.fireRateMultiplier
+        const playerBehavior = this.entity.getBehavior(PlayerBehavior);
+        const fireRateMultiplier = playerBehavior.fireRateMultiplier;
 
-        this.#lastFired = this.#cooldown / fireRateMultiplier
+        this.#lastFired = this.#cooldown / fireRateMultiplier;
 
         // Trigger the shooting pattern defined in PlayerBehavior
-        playerBehavior.shootingPattern()
+        playerBehavior.shootingPattern();
       }
     }
 
     // Rotate the entity to face the cursor's position
 
-    const world = this.inputs.cursor.world
-    if (!world) return
+    const world = this.inputs.cursor.world;
+    if (!world) return;
     // EXTREMELY IMPORTANT: Use the value of this.inputs.cursor.world before applying newPosition to the transform
-    const rotation = this.entity.transform.position.lookAt(world)
-    this.entity.transform.rotation = rotation
+    const rotation = this.entity.transform.position.lookAt(world);
+    this.entity.transform.rotation = rotation;
 
     // Apply the new position to the entity
-    this.entity.transform.position = newPosition
+    this.entity.transform.position = newPosition;
   }
 }
 

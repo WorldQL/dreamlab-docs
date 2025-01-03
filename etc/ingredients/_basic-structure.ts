@@ -1,4 +1,9 @@
-import { Behavior, Vector2, Vector2Adapter } from '@dreamlab/engine'
+import {
+  Behavior,
+  Vector2,
+  Vector2Adapter,
+  syncedValue,
+} from "@dreamlab/engine";
 /*
   In "@dreamlab/engine", a `Behavior` represents a modular piece of logic that can be attached to an entity.
   This allows you to encapsulate functionality, such as movement, health management, or AI, in reusable components.
@@ -27,44 +32,41 @@ import { Behavior, Vector2, Vector2Adapter } from '@dreamlab/engine'
   this.game.renderer.app is a Pixi application. When making calls to pixi, you must import it as:
   import * as PIXI from "@dreamlab/vendor/pixi.ts";
 
-  onTick() is called 60 times per second.
-
 */
 
 // example Behavior that allows for WASD movement as well as a pattern for firing projectiles.
 // this serves as an example for the general structure of a behavior
-class Movement extends Behavior {
+export default class Movement extends Behavior {
   // the speed of the player
-  speed = 5.0
+  @syncedValue()
+  speed = 5.0;
+
   // example value
-  anotherValue = 42.0
+  @syncedValue()
+  anotherValue = 42.0;
+
   // the current velocity of the player
-  velocity = Vector2.ZERO
+  @syncedValue(Vector2Adapter)
+  velocity = Vector2.ZERO;
 
-  #up = this.inputs.create('@movement/up', 'Move Up', 'KeyW')
-  #down = this.inputs.create('@movement/down', 'Move Down', 'KeyS')
-  #left = this.inputs.create('@movement/left', 'Move Left', 'KeyA')
-  #right = this.inputs.create('@movement/right', 'Move Right', 'KeyD')
-
-  // the setup method should ONLY be used for calls to defineValue. Anything else should go in onInitialize which will run when the behavior is spawned.
-  setup(): void {
-    // definevalue calls make the public class variables visible in the inspector GUI and also sync over the network
-    // define multiple values at once by passing them as more arguments. do not pass a list.
-    this.defineValues(Movement, 'speed', 'anotherValue')
-    this.defineValue(Movement, 'velocity', { type: Vector2Adapter })
-  }
+  #up = this.inputs.create("@movement/up", "Move Up", "KeyW");
+  #down = this.inputs.create("@movement/down", "Move Down", "KeyS");
+  #left = this.inputs.create("@movement/left", "Move Left", "KeyA");
+  #right = this.inputs.create("@movement/right", "Move Right", "KeyD");
 
   onTick(): void {
-    const movement = new Vector2(0, 0)
-    const currentSpeed = this.speed
+    const movement = new Vector2(0, 0);
+    const currentSpeed = this.speed;
 
-    if (this.#up.held) movement.y += 1
-    if (this.#down.held) movement.y -= 1
-    if (this.#right.held) movement.x += 1
-    if (this.#left.held) movement.x -= 1
+    if (this.#up.held) movement.y += 1;
+    if (this.#down.held) movement.y -= 1;
+    if (this.#right.held) movement.x += 1;
+    if (this.#left.held) movement.x -= 1;
 
-    this.velocity = movement.normalize().mul((this.game.physics.tickDelta / 100) * currentSpeed)
+    this.velocity = movement
+      .normalize()
+      .mul((this.game.physics.tickDelta / 100) * currentSpeed);
 
-    const newPosition = this.entity.transform.position.add(this.velocity)
+    const newPosition = this.entity.transform.position.add(this.velocity);
   }
 }

@@ -1,4 +1,4 @@
-import { Behavior } from '@dreamlab/engine'
+import { Behavior } from "@dreamlab/engine";
 /*
   You can look up entities by their ID using the various roots (prefabs, local, world, & server).
   Each root contains a collection of entities, and you can access a specific entity by its ID
@@ -20,14 +20,14 @@ import { Behavior } from '@dreamlab/engine'
 
 export default class PlayerSpawner extends Behavior {
   onInitialize(): void {
-    if (!this.game.isClient()) return
+    if (!this.game.isClient()) return;
 
     this.game.prefabs._.Player.cloneInto(this.game.world, {
-      name: 'Player.' + this.game.network.self,
+      name: "Player." + this.game.network.self,
       transform: { position: { x: 0, y: 0 } },
       authority: this.game.network.self,
-    })
+    });
 
-    this.game.local._.Camera.transform.scale.assign({ x: 2, y: 2 })
+    this.game.local._.Camera.transform.scale.assign({ x: 2, y: 2 });
   }
 }

@@ -1,5 +1,5 @@
-import { Behavior, RectCollider, Sprite } from '@dreamlab/engine'
-import BulletBehavior from './bullet.ts'
+import { Behavior, Collider, Sprite } from "@dreamlab/engine";
+import BulletBehavior from "./bullet.ts"; // this import is not an API, the user will need to make this behavior
 
 /*
   Spawning Entities Overview:
@@ -49,61 +49,63 @@ import BulletBehavior from './bullet.ts'
 export default class PlayerSpawner extends Behavior {
   onInitialize(): void {
     // Cloning a prefab to spawn a player entity.
-    if (!this.game.isClient()) return
+    if (!this.game.isClient()) return;
 
     this.game.prefabs._.Player.cloneInto(this.game.world, {
-      name: 'Player.' + this.game.network.self,
+      name: "Player." + this.game.network.self,
       transform: { position: { x: 0, y: 0 } },
       authority: this.game.network.self,
-    })
+    });
 
     // Modify the local camera entity's scale after spawning the player.
-    this.game.local._.Camera.transform.scale.assign({ x: 2, y: 2 })
+    this.game.local._.Camera.transform.scale.assign({ x: 2, y: 2 });
   }
 }
 
 export default class EnemyMovement extends Behavior {
-  speed = Math.random() * 0.5 + 0.5
-  minDistance = 5
-  shootDistance = 10
-  lastShootTime = 0
-  shootCooldown = Math.random() * 2000 + 1000
+  speed = Math.random() * 0.5 + 0.5;
+  minDistance = 5;
+  shootDistance = 10;
+  lastShootTime = 0;
+  shootCooldown = Math.random() * 2000 + 1000;
 
   onTick(): void {
-    const player = this.entity.game.world.children.get('Player')
-    const playerPos = player?.globalTransform.position
-    if (!playerPos) return
+    const player = this.entity.game.world.children.get("Player");
+    const playerPos = player?.globalTransform.position;
+    if (!playerPos) return;
 
-    const direction = playerPos.sub(this.entity.transform.position).normalize()
-    const distance = playerPos.sub(this.entity.transform.position).magnitude()
+    const direction = playerPos.sub(this.entity.transform.position).normalize();
+    const distance = playerPos.sub(this.entity.transform.position).magnitude();
 
     if (distance > this.minDistance + 5) {
-      let speedFactor = 1
+      let speedFactor = 1;
       if (distance < this.minDistance + 10) {
-        speedFactor = (distance - this.minDistance) / 10
+        speedFactor = (distance - this.minDistance) / 10;
       }
-      this.entity.transform.position = this.entity.transform.position.add(direction.mul((this.time.delta / 100) * this.speed * speedFactor))
+      this.entity.transform.position = this.entity.transform.position.add(
+        direction.mul((this.time.delta / 100) * this.speed * speedFactor)
+      );
     }
 
-    const rotation = Math.atan2(direction.y, direction.x)
-    this.entity.transform.rotation = rotation - Math.PI / 2
+    const rotation = Math.atan2(direction.y, direction.x);
+    this.entity.transform.rotation = rotation - Math.PI / 2;
 
     if (distance <= this.shootDistance) {
-      const now = Date.now()
+      const now = Date.now();
       if (now - this.lastShootTime > this.shootCooldown) {
-        this.lastShootTime = now
-        this.shootAtPlayer()
+        this.lastShootTime = now;
+        this.shootAtPlayer();
       }
     }
   }
 
   shootAtPlayer(): void {
-    const rotation = this.entity.transform.rotation + Math.PI / 2
+    const rotation = this.entity.transform.rotation + Math.PI / 2;
 
-    // Spawning a bullet entity with custom components and behaviors
+    // Spawning a bullet entity with custom transform, behaviors, and children entities
     this.entity.game.world.spawn({
-      type: RectCollider,
-      name: 'EnemyBullet',
+      type: Collider,
+      name: "EnemyBullet",
       transform: {
         position: this.entity.transform.position.clone(),
         rotation,
@@ -113,12 +115,12 @@ export default class EnemyMovement extends Behavior {
       children: [
         {
           type: Sprite,
-          name: 'BulletSprite',
+          name: "BulletSprite",
           transform: {
             scale: { x: 0.75, y: 0.75 },
           },
         },
       ],
-    })
+    });
   }
 }

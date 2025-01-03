@@ -16,7 +16,12 @@ the right-hand side.
 :::
 
 ```typescript
-import { Behavior, Vector2, Vector2Adapter, syncedValue } from '@dreamlab/engine'
+import {
+  Behavior,
+  Vector2,
+  Vector2Adapter,
+  syncedValue,
+} from "@dreamlab/engine";
 /*
   In "@dreamlab/engine", a `Behavior` represents a modular piece of logic that can be attached to an entity.
   This allows you to encapsulate functionality, such as movement, health management, or AI, in reusable components.
@@ -49,36 +54,38 @@ import { Behavior, Vector2, Vector2Adapter, syncedValue } from '@dreamlab/engine
 
 // example Behavior that allows for WASD movement as well as a pattern for firing projectiles.
 // this serves as an example for the general structure of a behavior
-class Movement extends Behavior {
+export default class Movement extends Behavior {
   // the speed of the player
   @syncedValue()
-  speed = 5.0
+  speed = 5.0;
 
   // example value
   @syncedValue()
-  anotherValue = 42.0
+  anotherValue = 42.0;
 
   // the current velocity of the player
   @syncedValue(Vector2Adapter)
-  velocity = Vector2.ZERO
+  velocity = Vector2.ZERO;
 
-  #up = this.inputs.create('@movement/up', 'Move Up', 'KeyW')
-  #down = this.inputs.create('@movement/down', 'Move Down', 'KeyS')
-  #left = this.inputs.create('@movement/left', 'Move Left', 'KeyA')
-  #right = this.inputs.create('@movement/right', 'Move Right', 'KeyD')
+  #up = this.inputs.create("@movement/up", "Move Up", "KeyW");
+  #down = this.inputs.create("@movement/down", "Move Down", "KeyS");
+  #left = this.inputs.create("@movement/left", "Move Left", "KeyA");
+  #right = this.inputs.create("@movement/right", "Move Right", "KeyD");
 
   onTick(): void {
-    const movement = new Vector2(0, 0)
-    const currentSpeed = this.speed
+    const movement = new Vector2(0, 0);
+    const currentSpeed = this.speed;
 
-    if (this.#up.held) movement.y += 1
-    if (this.#down.held) movement.y -= 1
-    if (this.#right.held) movement.x += 1
-    if (this.#left.held) movement.x -= 1
+    if (this.#up.held) movement.y += 1;
+    if (this.#down.held) movement.y -= 1;
+    if (this.#right.held) movement.x += 1;
+    if (this.#left.held) movement.x -= 1;
 
-    this.velocity = movement.normalize().mul((this.game.physics.tickDelta / 100) * currentSpeed)
+    this.velocity = movement
+      .normalize()
+      .mul((this.game.physics.tickDelta / 100) * currentSpeed);
 
-    const newPosition = this.entity.transform.position.add(this.velocity)
+    const newPosition = this.entity.transform.position.add(this.velocity);
   }
 }
 

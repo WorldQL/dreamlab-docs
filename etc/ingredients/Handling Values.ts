@@ -1,4 +1,4 @@
-import { Behavior, Vector2 } from '@dreamlab/engine'
+import { Behavior, Vector2, syncedValue } from "@dreamlab/engine";
 
 /*
   Handling Values in Behaviors:
@@ -25,42 +25,41 @@ import { Behavior, Vector2 } from '@dreamlab/engine'
 */
 
 export default class PlayerMovement extends Behavior {
-  // Define a synced value for the player's speed
-  speed = 5.0
+  /*
+    Define a synced value for the player's speed
+    - The `defineValues` method is used to specify which properties should be treated as values.
+    - Once defined, `speed` will be managed by the internal value system, allowing it to be
+      synchronized across the network if needed.
+  */
+  @syncedValue()
+  speed = 5.0;
 
-  #up = this.inputs.create('@movement/up', 'Move Up', 'KeyW')
-  #down = this.inputs.create('@movement/down', 'Move Down', 'KeyS')
-  #left = this.inputs.create('@movement/left', 'Move Left', 'KeyA')
-  #right = this.inputs.create('@movement/right', 'Move Right', 'KeyD')
-  #boost = this.inputs.create('@movement/boost', 'Speed Boost', 'ShiftLeft')
-
-  setup() {
-    /*
-      Defining the `speed` value to be managed by the behavior.
-      - The `defineValues` method is used to specify which properties should be treated as values.
-      - Once defined, `speed` will be managed by the internal value system, allowing it to be
-        synchronized across the network if needed.
-    */
-    this.defineValues(PlayerMovement, 'speed')
-  }
+  #up = this.inputs.create("@movement/up", "Move Up", "KeyW");
+  #down = this.inputs.create("@movement/down", "Move Down", "KeyS");
+  #left = this.inputs.create("@movement/left", "Move Left", "KeyA");
+  #right = this.inputs.create("@movement/right", "Move Right", "KeyD");
+  #boost = this.inputs.create("@movement/boost", "Speed Boost", "ShiftLeft");
 
   onTick(): void {
     // Ensure that only the entity's owner can control it
-    if (this.entity.authority !== this.game.network.self) return
+    if (this.entity.authority !== this.game.network.self) return;
 
-    const movement = new Vector2(0, 0)
+    const movement = new Vector2(0, 0);
 
-    if (this.#up.held) movement.y += 1
-    if (this.#down.held) movement.y -= 1
-    if (this.#right.held) movement.x += 1
-    if (this.#left.held) movement.x -= 1
+    if (this.#up.held) movement.y += 1;
+    if (this.#down.held) movement.y -= 1;
+    if (this.#right.held) movement.x += 1;
+    if (this.#left.held) movement.x -= 1;
 
     // Adjust speed if boost is held
-    let currentSpeed = this.speed
-    if (this.#boost.held) currentSpeed *= 2
+    let currentSpeed = this.speed;
+    if (this.#boost.held) currentSpeed *= 2;
 
-    const velocity = movement.normalize().mul((this.game.physics.tickDelta / 100) * currentSpeed)
+    const velocity = movement
+      .normalize()
+      .mul((this.game.physics.tickDelta / 100) * currentSpeed);
 
-    this.entity.transform.position = this.entity.transform.position.add(velocity)
+    this.entity.transform.position =
+      this.entity.transform.position.add(velocity);
   }
 }

@@ -1,5 +1,5 @@
-import { Behavior, UILayer } from '@dreamlab/engine'
-import { element } from '@dreamlab/ui'
+import { Behavior, UILayer, syncedValue } from "@dreamlab/engine";
+import { element } from "@dreamlab/ui";
 
 /*
   UI System Overview:
@@ -39,13 +39,11 @@ import { element } from '@dreamlab/ui'
 
 export default class DeathScreen extends Behavior {
   // Reference to the UI layer associated with the entity
-  #ui = this.entity.cast(UILayer)
-  #element!: HTMLDivElement
-  score: number = 0
+  #ui = this.entity.cast(UILayer);
+  #element!: HTMLDivElement;
 
-  setup() {
-    this.defineValues(DeathScreen, 'score')
-  }
+  @syncedValue()
+  score = 0;
 
   onInitialize() {
     // CSS for the death screen UI element
@@ -90,42 +88,42 @@ export default class DeathScreen extends Behavior {
     button:hover {
       background-color: #e65c00;
     }
-    `
+    `;
 
     // Create a <style> element and add the CSS to it
-    const style = element('style', { textContent: css })
-    this.#ui.dom.appendChild(style)
+    const style = element("style", { textContent: css });
+    this.#ui.dom.appendChild(style);
 
     // Create a "Respawn" button using the new `element` method
-    const button = element('button', { type: 'button' }, ['Respawn'])
-    button.addEventListener('click', () => this.#respawnPlayer())
+    const button = element("button", { type: "button" }, ["Respawn"]);
+    button.addEventListener("click", () => this.#respawnPlayer());
 
     // Create the main death screen UI container
     this.#element = element(
-      'div',
+      "div",
       {
-        id: 'death-screen', // Set the ID for the main container
+        id: "death-screen", // Set the ID for the main container
       },
       [
         // Add an <h1> element for the "Game Over" title
-        element('h1', { className: 'example-classname' }, ['Game Over']),
+        element("h1", { className: "example-classname" }, ["Game Over"]),
 
         // Add a <p> element to display the player's final score
-        element('p', {}, [`Final Score: ${this.score.toLocaleString()}`]),
+        element("p", {}, [`Final Score: ${this.score.toLocaleString()}`]),
 
         // Add the "Respawn" button created earlier
         button,
-      ],
-    )
+      ]
+    );
 
     // Append the death screen UI container to the UI layer
-    this.#ui.element.appendChild(this.#element)
+    this.#ui.element.appendChild(this.#element);
   }
 
   #respawnPlayer() {
     // spawnPlayer(this.game)
 
     // Destroy the current entity, removing the death screen from the UI
-    this.entity.destroy()
+    this.entity.destroy();
   }
 }
