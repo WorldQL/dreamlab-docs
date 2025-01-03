@@ -1,0 +1,212 @@
+import useBaseUrl from "@docusaurus/useBaseUrl";
+
+# Message Channels
+Facilitating communication between behaviors using custom messages and synced values to synchronize state or trigger actions.
+:::info
+These docs power Dreamlab Assistant, an AI chatbot that helps you code your game.
+
+<img
+  src={useBaseUrl("/img/scriptstab.png")}
+  style={{ width: "auto", maxHeight: "15rem" }}
+  alt="scripts tab location"
+/>
+Navigate to your "Scripts" tab and the Dreamlab Assistant will be available on
+the right-hand side.
+
+:::
+
+```typescript
+import { Behavior, ClickableEntity, MouseDown, Sprite } from "@dreamlab/engine";
+
+/*
+  Custom Messages and Synced Values:
+
+  In multiplayer game development, behaviors often need to communicate with each other to maintain
+  consistency across the network. This can be achieved using custom messages or synced values.
+
+  Key Points:
+  - **Custom Messages:**
+    Custom messages are event-driven and useful for sending specific data or triggering actions
+    between behaviors. These messages are handled explicitly in the code, providing flexibility
+    for dynamic interactions.
+
+  - **Synced Values:**
+    Synced values automatically synchronize data between the server and clients. They are ideal
+    for maintaining shared states like scores, health, or leaderboard information. Using synced
+    values reduces the complexity of managing data consistency manually.
+
+  - **When to Use:**
+    Use custom messages for one-time events or interactions, such as button clicks or attacks.
+    Use synced values for persistent or frequently updated data that needs to remain consistent
+    across the network.
+*/
+
+export default class ClickableColorChanger extends Behavior {
+  #clickable: ClickableEntity;
+  private isClicked = false;
+  private effectTimer = 0;
+  private originalScale = { x: 1, y: 1 };
+
+  onInitialize(): void {
+    this.#clickable = this.entity.cast(ClickableEntity);
+
+    this.listen(this.#clickable, MouseDown, ({ button }) => {
+      if (button !== "left") return;
+
+      const player = this.game.network.connections.find(
+        (conn) => conn.id === this.game.network.self
+      );
+
+      if (!player) return;
+
+      this.game.network.sendCustomMessage("server", "@cookie/click", {
+        playerId: player.playerId,
+        nickname: player.nickname || "Unknown",
+      });
+
+      if (!this.isClicked) this.startClickEffect();
+    });
+  }
+
+  private startClickEffect(): void {
+    const sprite = this.entity._.Sprite.cast(Sprite);
+    if (!sprite) return;
+
+    this.isClicked = true;
+    this.effectTimer = 150;
+
+    this.originalScale = this.entity.transform.scale;
+    sprite.alpha = 0.5;
+    this.entity.transform.scale = {
+      x: this.originalScale.x * 0.8,
+      y: this.originalScale.y * 0.8,
+    };
+  }
+
+  onTick(): void {
+    if (this.isClicked) {
+      const sprite = this.entity._.Sprite.cast(Sprite);
+      if (!sprite) return;
+
+      this.effectTimer -= this.time.delta;
+      if (this.effectTimer <= 0) {
+        sprite.alpha = 1;
+        this.entity.transform.scale = this.originalScale;
+        this.isClicked = false;
+      }
+    }
+  }
+}
+
+import {
+  Behavior,
+  ObjectAdapter,
+  PlayerJoined,
+  syncedValue,
+} from "@dreamlab/engine";
+import { z } from "@dreamlab/vendor/zod.ts";
+
+export default class GlobalStats extends Behavior {
+  @syncedValue(ObjectAdapter)
+  leaderboard: Record<string, { nickname: string; clicks: number }> = {};
+
+  @syncedValue()
+  totalClicks = 0;
+
+  private playerClicks = new Map<
+    string,
+    { nickname: string; clicks: number }
+  >();
+  private playerIds = new Set<string>();
+
+  async onInitialize() {
+    if (!this.game.isServer()) return;
+
+    const totalClicks = await this.game.kv.server.get("totalClicks");
+    if (typeof totalClicks === "number") this.totalClicks = totalClicks;
+
+    const savedPlayers = await this.game.kv.server.get("allPlayers");
+    if (Array.isArray(savedPlayers)) {
+      for (const { playerId, nickname } of savedPlayers) {
+        const storedClicks = await this.game.kv.server.get(
+          `playerClicks:${playerId}`
+        );
+        const clicks = typeof storedClicks === "number" ? storedClicks : 0;
+        this.playerClicks.set(playerId, { nickname, clicks });
+        this.playerIds.add(playerId);
+      }
+    }
+
+    this.updateLeaderboard();
+
+    this.listen(this.game, PlayerJoined, async (player) => {
+      if (!this.game.isServer()) return;
+
+      const playerId = player.connection.playerId;
+      const nickname = player.connection.nickname || "Unknown";
+
+      if (!this.playerIds.has(playerId)) {
+        this.playerIds.add(playerId);
+        await this.persistPlayer(playerId, nickname);
+      }
+
+      const storedClicks = await this.game.kv.server.get(
+        `playerClicks:${playerId}`
+      );
+      const clicks = typeof storedClicks === "number" ? storedClicks : 0;
+
+      this.playerClicks.set(playerId, { nickname, clicks });
+      this.updateLeaderboard();
+    });
+
+    this.game.network.onReceiveCustomMessage((from, channel, data) => {
+      if (channel !== "@cookie/click" || !this.game.isServer()) return;
+
+      const ClickSchema = z.object({
+        playerId: z.string(),
+        nickname: z.string(),
+      });
+      const packet = ClickSchema.safeParse(data);
+      if (!packet.success) return;
+
+      const { playerId, nickname } = packet.data;
+
+      this.totalClicks += 1;
+      this.game.kv.server.set("totalClicks", this.totalClicks);
+
+      const playerData = this.playerClicks.get(playerId) || {
+        nickname,
+        clicks: 0,
+      };
+      playerData.clicks += 1;
+      this.playerClicks.set(playerId, playerData);
+
+      this.game.kv.server.set(`playerClicks:${playerId}`, playerData.clicks);
+      this.persistPlayer(playerId, nickname);
+
+      this.updateLeaderboard();
+    });
+  }
+
+  private async persistPlayer(playerId: string, nickname: string) {
+    if (!this.game.isServer()) return;
+
+    const allPlayersRaw = await this.game.kv.server.get("allPlayers");
+    const allPlayers = Array.isArray(allPlayersRaw) ? allPlayersRaw : [];
+
+    const updatedPlayers = [
+      ...allPlayers.filter(
+        (player) => typeof player === "object" && player.playerId !== playerId
+      ),
+      { playerId, nickname },
+    ];
+
+    await this.game.kv.server.set("allPlayers", updatedPlayers);
+  }
+
+  private updateLeaderboard() {
+    this.leaderboard = Object.fromEntries(this.playerClicks.entries());
+  }
+}
+
+```

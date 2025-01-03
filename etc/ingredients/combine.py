@@ -12,7 +12,8 @@ available_topics = {
     "User Interfaces": "Creating GUIs (HUDs, health bars, etc)",
     "Spawning Entities": "Spawning new entities into the world and attaching behaviors.",
     "Character Controller": "Using the built-in character controller which handles collision detection. Great for any movement style.",
-    "Behavior Structure": "Behavior classes are used to implement all game functionality."
+    "Basic Structure": "Behavior classes are used to implement all game functionality.",
+    "Message Channels": "Facilitating communication between behaviors using custom messages and synced values to synchronize state or trigger actions.",
 }
 
 
@@ -46,7 +47,11 @@ def collect_files():
 def create_js_dictionary(file_dict):
     js_dict = json.dumps(file_dict, indent=2)
     js_output = f"export const fileContents = {js_dict};\n"
-    js_output += "const available_topics = `" + '\n'.join([f"{key} - {value}" for key, value in available_topics.items()]) + "`"
+    js_output += (
+        "const available_topics = `"
+        + "\n".join([f"{key} - {value}" for key, value in available_topics.items()])
+        + "`"
+    )
 
     with open("file_contents.js", "w", encoding="utf-8") as js_file:
         js_file.write(js_output)
@@ -67,15 +72,17 @@ def create_mdx_files(file_dict):
             title = "Behavior Structure"
         else:
             # Generate mdx filename: convert to lowercase and replace underscores with hyphens
-            mdx_filename = file_name.replace(" ", "-").replace("_", "-").lower() + ".mdx"
+            mdx_filename = (
+                file_name.replace(" ", "-").replace("_", "-").lower() + ".mdx"
+            )
             # Keep the title as the original filename with spaces instead of underscores
             title = file_name.replace("_", " ")
 
         mdx_filepath = os.path.join(mdx_dir, mdx_filename)
         mdx_content = 'import useBaseUrl from "@docusaurus/useBaseUrl";\n\n'
         mdx_content += f"# {title}\n"
-        mdx_content += available_topics[title] + '\n'
-        mdx_content+= ''':::info
+        mdx_content += available_topics[title] + "\n"
+        mdx_content += """:::info
 These docs power Dreamlab Assistant, an AI chatbot that helps you code your game.
 
 <img
@@ -86,7 +93,7 @@ These docs power Dreamlab Assistant, an AI chatbot that helps you code your game
 Navigate to your "Scripts" tab and the Dreamlab Assistant will be available on
 the right-hand side.
 
-:::\n\n'''
+:::\n\n"""
         mdx_content += f"```typescript\n{file_contents}\n```"
 
         try:
