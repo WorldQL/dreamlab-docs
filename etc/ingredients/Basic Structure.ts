@@ -29,8 +29,12 @@ import {
 
   If you want to get the width or height of the screen, you can use this.game.renderer.app.canvas.width / height.
 
-  this.game.renderer.app is a Pixi application. When making calls to pixi, you must import it as:
-  import * as PIXI from "@dreamlab/vendor/pixi.ts";
+  Important Notes:
+  - **Do Not Use Renderer for Game Screen Dimensions:**
+    The game screen is defined by the camera(s) in the game scene, not by the renderer or app.
+    Attempting to access `this.game.renderer.app.screen.width` or `this.game.renderer.app.screen.height` is incorrect.
+    To limit game space or define boundaries, use colliders (e.g., walls) in the world.
+    Avoid relying on renderer properties as they do not exist on `game` and are unrelated to defining game space.
 
 */
 
@@ -49,6 +53,8 @@ export default class Movement extends Behavior {
   @syncedValue(Vector2Adapter)
   velocity = Vector2.ZERO;
 
+  // Input bindings for movement
+  // (method) Inputs.create(name: string, label: string, defaultBinding: Input): Action
   #up = this.inputs.create("@movement/up", "Move Up", "KeyW");
   #down = this.inputs.create("@movement/down", "Move Down", "KeyS");
   #left = this.inputs.create("@movement/left", "Move Left", "KeyA");

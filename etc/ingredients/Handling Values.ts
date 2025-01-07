@@ -1,4 +1,9 @@
-import { Behavior, Vector2, syncedValue } from "@dreamlab/engine";
+import {
+  Behavior,
+  Vector2,
+  Vector2Adapter,
+  syncedValue,
+} from "@dreamlab/engine";
 
 /*
   Handling Values in Behaviors:
@@ -21,6 +26,52 @@ import { Behavior, Vector2, syncedValue } from "@dreamlab/engine";
     they are wrapped in a `Value` object that manages synchronization, type checking,
     and default values.
 
+  - **Using Adapters for Complex Values:**
+    If your synced value requires additional processing or conversion, you must use an adapter.
+    Below are examples of adapters and their usage:
+
+    - **Vector2Adapter:** For vector data, like positions or velocities.
+      ```typescript
+      @syncedValue(Vector2Adapter)
+      velocity = Vector2.ZERO;
+      ```
+
+    - **TextureAdapter:** For textures that need preloading.
+      ```typescript
+      @syncedValue(TextureAdapter)
+      texture = "path/to/texture.png";
+      ```
+
+    - **SpritesheetAdapter:** For spritesheets requiring preloading.
+      ```typescript
+      @syncedValue(SpritesheetAdapter)
+      spritesheet = "path/to/spritesheet.json";
+      ```
+
+    - **ObjectAdapter:** For synchronizing plain objects with mutation detection.
+      ```typescript
+      @syncedValue(ObjectAdapter)
+      config = { key: "value" };
+      ```
+
+    - **EntityByRefAdapter:** For referencing game entities.
+      ```typescript
+      @syncedValue(EntityByRefAdapter)
+      targetEntity = undefined;
+      ```
+
+    - **ColorAdapter:** For color values.
+      ```typescript
+      @syncedValue(ColorAdapter)
+      color = "#FFFFFF";
+      ```
+
+    - **AudioAdapter:** For preloading audio resources.
+      ```typescript
+      @syncedValue(AudioAdapter)
+      audio = "path/to/sound.mp3";
+      ```
+
   Below is an example demonstrating how to define and use values within a behavior.
 */
 
@@ -33,6 +84,14 @@ export default class PlayerMovement extends Behavior {
   */
   @syncedValue()
   speed = 5.0;
+
+  /*
+    Define a synced value for velocity using the Vector2Adapter
+    - This ensures that the `velocity` property can handle vector data correctly
+      and synchronize it across the network if needed.
+  */
+  @syncedValue(Vector2Adapter)
+  velocity = Vector2.ZERO;
 
   #up = this.inputs.create("@movement/up", "Move Up", "KeyW");
   #down = this.inputs.create("@movement/down", "Move Down", "KeyS");

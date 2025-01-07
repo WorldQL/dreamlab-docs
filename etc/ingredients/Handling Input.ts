@@ -55,6 +55,7 @@ export default class Movement extends Behavior {
   speed = 5.0;
 
   // Input bindings for movement
+  // (method) Inputs.create(name: string, label: string, defaultBinding: Input): Action
   #up = this.inputs.create("@movement/up", "Move Up", "KeyW");
   #down = this.inputs.create("@movement/down", "Move Down", "KeyS");
   #left = this.inputs.create("@movement/left", "Move Left", "KeyA");

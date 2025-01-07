@@ -28,6 +28,7 @@ export default class EnemyBehavior extends Behavior {
     });
 
     // Listen for collision event
+    // EntityCollision only has: (public started: boolean, public other: Entity)
     this.listen(this.entity, EntityCollision, (e) => {
       if (e.started) this.onCollide(e.other);
     });
