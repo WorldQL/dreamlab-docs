@@ -3,6 +3,7 @@ import {
   Vector2,
   Vector2Adapter,
   syncedValue,
+  ColoredSquare,
 } from "@dreamlab/engine";
 /*
   In "@dreamlab/engine", a `Behavior` represents a modular piece of logic that can be attached to an entity.
@@ -27,7 +28,18 @@ import {
   The `Behavior` class is highly flexible, supporting complex game mechanics through a combination of values, signals,
   and lifecycle hooks. It serves as the foundation for defining how entities behave in the game world.
 
-  If you want to get the width or height of the screen, you can use this.game.renderer.app.canvas.width / height.
+  Accessing entity children:
+  Use `this.entity._.ChildName` to access a child entity directly. 
+  For example: `this.entity._.ColoredSquare` will work if the entity has a child named 'ColoredSquare'.
+
+  If the child's name contains a space, use bracket notation: `this.entity._["My_Entity"]`.
+
+  You can also access children of children by chaining: 
+  `this.entity.myChild.myOtherChild`.
+
+  Important: 
+  Do NOT use `this.entity.children.find(child => child.name === "ChildName")` as it is inefficient and unnecessary. 
+  The `children` property provides a `ReadonlyMap` for reference but should not be used for lookups.
 
   Important Notes:
   - **Do Not Use Renderer for Game Screen Dimensions:**

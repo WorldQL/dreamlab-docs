@@ -16,7 +16,12 @@ the right-hand side.
 :::
 
 ```typescript
-import { Behavior, Entity, EntityCollision } from "@dreamlab/engine";
+import {
+  Behavior,
+  Entity,
+  EntityCollision,
+  ColoredSquare,
+} from "@dreamlab/engine";
 import PlayerBehavior from "./player.ts"; // this import is not an api, the user will have to have or create a player behavior for this example.
 
 /*
@@ -28,6 +33,19 @@ import PlayerBehavior from "./player.ts"; // this import is not an api, the user
 
   In this example, `getBehavior()` is used to update the player's score when an asteroid is destroyed,
   as well as to interact with the asteroid's health bar.
+
+  Accessing entity children:
+  Use `this.entity._.ChildName` to access a child entity directly. 
+  For example: `this.entity._.ColoredSquare` will work if the entity has a child named 'ColoredSquare'.
+
+  If the child's name contains a space, use bracket notation: `this.entity._["My_Entity"]`.
+
+  You can also access children of children by chaining: 
+  `this.entity.myChild.myOtherChild`.
+
+  Important: 
+  Do NOT use `this.entity.children.find(child => child.name === "ChildName")` as it is inefficient and unnecessary. 
+  The `children` property provides a `ReadonlyMap` for reference but should not be used for lookups.
 
   Benefits of `getBehavior()`:
   - Prevents duplication of behavior instances.
@@ -77,10 +95,10 @@ import {
 } from "@dreamlab/engine";
 
 export default class HealthBar extends Behavior {
-  syncedValue();
+  @syncedValue()
   maxHealth = 100;
 
-  syncedValue();
+  @syncedValue()
   currentHealth = 100;
 
   healthBarEntity!: Entity;
