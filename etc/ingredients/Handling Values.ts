@@ -14,7 +14,7 @@ import {
 
   Key Points:
   - **Defining Values:**
-    Values are defined using the `defineValues` or `defineValue` method, which binds a property
+    Values are defined using the `defineValues` decorator, which binds a property
     to the behavior, ensuring it is properly managed and optionally synchronized across the network.
 
   - **Value Synchronization:**
