@@ -85,9 +85,6 @@ export default class AsteroidBehavior extends Behavior {
 
 // Health bar behavior for reference
 import {
-  Behavior,
-  BehaviorContext,
-  Entity,
   GamePostTick,
   Sprite,
   Vector2,
@@ -107,7 +104,7 @@ export default class HealthBar extends Behavior {
     this.healthBarEntity = this.game.world.spawn({
       type: Sprite,
       name: "HealthBar",
-      transform: { position: { x: 0, y: 1 }, scale: { x: 1, y: 0.1 } },
+      transform: { position: { x: 0, y: 1, }, scale: { x: 1, y: 0.1 } },
       values: { texture: "res://assets/healthbar.png" },
     });
 

@@ -32,7 +32,7 @@ import {
 
   Key Points:
   - **Defining Values:**
-    Values are defined using the `defineValues` or `defineValue` method, which binds a property
+    Values are defined using the `defineValues` decorator, which binds a property
     to the behavior, ensuring it is properly managed and optionally synchronized across the network.
 
   - **Value Synchronization:**
@@ -119,7 +119,7 @@ export default class PlayerMovement extends Behavior {
 
   onTick(): void {
     // Ensure that only the entity's owner can control it
-    if (this.entity.authority !== this.game.network.self) return;
+    if (this.hasAuthority()) return;
 
     const movement = new Vector2(0, 0);
 

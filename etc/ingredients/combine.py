@@ -48,7 +48,7 @@ def create_js_dictionary(file_dict):
     js_dict = json.dumps(file_dict, indent=2)
     js_output = f"export const fileContents: Record<string, string> = {js_dict};\n"
     js_output += (
-        "const available_topics = `"
+        "export const available_topics = `"
         + "\n".join([f"{key} - {value}" for key, value in available_topics.items()])
         + "`"
     )

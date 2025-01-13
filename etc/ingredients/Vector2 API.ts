@@ -1,156 +1,80 @@
-// The following code demonstrates the `Vector2` class, which is part of the `@dreamlab/engine` package.
-// This class provides a 2D vector with a variety of utility methods for vector operations,
-// such as addition, subtraction, normalization, and more.
-// You can import and use this class in your project to handle 2D vector mathematics efficiently.
+// Vector2 is a common class in Dreamlab
+import { Vector2, IVector2 } from "@dreamlab/engine";
 
-// Abstract representation of Vector2 API usage
-import { Vector2 } from "@dreamlab/engine";
+// example use
+const v: IVector2 = {x:0, y:0}
+const myVector: Vector2 = new Vector2(v)
 
-/**
- * Abstract class that provides examples of the Vector2 API.
- * This class ensures that the AI model understands all available Vector2 functions.
- */
-export abstract class Vector2AIExample {
-  /**
-   * Demonstrates addition of two vectors.
-   * @param vecA First vector.
-   * @param vecB Second vector.
-   */
-  static addVectors(vecA: Vector2, vecB: Vector2): Vector2 {
-    return vecA.add(vecB);
-  }
 
-  /**
-   * Demonstrates subtraction of two vectors.
-   * @param vecA First vector.
-   * @param vecB Second vector.
-   */
-  static subtractVectors(vecA: Vector2, vecB: Vector2): Vector2 {
-    return vecA.sub(vecB);
-  }
+interface IVector2 {
+  x: number;
+  y: number;
+}
 
-  /**
-   * Demonstrates multiplication of a vector by a scalar.
-   * @param vec Vector to multiply.
-   * @param scalar Scalar value.
-   */
-  static multiplyByScalar(vec: Vector2, scalar: number): Vector2 {
-    return vec.mul(scalar);
-  }
+// It has the following methods.
+class Vector2 {
+  // Constants
+  static ZERO: Vector2    // (0, 0)
+  static ONE: Vector2     // (1, 1) 
+  static NEG_ONE: Vector2 // (-1, -1)
+  static X: Vector2       // (1, 0)
+  static Y: Vector2       // (0, 1)
+  static NEG_X: Vector2   // (-1, 0)
+  static NEG_Y: Vector2   // (0, -1)
 
-  /**
-   * Demonstrates division of a vector by a scalar.
-   * @param vec Vector to divide.
-   * @param scalar Scalar value.
-   */
-  static divideByScalar(vec: Vector2, scalar: number): Vector2 {
-    return vec.div(scalar);
-  }
+  // Properties
+  x: number
+  y: number
 
-  /**
-   * Demonstrates negation of a vector.
-   * @param vec Vector to negate.
-   */
-  static negateVector(vec: Vector2): Vector2 {
-    return vec.neg();
-  }
+  // Constructors
+  constructor(x: number, y: number)
+  constructor(vector: IVector2)
+  
+  // Static Methods
+  static splat(value: number): Vector2                    // Creates vector with all elements set to value
+  static eq(a: IVector2, b: IVector2): boolean           // Compare equality
+  static abs(vector: IVector2): Vector2                  // Absolute values
+  static neg(vector: IVector2): Vector2                  // Negate values
+  static inverse(vector: IVector2): Vector2              // 1/value for each component
+  static add(a: IVector2, b: IVector2): Vector2         // Add vectors
+  static sub(a: IVector2, b: IVector2): Vector2         // Subtract vectors
+  static mul(a: IVector2, b: IVector2|number): Vector2  // Multiply by vector or scalar
+  static div(a: IVector2, b: IVector2|number): Vector2  // Divide by vector or scalar
+  static magnitude(vector: IVector2): number            // Length of vector
+  static magnitudeSquared(vector: IVector2): number     // Squared length
+  static normalize(vector: IVector2): Vector2           // Convert to unit vector
+  static lookAt(vector: IVector2, target: IVector2): number  // Get angle to target
+  static lerp(a: IVector2, b: IVector2, t: number): Vector2 // Linear interpolation
+  static smoothLerp(current: IVector2, target: IVector2, decay: number, deltaTime: number, epsilon?: number): Vector2
+  static distance(a: IVector2, b: IVector2): number     // Distance between vectors
+  static distanceSquared(a: IVector2, b: IVector2): number  // Squared distance
+  static max(a: IVector2, b: IVector2): Vector2        // Component-wise maximum
+  static min(a: IVector2, b: IVector2): Vector2        // Component-wise minimum
+  static rotate(vector: IVector2, angle: number): Vector2    // Rotate vector
+  static rotateAbout(vector: IVector2, angle: number, point: IVector2): Vector2  // Rotate around point
+  static dot(a: IVector2, b: IVector2): number         // Dot product
 
-  /**
-   * Demonstrates normalization of a vector.
-   * @param vec Vector to normalize.
-   */
-  static normalizeVector(vec: Vector2): Vector2 {
-    return vec.normalize();
-  }
-
-  /**
-   * Demonstrates calculation of the magnitude of a vector.
-   * @param vec Vector to calculate magnitude for.
-   */
-  static calculateMagnitude(vec: Vector2): number {
-    return vec.magnitude();
-  }
-
-  /**
-   * Demonstrates calculation of the squared magnitude of a vector.
-   * @param vec Vector to calculate squared magnitude for.
-   */
-  static calculateMagnitudeSquared(vec: Vector2): number {
-    return vec.magnitudeSquared();
-  }
-
-  /**
-   * Demonstrates calculation of the distance between two vectors.
-   * @param vecA First vector.
-   * @param vecB Second vector.
-   */
-  static calculateDistance(vecA: Vector2, vecB: Vector2): number {
-    return vecA.distance(vecB);
-  }
-
-  /**
-   * Demonstrates calculation of the squared distance between two vectors.
-   * @param vecA First vector.
-   * @param vecB Second vector.
-   */
-  static calculateDistanceSquared(vecA: Vector2, vecB: Vector2): number {
-    return vecA.distanceSquared(vecB);
-  }
-
-  /**
-   * Demonstrates the absolute value of a vector.
-   * @param vec Vector to calculate absolute value for.
-   */
-  static absoluteValue(vec: Vector2): Vector2 {
-    return vec.abs();
-  }
-
-  /**
-   * Demonstrates rotation of a vector by a specified angle.
-   * @param vec Vector to rotate.
-   * @param angle Angle in radians.
-   */
-  static rotateVector(vec: Vector2, angle: number): Vector2 {
-    return vec.rotate(angle);
-  }
-
-  /**
-   * Demonstrates rotation of a vector around a specific point by a specified angle.
-   * @param vec Vector to rotate.
-   * @param angle Angle in radians.
-   * @param point Point to rotate around.
-   */
-  static rotateVectorAroundPoint(vec: Vector2, angle: number, point: Vector2): Vector2 {
-    return vec.rotateAbout(angle, point);
-  }
-
-  /**
-   * Demonstrates the lookAt functionality to calculate the angle to another vector.
-   * @param vec Source vector.
-   * @param target Target vector.
-   */
-  static calculateLookAt(vec: Vector2, target: Vector2): number {
-    return vec.lookAt(target);
-  }
-
-  /**
-   * Demonstrates linear interpolation between two vectors.
-   * @param vecA First vector.
-   * @param vecB Second vector.
-   * @param t Interpolation factor (0 to 1).
-   */
-  static linearInterpolation(vecA: Vector2, vecB: Vector2, t: number): Vector2 {
-    return Vector2.lerp(vecA, vecB, t);
-  }
-
-  /**
-   * Demonstrates smooth interpolation between two vectors.
-   * @param current Current vector.
-   * @param target Target vector.
-   * @param decay Decay rate.
-   * @param deltaTime Time elapsed.
-   */
-  static smoothInterpolation(current: Vector2, target: Vector2, decay: number, deltaTime: number): Vector2 {
-    return Vector2.smoothLerp(current, target, decay, deltaTime);
-  }
+  // Instance Methods
+  clone(): Vector2                    // Create copy
+  bare(): IVector2                    // Get raw x,y object
+  assign(value: Partial<IVector2>): boolean  // Update components
+  eq(other: IVector2): boolean
+  abs(): Vector2
+  neg(): Vector2
+  inverse(): Vector2
+  add(other: IVector2): Vector2
+  sub(other: IVector2): Vector2
+  mul(other: IVector2|number): Vector2
+  div(other: IVector2|number): Vector2
+  magnitude(): number
+  magnitudeSquared(): number
+  normalize(): Vector2
+  lookAt(target: IVector2): number
+  distance(other: IVector2): number
+  distanceSquared(other: IVector2): number
+  max(other: IVector2): Vector2
+  min(other: IVector2): Vector2
+  rotate(angle: number): Vector2
+  rotateAbout(angle: number, point: IVector2): Vector2
+  dot(other: IVector2): number
 }

@@ -101,7 +101,7 @@ export default class PlayerMovement extends Behavior {
 
   onTick(): void {
     // Ensure that only the entity's owner can control it
-    if (this.entity.authority !== this.game.network.self) return;
+    if (this.hasAuthority()) return;
 
     const movement = new Vector2(0, 0);
 

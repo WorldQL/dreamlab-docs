@@ -1,6 +1,4 @@
 import { Behavior, Vector2, syncedValue } from "@dreamlab/engine";
-import PlayerBehavior from "./player.ts"; // this import is not an api, the user will have to have or create a player behavior for this example.
-
 /*
   Handling Inputs in a Behavior:
 
@@ -23,30 +21,6 @@ import PlayerBehavior from "./player.ts"; // this import is not an api, the user
     position in the game world.
 
   Below is the implementation of the `Movement` behavior that handles player movement and firing based on input.
-
-  If you are using this.entity.transform.position.lookAt(this.inputs.cursor.world) you should ALWAYS do this before updating the transform position for the next frame.
-
-  This is correct:
-  const world = this.inputs.cursor.world;
-  if (!world) return;
-  // EXTREMELY IMPORTANT: Use the value of this.inputs.cursor.world before applying newPosition to the transform
-  const rotation = this.entity.transform.position.lookAt(world);
-  this.entity.transform.rotation = rotation;
-
-  // Apply the new position to the entity
-  this.entity.transform.position = newPosition;
-
-  This is wrong:
-  // Apply the new position to the entity
-  this.entity.transform.position = newPosition;
-
-  const world = this.inputs.cursor.world;
-  if (!world) return;
-  // EXTREMELY IMPORTANT: Use the value of this.inputs.cursor.world before applying newPosition to the transform
-  const rotation = this.entity.transform.position.lookAt(world);
-  this.entity.transform.rotation = rotation;
-
-  Please pay careful attention to this. It's tricky and important to remember when using cursor.world while also moving the entity and making it look at the cursor.
 
 */
 
@@ -85,32 +59,19 @@ export default class Movement extends Behavior {
       .normalize()
       .mul((this.game.physics.tickDelta / 100) * currentSpeed);
 
-    // Update entity's position
+    // Update entity's position based on the input
     const newPosition = this.entity.transform.position.add(this.velocity);
 
-    // Boundary checks can be added here to restrict movement within certain limits
-
-    // Handle firing input with cooldown management
-    if (this.#lastFired > 0) {
-      this.#lastFired -= 1;
-    } else {
-      if (this.#fire.held) {
-        const playerBehavior = this.entity.getBehavior(PlayerBehavior);
-        const fireRateMultiplier = playerBehavior.fireRateMultiplier;
-
-        this.#lastFired = this.#cooldown / fireRateMultiplier;
-
-        // Trigger the shooting pattern defined in PlayerBehavior
-        playerBehavior.shootingPattern();
-      }
+    if (this.#fire.pressed) {
+      // create a bullet
     }
 
-    // Rotate the entity to face the cursor's position
 
-    const world = this.inputs.cursor.world;
-    if (!world) return;
+    // look at cursor
+    const cursorPosition = this.inputs.cursor.world;
+    if (!cursorPosition) return;
     // EXTREMELY IMPORTANT: Use the value of this.inputs.cursor.world before applying newPosition to the transform
-    const rotation = this.entity.transform.position.lookAt(world);
+    const rotation = this.entity.transform.position.lookAt(cursorPosition);
     this.entity.transform.rotation = rotation;
 
     // Apply the new position to the entity
