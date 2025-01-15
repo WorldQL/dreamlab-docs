@@ -22,7 +22,7 @@ Dreamlab is a good fit for you if you want to:
 
 ### Step 1: Creating Your First Project
 
-1. Navigate to the [Create](https://app.dreamlab.gg/assets/create) tab.
+1. Navigate to the [Create](https://app.dreamlab.gg/create/project) tab.
 2. Click on the **"Create Game"** button to start a new project.
    - Select the template "Dreamlab Tutorial"
    - Enter a project name, then click **"Create Game."**
