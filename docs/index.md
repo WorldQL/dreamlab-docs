@@ -20,6 +20,12 @@ Dreamlab is a good fit for you if you want to:
 
 ---
 
+If videos are more your style, here's this tutorial in video format:
+
+<iframe width="725" height="415" src="https://www.youtube.com/embed/0Xr6YwaPc44?si=Mao9cu_aokbdawD3" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen style={{maxWidth: "100%"}}></iframe>
+
+We recommend watching it!
+
 ### Step 1: Creating Your First Project
 
 Click on the **"Create Game"** button to start a new project.
@@ -158,8 +164,13 @@ onCollide(e: EntityCollision) {
 The reason we have to use `waitForNextTick` is because the PlayerController's `onTick` function (updating the character position) may run after the collision has been fired, undoing the effects of our collision. This technique allows us to set the position correctly at the beginning of the next tick.
 
 The completed Behavior looks like this:
+
 ```typescript
-import { Behavior, CharacterController, EntityCollision } from "@dreamlab/engine";
+import {
+  Behavior,
+  CharacterController,
+  EntityCollision,
+} from "@dreamlab/engine";
 import PlayerController from "./player-controller.ts";
 
 export default class Obstacle extends Behavior {
