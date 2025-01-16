@@ -72,6 +72,11 @@ export default class Movement extends Behavior {
   #left = this.inputs.create("@movement/left", "Move Left", "KeyA");
   #right = this.inputs.create("@movement/right", "Move Right", "KeyD");
 
+  onInitialize(): void {
+    // if you want to disable/enable an entity (useful for hiding and showing things), simply use
+    this.entity.enabled = false;
+  }
+
   onTick(): void {
     const movement = new Vector2(0, 0);
     const currentSpeed = this.speed;

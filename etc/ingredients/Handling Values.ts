@@ -31,46 +31,39 @@ import {
     Below are examples of adapters and their usage:
 
     - **Vector2Adapter:** For vector data, like positions or velocities.
-      ```typescript
       @syncedValue(Vector2Adapter)
       velocity = Vector2.ZERO;
-      ```
+      
 
     - **TextureAdapter:** For textures that need preloading.
-      ```typescript
       @syncedValue(TextureAdapter)
       texture = "path/to/texture.png";
-      ```
+      
 
     - **SpritesheetAdapter:** For spritesheets requiring preloading.
-      ```typescript
       @syncedValue(SpritesheetAdapter)
       spritesheet = "path/to/spritesheet.json";
-      ```
+      
 
     - **ObjectAdapter:** For synchronizing plain objects with mutation detection.
-      ```typescript
       @syncedValue(ObjectAdapter)
       config = { key: "value" };
-      ```
+      
 
     - **EntityByRefAdapter:** For referencing game entities.
-      ```typescript
       @syncedValue(EntityByRefAdapter)
       targetEntity = undefined;
-      ```
+      
 
     - **ColorAdapter:** For color values.
-      ```typescript
       @syncedValue(ColorAdapter)
       color = "#FFFFFF";
-      ```
+      
 
     - **AudioAdapter:** For preloading audio resources.
-      ```typescript
       @syncedValue(AudioAdapter)
       audio = "path/to/sound.mp3";
-      ```
+      
 
   Below is an example demonstrating how to define and use values within a behavior.
 */

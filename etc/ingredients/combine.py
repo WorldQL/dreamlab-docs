@@ -13,7 +13,7 @@ available_topics = {
     "Spawning Entities": "Spawning new entities into the world and attaching behaviors.",
     "Character Controller": "Using the built-in character controller which handles collision detection. Great for any movement style.",
     "Basic Structure": "Behavior classes are used to implement all game functionality.",
-    "Message Channels": "Facilitating communication between behaviors using custom messages and synced values to synchronize state or trigger actions.",
+    "Message Channels and Key Value Database": "Facilitating communication between behaviors using custom messages and synced values to synchronize state or trigger actions.",
 }
 
 
@@ -79,20 +79,11 @@ def create_mdx_files(file_dict):
             title = file_name.replace("_", " ")
 
         mdx_filepath = os.path.join(mdx_dir, mdx_filename)
-        mdx_content = 'import useBaseUrl from "@docusaurus/useBaseUrl";\n\n'
+        mdx_content = ''
         mdx_content += f"# {title}\n"
         mdx_content += available_topics[title] + "\n"
         mdx_content += """:::info
 These docs power Dreamlab Assistant, an AI chatbot that helps you code your game.
-
-<img
-  src={useBaseUrl("/img/scriptstab.png")}
-  style={{ width: "auto", maxHeight: "15rem" }}
-  alt="scripts tab location"
-/>
-Navigate to your "Scripts" tab and the Dreamlab Assistant will be available on
-the right-hand side.
-
 :::\n\n"""
         mdx_content += f"```typescript\n{file_contents}\n```"
 

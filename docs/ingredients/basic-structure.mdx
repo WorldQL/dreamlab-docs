@@ -1,18 +1,7 @@
-import useBaseUrl from "@docusaurus/useBaseUrl";
-
 # Basic Structure
 Behavior classes are used to implement all game functionality.
 :::info
 These docs power Dreamlab Assistant, an AI chatbot that helps you code your game.
-
-<img
-  src={useBaseUrl("/img/scriptstab.png")}
-  style={{ width: "auto", maxHeight: "15rem" }}
-  alt="scripts tab location"
-/>
-Navigate to your "Scripts" tab and the Dreamlab Assistant will be available on
-the right-hand side.
-
 :::
 
 ```typescript
@@ -89,6 +78,11 @@ export default class Movement extends Behavior {
   #down = this.inputs.create("@movement/down", "Move Down", "KeyS");
   #left = this.inputs.create("@movement/left", "Move Left", "KeyA");
   #right = this.inputs.create("@movement/right", "Move Right", "KeyD");
+
+  onInitialize(): void {
+    // if you want to disable/enable an entity (useful for hiding and showing things), simply use
+    this.entity.enabled = false;
+  }
 
   onTick(): void {
     const movement = new Vector2(0, 0);

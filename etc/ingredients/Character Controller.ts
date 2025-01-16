@@ -53,7 +53,7 @@ export default class PlatformMovement extends Behavior {
   onTick(): void {
     if (!this.#controller) return;
 
-    const deltaTime = this.game.physics.tickDelta / 1000; // Convert to seconds
+    const deltaTime = this.game.time.delta / 1000; // Convert to seconds
 
     let horizontalInput = 0;
     if (this.#right.held) horizontalInput += 1;

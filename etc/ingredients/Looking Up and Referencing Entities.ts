@@ -35,7 +35,6 @@ import { Behavior, ColoredSquare } from "@dreamlab/engine";
   1. **Entity synced values**:
      To access a synced value from an entity, use the `cast` method to cast the entity's child to its specific type.
      Example:
-     ```javascript
      private onCollide(e: EntityCollision): void {
        // Change the wall's color to match the ball's color
        // Color is a HEX value only in a String
@@ -43,7 +42,7 @@ import { Behavior, ColoredSquare } from "@dreamlab/engine";
        wallSolidColor.cast(ColoredSquare).color =
          this.entity._.ColoredSquare.cast(ColoredSquare).color;
      }
-     ```
+     
 
      - `cast` ensures you access the correct type, allowing you to manipulate its synced values safely.
      - This is essential when interacting with child entities or components that expose synced values.
@@ -51,7 +50,6 @@ import { Behavior, ColoredSquare } from "@dreamlab/engine";
   2. **Behavior synced values**:
      To access synced values within a behavior, use the `getBehavior` method to retrieve the behavior instance attached to an entity.
      Example:
-     ```javascript
      onCollide(other: Entity) {
        if (!other.name.startsWith("Bullet")) return;
 
@@ -62,7 +60,7 @@ import { Behavior, ColoredSquare } from "@dreamlab/engine";
          player.getBehavior(PlayerBehavior).score += 100;
        }
      }
-     ```
+     
 
      - `getBehavior` retrieves the behavior instance where the synced value is defined, allowing direct access to it.
      - Use this method for behaviors instead of `getComponent`.

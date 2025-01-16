@@ -1,18 +1,7 @@
-import useBaseUrl from "@docusaurus/useBaseUrl";
-
 # Character Controller
 Using the built-in character controller which handles collision detection. Great for any movement style.
 :::info
 These docs power Dreamlab Assistant, an AI chatbot that helps you code your game.
-
-<img
-  src={useBaseUrl("/img/scriptstab.png")}
-  style={{ width: "auto", maxHeight: "15rem" }}
-  alt="scripts tab location"
-/>
-Navigate to your "Scripts" tab and the Dreamlab Assistant will be available on
-the right-hand side.
-
 :::
 
 ```typescript
@@ -71,7 +60,7 @@ export default class PlatformMovement extends Behavior {
   onTick(): void {
     if (!this.#controller) return;
 
-    const deltaTime = this.game.physics.tickDelta / 1000; // Convert to seconds
+    const deltaTime = this.game.time.delta / 1000; // Convert to seconds
 
     let horizontalInput = 0;
     if (this.#right.held) horizontalInput += 1;

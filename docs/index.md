@@ -22,25 +22,13 @@ Dreamlab is a good fit for you if you want to:
 
 ### Step 1: Creating Your First Project
 
-1. Navigate to the [Create](https://app.dreamlab.gg/create/project) tab.
-2. Click on the **"Create Game"** button to start a new project.
-   - Select the template "Dreamlab Tutorial"
-   - Enter a project name, then click **"Create Game."**
+Click on the **"Create Game"** button to start a new project.
 
-<img src="/img/tutorial/step1.png" alt="Step 1" width="600" height="600" />
+![alt text](../static/img/image-4.png)
 
 ---
 
-### Step 2: Editing Your Game
-
-After creating the project, you’ll see your project dashboard.  
-Click the **"Edit Game"** button to access the editor and modify your project.
-
-![Step 2](/img/tutorial/step2.png)
-
----
-
-### Step 3: Navigating the Editor
+### Step 2: Navigating the Editor
 
 The Dreamlab Editor consists of 5 main panels:  
 
@@ -69,7 +57,7 @@ Navigate around your project with your mouse or touchpad.
 
 ---
 
-### Step 4: Testing Your Game
+### Step 3: Testing Your Game
 
 Click the **Play** button at the top to test your game in real time.  
 ![Step 4](/img/tutorial/step4-1.png)
@@ -80,17 +68,14 @@ You can pause, resume, or exit the play session using the toolbar.
 
 ---
 
-### Step 5: Modifying The Level
+### Step 4: Modifying The Level
 
 1. Select the **Prefabs** tab from the bottom panel.
 2. Drag new **Platform Prefabs** into the scene to complete the level.
 
 ![Step 5](/img/tutorial/step5.png)
 
-3. Use the combine tool to position the entities in your scene.
-- The combined tool can translate, rotate, and scale.
-- The box tool can translate and scale in a different style.
-<img src="/img/tutorial/step5-1.png" alt="Step 5.1" width="800" height="600" />
+3. Use the transform gizmo to position the entities in your scene.
 
 4. Once you position all the new entities, test your game!
 <img src="/img/tutorial/step5-2.png" alt="Step 5.1" width="600" height="600" />
@@ -98,7 +83,7 @@ You can pause, resume, or exit the play session using the toolbar.
 
 ---
 
-### Step 6: Changing the Player Speed
+### Step 5: Changing the Player Speed
 
 1. Select the **Player** entity in the **Scene Graph.**. It will be located in the **Prefabs** section.
 2. Once selected, in the **Behaviors Panel**, edit the `speed` & `jumpForce` value under the **PlatformMovement** behavior to adjust player movement.
@@ -108,7 +93,7 @@ You can pause, resume, or exit the play session using the toolbar.
 
 ---
 
-### Step 7: Creating an Obstacle
+### Step 6: Creating an Obstacle
 
 1. In the **Prefabs** section, right-click and select **New Entity** → **Collider.**.
 2. Customize the collider’s properties (e.g., change its shape, size, and color) in the **Properties Panel.**.
@@ -125,7 +110,7 @@ You can pause, resume, or exit the play session using the toolbar.
 
 ---
 
-### Step 8: Saving Your Work
+### Step 7: Saving Your Work
 
 Always save your project to avoid losing progress.  
 Click the **Save** button at the top-right corner of the editor.
@@ -134,7 +119,7 @@ Click the **Save** button at the top-right corner of the editor.
 
 ---
 
-### Step 9: Writing Your First Script
+### Step 8: Writing Your First Script
 
 1. In the top left, select the script editor button.
 
@@ -179,7 +164,7 @@ Use the built-in AI Assistant for help writing your code.
 
 ---
 
-### Step 10: Attaching a Behavior Script
+### Step 9: Attaching a Behavior Script
 
 1. Once returned to the editor, select the **Obstacle** entity from your **Prefabs** section.
 2. Once selected, drag the created behavior script onto your prefab in the **Behavior Panel** from the **Project Panel**.
@@ -188,7 +173,7 @@ Use the built-in AI Assistant for help writing your code.
 
 ---
 
-### Step 11: Adding Multiple Obstacles
+### Step 10: Adding Multiple Obstacles
 
 1. Select the **Obstacle** prefab from the bottom **Prefabs Panel**.
 2. Drag and position it multiple times in your scene to populate the level.
@@ -197,7 +182,7 @@ Use the built-in AI Assistant for help writing your code.
 
 ---
 
-### Step 12: Testing!
+### Step 11: Testing!
 
 1. Test your game again by clicking the **Play** button.
 2. Check if the behaviors work as expected.
