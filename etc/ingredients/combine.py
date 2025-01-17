@@ -82,9 +82,7 @@ def create_mdx_files(file_dict):
         mdx_content = ''
         mdx_content += f"# {title}\n"
         mdx_content += available_topics[title] + "\n"
-        mdx_content += """:::info
-These docs power Dreamlab Assistant, an AI chatbot that helps you code your game.
-:::\n\n"""
+        mdx_content += """"""
         mdx_content += f"```typescript\n{file_contents}\n```"
 
         try:
