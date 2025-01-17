@@ -4,7 +4,7 @@ sidebar_position: 0.2
 
 # Game Jams
 
-Dreamlab is an open-source web game engine with Google Docs-style collaboration. It allows game jam teams to work on their code and level together in real time. Dreamlab is similar to Godot and Unity, so you can get started quickly.
+Dreamlab is an open-source web game engine with Google Docs-style collaboration. Game jam teams can collaborate on code and design levels together in real time. Dreamlab is similar to Godot and Unity, so you can get started quickly.
 
 Check it out:
 
