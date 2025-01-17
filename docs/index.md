@@ -50,7 +50,7 @@ On The Right:
 
 On The Bottom:
 
-- **Assistant Panel:** Chat with your ai assistant to help build your dream game.
+- **Assistant Panel:** Chat with your AI assistant to help build your dream game.
 - **Prefabs Panel:** Quickly add reusable entities to your world by dragging them.
 - **Logs Panel:** View server logs from your game.
 
