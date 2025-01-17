@@ -6,13 +6,11 @@ sidebar_position: 0.1
 
 ## What is Dreamlab?
 
-Dreamlab is a browser-based, 2D game engine for building online games. It features:
+Dreamlab is a browser-based, 2D game engine for building singleplayer and online games. It features:
 
 - **Built-in Multiplayer:** Every game you create in Dreamlab is multiplayer-ready by default. No server setup or additional plug-ins
 - **Collaboration:** Edit code and levels with your teammates in real-time
-- **AI Tools:** Built-in AI assistant helps you write code
-
-Dreamlab is a good fit for you if you want to:
+- **Optional AI Tools:** Built-in AI assistant helps you write code
 
 ## Quick Start Tutorial
 
@@ -20,9 +18,11 @@ Dreamlab is a good fit for you if you want to:
 
 ---
 
-If videos are more your style, here's this tutorial in video format:
+### Video Tutorial
 
-<iframe width="725" height="415" src="https://www.youtube.com/embed/0Xr6YwaPc44?si=Mao9cu_aokbdawD3" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen style={{maxWidth: "100%"}}></iframe>
+**If videos are more your style, here's this tutorial in video format:**
+
+<iframe width="725" height="415" src="https://www.youtube.com/embed/0Xr6YwaPc44?si=Mao9cu_aokbdawD3" title="YouTube video player" frameborder="0" allow="fullscreen; accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen style={{maxWidth: "100%"}}></iframe>
 
 We recommend watching it!
 
@@ -30,7 +30,7 @@ We recommend watching it!
 
 Click on the **"Create Game"** button to start a new project.
 
-![alt text](../static/img/image-4.png)
+![](../static/img/image-4.png)
 
 ---
 
