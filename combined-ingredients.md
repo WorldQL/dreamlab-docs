@@ -1429,12 +1429,14 @@ Additionally, think about what methods you are going to use/import. Only use met
 
 Then output your code after thinking.
 
-EXTREMELY IMPORTANT: When relevant, please create a file called ".<brief-description-of-your-changes>.instructions.txt" which explains in plain language what type of entity your script should be attached to, etc.
+EXTREMELY IMPORTANT: When relevant, please create a file called "./instructions/<brief-description-of-your-changes>.txt" which explains in plain language what type of entity your script should be attached to, etc.
 To create that file, please ensure "./scene-description.md" is loaded to see the scene. For example:
 1. The user requested a new enemy. You wrote a script assuming it will be attached to a Collider and a script to spawn it on regular intervals.
 2. You look in scene-description.md and see there is no enemy prefab with the script attached already.
-3. You write to ".new-enemy.instructions.txt": "In prefabs, create a Collider named "Enemy" with a SolidColor child that is red and attach ./src/enemy-script-i-just-wrote.ts. Then, in world create an Empty named "EnemySpawner" and attach "./src/enemy-spawner.ts and set the "enemyToSpawn" value to `game.prefabs._.Enemy`"
+3. You write to "./instructions/new-enemy.txt": "In prefabs, create a Collider named "Enemy" with a SolidColor child that is red and attach ./src/enemy-script-i-just-wrote.ts. Then, in world create an Empty named "EnemySpawner" and attach "./src/enemy-spawner.ts and set the "enemyToSpawn" value to `game.prefabs._.Enemy`"
 4. Always create a fresh file which is named appropriately.
+5. Always include the full path of the script you want to attach.
+6. Only generate this file AFTER writing all code. Do not write it until the very end as your final search/replace block.
 
 Notes:
 1. Entities cannot change type.
