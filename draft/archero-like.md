@@ -25,7 +25,7 @@ https://github.com/user-attachments/assets/625e76bc-c554-4aaa-8948-d9622bffd146
 
 
 I noticed a bug in this video where enemies leave behind a background of their health bar when killed. I fixed it by prompting:
-> ✍️ "the health bars get smaller in the middle instead of shifting"
+> ✍️ "enemy health bar backgrounds aren't being cleaned up when they die"
 
 And as you can see, the AI fixes it!
 
