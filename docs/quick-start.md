@@ -1,0 +1,229 @@
+---
+sidebar_position: 0.19
+---
+# Quick Start Tutorial
+
+**The easiest way to get started is to <a href="https://app.dreamlab.gg/" target="_blank">use our online editor</a>. No setup required!**
+
+---
+
+## Video Tutorial
+
+**If videos are more your style, here's this tutorial in video format:**
+
+<iframe width="725" height="415" src="https://www.youtube.com/embed/0Xr6YwaPc44?si=Mao9cu_aokbdawD3" title="YouTube video player" frameborder="0" allow="fullscreen; accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen style={{maxWidth: "100%"}}></iframe>
+
+We recommend watching it!
+
+---
+
+## Text Tutorial
+
+### Step 1: Creating Your First Project
+
+Click on the **"Create Game"** button to start a new project.
+
+![](../static/img/image-4.png)
+
+---
+
+### Step 2: Navigating the Editor
+
+The Dreamlab Editor consists of 5 main panels:
+
+On The Left:
+
+- **Scene Graph:** Manage the entities in your game.
+- **Project Panel:** View/Drag your projects behaviors and images.
+
+On The Right:
+
+- **Properties Panel:** Edit the selected entities transform and values.
+- **Behaviors Panel:** Edit the selected entities behaviors.
+
+On The Bottom:
+
+- **Assistant Panel:** Chat with your AI assistant to help build your dream game.
+- **Prefabs Panel:** Quickly add reusable entities to your world by dragging them.
+- **Logs Panel:** View server logs from your game.
+
+![Step 3](/img/tutorial/step3.png)
+
+Navigate around your project with your mouse or touchpad.
+
+- **Scroll** to zoom in or out
+- **Ctrl Scroll** to pane up or down
+- **Left Click** to select and entity
+- **Middle Click** to pane around
+
+---
+
+### Step 3: Testing Your Game
+
+Click the **Play** button at the top to test your game in real time.  
+![Step 4](/img/tutorial/step4-1.png)
+
+You can pause, resume, or exit the play session using the toolbar.
+<img src="/img/tutorial/step4.png" alt="Step 4.1" width="600" height="600" />
+
+---
+
+### Step 4: Modifying The Level
+
+1. Select the **Prefabs** tab from the bottom panel.
+2. Drag new **Platform Prefabs** into the scene to complete the level.
+
+![Step 5](/img/tutorial/step5.png)
+
+3. Use the transform gizmo to position the entities in your scene.
+
+4. Once you position all the new entities, test your game!
+   <img src="/img/tutorial/step5-2.png" alt="Step 5.1" width="600" height="600" />
+
+---
+
+### Step 5: Changing the Player Speed
+
+1. Select the **Player** entity in the **Scene Graph.**. It will be located in the **Prefabs** section.
+2. Once selected, in the **Behaviors Panel**, edit the `speed` & `jumpForce` value under the **PlatformMovement** behavior to adjust player movement.
+   _(e.g., Increase speed from 10 to 12 for faster movement.)_
+
+![Step 6](/img/tutorial/step6.png)
+
+---
+
+### Step 6: Creating an Obstacle
+
+1. In the **Prefabs** section, right-click and select **New Entity** → **Collider.**.
+2. Customize the collider’s properties (e.g., change its shape, size, and color) in the **Properties Panel.**.
+
+![Step 7](/img/tutorial/step7.png)
+
+3. Name the Collider `Obstacle`.
+4. Right click on the newly created entity and create another entity of the type: **ColoredPolygon**.
+5. Try customizing your new entity.
+
+- Select the **Obsticle Collider** and change the shape to a `circle`.
+- Select the **ColoredPolygon** and change the sides and color.
+
+![Step 7.1](/img/tutorial/step7.1.png)
+
+---
+
+### Step 7: Saving Your Work
+
+Always save your project to avoid losing progress.  
+Click the **Save** button at the top-right corner of the editor.
+
+![Step 8](/img/tutorial/step8.png)
+
+---
+
+### Step 8: Writing Your First Script
+
+1. In the top left, select the script editor button.
+
+![Step 9](/img/tutorial/step9.png)
+
+2. Right click on the `/src` folder and create a new behavior.
+3. Name this behavior `obstacle-behavior.ts`
+
+![Step 9.1](/img/tutorial/step9-1.png)
+
+3. Our goal for this behavior is to make it teleport the player to the start of the level when they collide with it.
+
+So first lets listen for entity collision.
+
+```typescript
+onInitializeClient(): void {
+  this.registerCollisions(this.onCollide);
+}
+```
+
+We can teleport the player to `-6, -18` which would be near the player spawnpoint or we could get the PlayerSpawnpoint position and move the player there.
+
+```typescript
+onCollide(e: EntityCollision) {
+  if (e.started && e.other.hasBehavior(PlayerController)) {
+    const player = e.other.cast(CharacterController);
+    this.game.time.waitForNextTick().then(() => {
+      player.pos = this.game.world._.PlayerSpawnpoint.pos;
+      player.teleport = true;
+    });
+  }
+}
+```
+
+The reason we have to use `waitForNextTick` is because the PlayerController's `onTick` function (updating the character position) may run after the collision has been fired, undoing the effects of our collision. This technique allows us to set the position correctly at the beginning of the next tick.
+
+The completed Behavior looks like this:
+
+```typescript
+import {
+  Behavior,
+  CharacterController,
+  EntityCollision,
+} from "@dreamlab/engine";
+import PlayerController from "./player-controller.ts";
+
+export default class Obstacle extends Behavior {
+  onInitializeClient(): void {
+    this.registerCollisions(this.onCollide);
+  }
+
+  onCollide(e: EntityCollision) {
+    if (e.started && e.other.hasBehavior(PlayerController)) {
+      const player = e.other.cast(CharacterController);
+      this.game.time.waitForNextTick().then(() => {
+        player.pos = this.game.world._.PlayerSpawnpoint.pos;
+        player.teleport = true;
+      });
+    }
+  }
+}
+```
+
+Once you have this, the behavior should be completed!
+
+![Step 9.2](/img/tutorial/step9-2.png)
+
+4. Return back to the Editor to use this behavior.
+
+---
+
+### Step 9: Attaching a Behavior Script
+
+1. Once returned to the editor, select the **Obstacle** entity from your **Prefabs** section.
+2. Once selected, drag the created behavior script onto your prefab in the **Behavior Panel** from the **Project Panel**.
+
+![Step 10](/img/tutorial/step10.png)
+
+---
+
+### Step 10: Adding Multiple Obstacles
+
+1. Select the **Obstacle** prefab from the bottom **Prefabs Panel**.
+2. Drag and position it multiple times in your scene to populate the level.
+   ![Step 11](/img/tutorial/step11.png)
+
+---
+
+### Step 11: Testing!
+
+1. Test your game again by clicking the **Play** button.
+2. Check if the behaviors work as expected.
+3. Make any adjustments that are needed.
+
+![Final Step](/img/tutorial/final-step.png)
+
+---
+
+## Next Steps
+
+If you finished the tutorial above, congratulations!
+
+Now you can:
+
+1. [Join our Discord to get help, share your games, and view things other people have created!](https://discord.gg/nwXFvtJ92g)
+   - A community member or Dreamlab developer will often respond to your questions within minutes!
+2. Continue to the **"Examples"** section to learn more about Dreamlab engine features.
