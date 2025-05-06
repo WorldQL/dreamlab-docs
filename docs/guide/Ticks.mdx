@@ -1,6 +1,6 @@
 # Tick Loop
 
-Dreamlab runs at a fixed, customizable tickrate. By default, the engine will tick 60 times a second. During a tick, the engine will update entities and run the `onTick` functions in your [Behavior scripts](Behaviors.mdx).
+Dreamlab runs at a fixed, customizable tickrate. By default, the engine will tick 60 times a second. During a tick, the engine will update entities and run the `onTick` functions in your [Behavior scripts](Behaviors.md).
 A fixed tickrate is advantageous because it means you don't have to constantly refer to a delta time eveywhere in your scripts and makes networking simpler.
 
 ## Ordering
@@ -45,9 +45,9 @@ class BehaviorOne extends Behavior {
 
 This is relatively niche and you probably won't need to do this. Most of the time, you'll be able to use `onTick` and `onPostTick`, detailed below, to solve ordering problems.
 
-###  `onTick` vs `onPostTick`
+### `onTick` vs `onPostTick`
 
-`onPostTick` is always guaranteed to run after `onTick`. It's useful to think of your tick methods as *preparing the next world state*. `onTick` is the first step of preparing the next state and `onPostTick` is the second step.
+`onPostTick` is always guaranteed to run after `onTick`. It's useful to think of your tick methods as _preparing the next world state_. `onTick` is the first step of preparing the next state and `onPostTick` is the second step.
 
 These are most useful when implementing things patterns like "camera that follows a player". If you move an entity in `onTick` methods, you want to wait for all of them to complete before you calculate the next camera position.
 
