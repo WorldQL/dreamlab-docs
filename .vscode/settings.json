@@ -1,5 +1,8 @@
 {
   "markdown.copyFiles.destination": {
     "/docs/**/*": "/static/img/${fileName}"
-}
+  },
+  "[markdown]": {
+    "editor.formatOnSave": false
+  }
 }

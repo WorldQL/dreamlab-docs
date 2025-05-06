@@ -1,8 +1,7 @@
 {
-    "label": "Manual",
-    "position": 1,
-    "link": {
-      "type": "generated-index"
-    }
+  "label": "Engine Manual",
+  "position": 1,
+  "link": {
+    "type": "generated-index"
   }
-  
+}

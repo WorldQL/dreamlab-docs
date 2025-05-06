@@ -1,59 +1,44 @@
-// This is an example of how to implement a platformer controller using the KinematicCharacterController
-
+// This is an example of how to implement a platformer controller using the CharacterController
 import {
   Behavior,
-  EntityDestroyed,
-  Collider,
+  CharacterController,
+  RichText,
   Vector2,
   syncedValue,
 } from "@dreamlab/engine";
-import { KinematicCharacterController } from "@dreamlab/vendor/rapier.ts";
 
-export default class PlatformMovement extends Behavior {
-  #collider: Collider = this.entity.cast(Collider);
-  #controller: KinematicCharacterController | undefined;
+// A very simple platformer controller
 
-  @syncedValue()
-  speed = 10.0;
+export default class PlayerController extends Behavior {
+  #controller = this.entity.cast(CharacterController);
 
-  @syncedValue()
-  jumpForce = 20.0;
+  @syncedValue() speed = 10;
+  @syncedValue() jumpForce = 20;
+  @syncedValue() jumpAcceleration = 40;
+  @syncedValue() gravity = 90;
+  @syncedValue() maxJumpTime = 1; // Maximum duration the jump key affects the jump
 
-  @syncedValue()
-  jumpAcceleration = 40;
-
-  @syncedValue()
-  gravity = 90.0;
-
-  @syncedValue()
-  maxJumpTime = 1; // Maximum duration the jump key affects the jump
+  @syncedValue() points = 0;
 
   #verticalVelocity = 0;
-  #isGrounded = false;
   #jumpTimeCounter = 0;
 
-  #up = this.inputs.create("@movement/up", "Move Up", "KeyW");
-  #down = this.inputs.create("@movement/down", "Move Down", "KeyS");
   #left = this.inputs.create("@movement/left", "Move Left", "KeyA");
   #right = this.inputs.create("@movement/right", "Move Right", "KeyD");
   #jump = this.inputs.create("@movement/jump", "Jump", "Space");
 
-  onInitialize(): void {
-    if (this.game.isClient()) {
-      this.#controller =
-        this.game.physics.world.createCharacterController(0.01);
-    }
-
-    this.listen(this.entity, EntityDestroyed, () => {
-      if (this.#controller)
-        this.game.physics.world.removeCharacterController(this.#controller);
+  onInitializeClient() {
+    if (!this.hasAuthority()) return;
+    this.values.get("points")?.onChanged((newPoints: number) => {
+      this.game.local!._.CoinCounter.cast(RichText).text =
+        "Coins: " + newPoints;
     });
   }
 
-  onTick(): void {
-    if (!this.#controller) return;
+  onTickClient(): void {
+    if (!this.hasAuthority()) return;
 
-    const deltaTime = this.game.time.delta / 1000; // Convert to seconds
+    const deltaTime = this.game.physics.tickDelta / 1_000; // Convert to seconds
 
     let horizontalInput = 0;
     if (this.#right.held) horizontalInput += 1;
@@ -62,7 +47,7 @@ export default class PlatformMovement extends Behavior {
     const horizontalVelocity = horizontalInput * this.speed;
 
     // Jumping logic
-    if (this.#jump.pressed && this.#isGrounded) {
+    if (this.#jump.pressed && this.#controller.isGrounded) {
       this.#verticalVelocity = this.jumpForce;
       this.#jumpTimeCounter = 0;
     }
@@ -79,12 +64,9 @@ export default class PlatformMovement extends Behavior {
       this.#verticalVelocity * deltaTime
     );
 
-    this.#controller.computeColliderMovement(this.#collider.collider, movement);
-    const corrected = this.#controller.computedMovement();
+    if (!this.#controller.isGrounded)
+      this.#verticalVelocity -= this.gravity * deltaTime;
 
-    this.#isGrounded = this.#controller.computedGrounded();
-    if (!this.#isGrounded) this.#verticalVelocity -= this.gravity * deltaTime;
-
-    this.entity.pos = this.entity.pos.add(corrected);
+    this.entity.pos = this.entity.pos.add(movement);
   }
 }

@@ -53,7 +53,7 @@ def create_js_dictionary(file_dict):
         + "`"
     )
 
-    with open("file_contents.js", "w", encoding="utf-8") as js_file:
+    with open("file_contents.ts", "w", encoding="utf-8") as js_file:
         js_file.write(js_output)
 
     print("JavaScript dictionary has been created in 'file_contents.js'")
@@ -79,7 +79,7 @@ def create_mdx_files(file_dict):
             title = file_name.replace("_", " ")
 
         mdx_filepath = os.path.join(mdx_dir, mdx_filename)
-        mdx_content = ''
+        mdx_content = ""
         mdx_content += f"# {title}\n"
         mdx_content += available_topics[title] + "\n"
         mdx_content += """"""
@@ -93,7 +93,52 @@ def create_mdx_files(file_dict):
             print(f"Error writing MDX file {mdx_filename}: {str(e)}")
 
 
+def create_combined_doc(file_dict):
+    """
+    Creates one combined MDX file that concatenates the content from each ingredient.
+    Each section will include a header, a description (from available_topics), and
+    a typescript code block containing the file's contents.
+    """
+    # Use the same directory as in create_mdx_files
+    mdx_dir = os.path.abspath(os.path.join(os.getcwd(), "../../docs/ingredients"))
+    if not os.path.exists(mdx_dir):
+        os.makedirs(mdx_dir)
+        print(f"Created directory: {mdx_dir}")
+
+    combined_content = "# Dreamlab API Reference\n\n"
+
+    # Loop through each file's data in the dictionary.
+    for file_name, file_contents in file_dict.items():
+        # Handle the special case for '_basic-structure'
+        if file_name == "_basic-structure":
+            title = "Behavior Structure"
+        else:
+            # Replace underscores with spaces to form the title
+            title = file_name.replace("_", " ")
+
+        # Build the section content following the same structure as create_mdx_files
+        combined_content += f"# {title}\n"
+        try:
+            combined_content += available_topics[title] + "\n"
+        except KeyError:
+            # If the title is not in available_topics, warn and continue.
+            combined_content += "_No available topic description found._\n"
+        combined_content += f"```typescript\n{file_contents}\n```\n\n"
+        # Add a horizontal rule as a separator between ingredients
+        combined_content += "---\n\n"
+
+    # Define the path for the combined document
+    combined_filepath = "./combined_ingredients.md"
+    try:
+        with open(combined_filepath, "w", encoding="utf-8") as combined_file:
+            combined_file.write(combined_content)
+        print(f"Created combined document: {combined_filepath}")
+    except Exception as e:
+        print(f"Error writing combined document: {str(e)}")
+
+
 if __name__ == "__main__":
     file_dict = collect_files()
     create_js_dictionary(file_dict)
     create_mdx_files(file_dict)
+    create_combined_doc(file_dict)
