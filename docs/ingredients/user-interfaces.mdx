@@ -1,5 +1,7 @@
 # User Interfaces
+
 Creating GUIs (HUDs, health bars, etc)
+
 ```typescript
 import { Behavior, UILayer, syncedValue } from "@dreamlab/engine";
 import { element } from "@dreamlab/ui";
@@ -116,7 +118,7 @@ export default class DeathScreen extends Behavior {
 
         // Add the "Respawn" button created earlier
         button,
-      ]
+      ],
     );
 
     // Append the death screen UI container to the UI layer
@@ -130,5 +132,4 @@ export default class DeathScreen extends Behavior {
     this.entity.destroy();
   }
 }
-
 ```

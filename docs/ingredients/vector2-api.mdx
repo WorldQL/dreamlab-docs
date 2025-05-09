@@ -1,13 +1,14 @@
 # Vector2 API
+
 Essential vector operations like addition, subtraction, and normalization using Vector2.
+
 ```typescript
 // Vector2 is a common class in Dreamlab
 import { Vector2, IVector2 } from "@dreamlab/engine";
 
 // example use
-const v: IVector2 = {x:0, y:0}
-const myVector: Vector2 = new Vector2(v)
-
+const v: IVector2 = { x: 0, y: 0 };
+const myVector: Vector2 = new Vector2(v);
 
 interface IVector2 {
   x: number;
@@ -17,68 +18,68 @@ interface IVector2 {
 // It has the following methods.
 class Vector2 {
   // Constants
-  static ZERO: Vector2    // (0, 0)
-  static ONE: Vector2     // (1, 1) 
-  static NEG_ONE: Vector2 // (-1, -1)
-  static X: Vector2       // (1, 0)
-  static Y: Vector2       // (0, 1)
-  static NEG_X: Vector2   // (-1, 0)
-  static NEG_Y: Vector2   // (0, -1)
+  static ZERO: Vector2; // (0, 0)
+  static ONE: Vector2; // (1, 1)
+  static NEG_ONE: Vector2; // (-1, -1)
+  static X: Vector2; // (1, 0)
+  static Y: Vector2; // (0, 1)
+  static NEG_X: Vector2; // (-1, 0)
+  static NEG_Y: Vector2; // (0, -1)
 
   // Properties
-  x: number
-  y: number
+  x: number;
+  y: number;
 
   // Constructors
-  constructor(x: number, y: number)
-  constructor(vector: IVector2)
-  
+  constructor(x: number, y: number);
+  constructor(vector: IVector2);
+
   // Static Methods
-  static splat(value: number): Vector2                    // Creates vector with all elements set to value
-  static eq(a: IVector2, b: IVector2): boolean           // Compare equality
-  static abs(vector: IVector2): Vector2                  // Absolute values
-  static neg(vector: IVector2): Vector2                  // Negate values
-  static inverse(vector: IVector2): Vector2              // 1/value for each component
-  static add(a: IVector2, b: IVector2): Vector2         // Add vectors
-  static sub(a: IVector2, b: IVector2): Vector2         // Subtract vectors
-  static mul(a: IVector2, b: IVector2|number): Vector2  // Multiply by vector or scalar
-  static div(a: IVector2, b: IVector2|number): Vector2  // Divide by vector or scalar
-  static magnitude(vector: IVector2): number            // Length of vector
-  static magnitudeSquared(vector: IVector2): number     // Squared length
-  static normalize(vector: IVector2): Vector2           // Convert to unit vector
-  static lookAt(vector: IVector2, target: IVector2): number  // Get angle to target
-  static lerp(a: IVector2, b: IVector2, t: number): Vector2 // Linear interpolation
-  static smoothLerp(current: IVector2, target: IVector2, decay: number, deltaTime: number, epsilon?: number): Vector2
-  static distance(a: IVector2, b: IVector2): number     // Distance between vectors
-  static distanceSquared(a: IVector2, b: IVector2): number  // Squared distance
-  static max(a: IVector2, b: IVector2): Vector2        // Component-wise maximum
-  static min(a: IVector2, b: IVector2): Vector2        // Component-wise minimum
-  static rotate(vector: IVector2, angle: number): Vector2    // Rotate vector
-  static rotateAbout(vector: IVector2, angle: number, point: IVector2): Vector2  // Rotate around point
-  static dot(a: IVector2, b: IVector2): number         // Dot product
+  static splat(value: number): Vector2; // Creates vector with all elements set to value
+  static eq(a: IVector2, b: IVector2): boolean; // Compare equality
+  static abs(vector: IVector2): Vector2; // Absolute values
+  static neg(vector: IVector2): Vector2; // Negate values
+  static inverse(vector: IVector2): Vector2; // 1/value for each component
+  static add(a: IVector2, b: IVector2): Vector2; // Add vectors
+  static sub(a: IVector2, b: IVector2): Vector2; // Subtract vectors
+  static mul(a: IVector2, b: IVector2 | number): Vector2; // Multiply by vector or scalar
+  static div(a: IVector2, b: IVector2 | number): Vector2; // Divide by vector or scalar
+  static magnitude(vector: IVector2): number; // Length of vector
+  static magnitudeSquared(vector: IVector2): number; // Squared length
+  static normalize(vector: IVector2): Vector2; // Convert to unit vector
+  static lookAt(vector: IVector2, target: IVector2): number; // Get angle to target
+  static lerp(a: IVector2, b: IVector2, t: number): Vector2; // Linear interpolation
+  static smoothLerp(current: IVector2, target: IVector2, decay: number, deltaTime: number, epsilon?: number): Vector2;
+  static distance(a: IVector2, b: IVector2): number; // Distance between vectors
+  static distanceSquared(a: IVector2, b: IVector2): number; // Squared distance
+  static max(a: IVector2, b: IVector2): Vector2; // Component-wise maximum
+  static min(a: IVector2, b: IVector2): Vector2; // Component-wise minimum
+  static rotate(vector: IVector2, angle: number): Vector2; // Rotate vector
+  static rotateAbout(vector: IVector2, angle: number, point: IVector2): Vector2; // Rotate around point
+  static dot(a: IVector2, b: IVector2): number; // Dot product
 
   // Instance Methods
-  clone(): Vector2                    // Create copy
-  bare(): IVector2                    // Get raw x,y object
-  assign(value: Partial<IVector2>): boolean  // Update components
-  eq(other: IVector2): boolean
-  abs(): Vector2
-  neg(): Vector2
-  inverse(): Vector2
-  add(other: IVector2): Vector2
-  sub(other: IVector2): Vector2
-  mul(other: IVector2|number): Vector2
-  div(other: IVector2|number): Vector2
-  magnitude(): number
-  magnitudeSquared(): number
-  normalize(): Vector2
-  lookAt(target: IVector2): number
-  distance(other: IVector2): number
-  distanceSquared(other: IVector2): number
-  max(other: IVector2): Vector2
-  min(other: IVector2): Vector2
-  rotate(angle: number): Vector2
-  rotateAbout(angle: number, point: IVector2): Vector2
-  dot(other: IVector2): number
+  clone(): Vector2; // Create copy
+  bare(): IVector2; // Get raw x,y object
+  assign(value: Partial<IVector2>): boolean; // Update components
+  eq(other: IVector2): boolean;
+  abs(): Vector2;
+  neg(): Vector2;
+  inverse(): Vector2;
+  add(other: IVector2): Vector2;
+  sub(other: IVector2): Vector2;
+  mul(other: IVector2 | number): Vector2;
+  div(other: IVector2 | number): Vector2;
+  magnitude(): number;
+  magnitudeSquared(): number;
+  normalize(): Vector2;
+  lookAt(target: IVector2): number;
+  distance(other: IVector2): number;
+  distanceSquared(other: IVector2): number;
+  max(other: IVector2): Vector2;
+  min(other: IVector2): Vector2;
+  rotate(angle: number): Vector2;
+  rotateAbout(angle: number, point: IVector2): Vector2;
+  dot(other: IVector2): number;
 }
 ```

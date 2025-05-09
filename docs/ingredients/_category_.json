@@ -1,8 +1,8 @@
 {
-    "label": "Script Ingredients",
-    "position": 2,
-    "link": {
-      "type": "generated-index",
-      "description": "Example Behavior scripts showcasing various functionality."
-    }
+  "label": "Script Ingredients",
+  "position": 2,
+  "link": {
+    "type": "generated-index",
+    "description": "Example Behavior scripts showcasing various functionality."
   }
+}

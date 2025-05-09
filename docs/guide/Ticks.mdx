@@ -1,7 +1,9 @@
 # Tick Loop
 
-Dreamlab runs at a fixed, customizable tickrate. By default, the engine will tick 60 times a second. During a tick, the engine will update entities and run the `onTick` functions in your [Behavior scripts](Behaviors.md).
-A fixed tickrate is advantageous because it means you don't have to constantly refer to a delta time eveywhere in your scripts and makes networking simpler.
+Dreamlab runs at a fixed, customizable tickrate. By default, the engine will tick 60 times a second. During a tick, the
+engine will update entities and run the `onTick` functions in your [Behavior scripts](Behaviors.md). A fixed tickrate is
+advantageous because it means you don't have to constantly refer to a delta time eveywhere in your scripts and makes
+networking simpler.
 
 ## Ordering
 
@@ -12,7 +14,9 @@ During a tick, the following happens:
 3. All Behaviors run their `onPostTick` methods
 4. Entities and their attached Behaviors under the `world` tree is synced over the network
 
-Behaviors do not tick in a guaranteed order. If you absolutely need to guarantee that one Behavior ticks before the other, it's recommended you refactor your code to enforce ordering using function calls; for example the following is incorrect:
+Behaviors do not tick in a guaranteed order. If you absolutely need to guarantee that one Behavior ticks before the
+other, it's recommended you refactor your code to enforce ordering using function calls; for example the following is
+incorrect:
 
 ```ts
 class BehaviorOne extends Behavior {
@@ -36,21 +40,24 @@ class BehaviorOne extends Behavior {
   onTick() {
     // prepare some data that BehaviorTwo needs
     prepareSomeData();
-    this.game.entities
-      .lookupByBehavior(BehaviorTwo)
-      .forEach((entity) => entity.getBehavior(BehaviorTwo).consumeData());
+    this.game.entities.lookupByBehavior(BehaviorTwo).forEach((entity) => entity.getBehavior(BehaviorTwo).consumeData());
   }
 }
 ```
 
-This is relatively niche and you probably won't need to do this. Most of the time, you'll be able to use `onTick` and `onPostTick`, detailed below, to solve ordering problems.
+This is relatively niche and you probably won't need to do this. Most of the time, you'll be able to use `onTick` and
+`onPostTick`, detailed below, to solve ordering problems.
 
 ### `onTick` vs `onPostTick`
 
-`onPostTick` is always guaranteed to run after `onTick`. It's useful to think of your tick methods as _preparing the next world state_. `onTick` is the first step of preparing the next state and `onPostTick` is the second step.
+`onPostTick` is always guaranteed to run after `onTick`. It's useful to think of your tick methods as _preparing the
+next world state_. `onTick` is the first step of preparing the next state and `onPostTick` is the second step.
 
-These are most useful when implementing things patterns like "camera that follows a player". If you move an entity in `onTick` methods, you want to wait for all of them to complete before you calculate the next camera position.
+These are most useful when implementing things patterns like "camera that follows a player". If you move an entity in
+`onTick` methods, you want to wait for all of them to complete before you calculate the next camera position.
 
 ## Interpolation
 
-Dreamlab will render smooth visuals on monitors of any refresh rate. Any motion is smoothed over the appropriate amount of frames, meaning your game will take full advantage of even a 240hz monitor. This interpolation comes at the cost of 1 tick of latency.
+Dreamlab will render smooth visuals on monitors of any refresh rate. Any motion is smoothed over the appropriate amount
+of frames, meaning your game will take full advantage of even a 240hz monitor. This interpolation comes at the cost of 1
+tick of latency.

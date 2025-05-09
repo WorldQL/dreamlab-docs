@@ -1,9 +1,11 @@
 ---
 sidebar_position: 0.19
 ---
+
 # Quick Start Tutorial
 
-**The easiest way to get started is to <a href="https://app.dreamlab.gg/" target="_blank">use our online editor</a>. No setup required!**
+**The easiest way to get started is to <a href="https://app.dreamlab.gg/" target="_blank">use our online editor</a>. No
+setup required!**
 
 ---
 
@@ -85,8 +87,8 @@ You can pause, resume, or exit the play session using the toolbar.
 ### Step 5: Changing the Player Speed
 
 1. Select the **Player** entity in the **Scene Graph.**. It will be located in the **Prefabs** section.
-2. Once selected, in the **Behaviors Panel**, edit the `speed` & `jumpForce` value under the **PlatformMovement** behavior to adjust player movement.
-   _(e.g., Increase speed from 10 to 12 for faster movement.)_
+2. Once selected, in the **Behaviors Panel**, edit the `speed` & `jumpForce` value under the **PlatformMovement**
+   behavior to adjust player movement. _(e.g., Increase speed from 10 to 12 for faster movement.)_
 
 ![Step 6](/img/tutorial/step6.png)
 
@@ -140,7 +142,8 @@ onInitializeClient(): void {
 }
 ```
 
-We can teleport the player to `-6, -18` which would be near the player spawnpoint or we could get the PlayerSpawnpoint position and move the player there.
+We can teleport the player to `-6, -18` which would be near the player spawnpoint or we could get the PlayerSpawnpoint
+position and move the player there.
 
 ```typescript
 onCollide(e: EntityCollision) {
@@ -154,16 +157,14 @@ onCollide(e: EntityCollision) {
 }
 ```
 
-The reason we have to use `waitForNextTick` is because the PlayerController's `onTick` function (updating the character position) may run after the collision has been fired, undoing the effects of our collision. This technique allows us to set the position correctly at the beginning of the next tick.
+The reason we have to use `waitForNextTick` is because the PlayerController's `onTick` function (updating the character
+position) may run after the collision has been fired, undoing the effects of our collision. This technique allows us to
+set the position correctly at the beginning of the next tick.
 
 The completed Behavior looks like this:
 
 ```typescript
-import {
-  Behavior,
-  CharacterController,
-  EntityCollision,
-} from "@dreamlab/engine";
+import { Behavior, CharacterController, EntityCollision } from "@dreamlab/engine";
 import PlayerController from "./player-controller.ts";
 
 export default class Obstacle extends Behavior {
@@ -194,7 +195,8 @@ Once you have this, the behavior should be completed!
 ### Step 9: Attaching a Behavior Script
 
 1. Once returned to the editor, select the **Obstacle** entity from your **Prefabs** section.
-2. Once selected, drag the created behavior script onto your prefab in the **Behavior Panel** from the **Project Panel**.
+2. Once selected, drag the created behavior script onto your prefab in the **Behavior Panel** from the **Project
+   Panel**.
 
 ![Step 10](/img/tutorial/step10.png)
 
@@ -203,8 +205,7 @@ Once you have this, the behavior should be completed!
 ### Step 10: Adding Multiple Obstacles
 
 1. Select the **Obstacle** prefab from the bottom **Prefabs Panel**.
-2. Drag and position it multiple times in your scene to populate the level.
-   ![Step 11](/img/tutorial/step11.png)
+2. Drag and position it multiple times in your scene to populate the level. ![Step 11](/img/tutorial/step11.png)
 
 ---
 

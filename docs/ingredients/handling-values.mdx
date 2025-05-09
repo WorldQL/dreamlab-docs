@@ -1,12 +1,10 @@
 # Handling Values
-Updating the public variables associated with behaviors. These should be used to store state that can be inspected in the editor.
+
+Updating the public variables associated with behaviors. These should be used to store state that can be inspected in
+the editor.
+
 ```typescript
-import {
-  Behavior,
-  Vector2,
-  Vector2Adapter,
-  syncedValue,
-} from "@dreamlab/engine";
+import { Behavior, Vector2, Vector2Adapter, syncedValue } from "@dreamlab/engine";
 
 /*
   Handling Values in Behaviors:
@@ -110,13 +108,9 @@ export default class PlayerMovement extends Behavior {
     let currentSpeed = this.speed;
     if (this.#boost.held) currentSpeed *= 2;
 
-    const velocity = movement
-      .normalize()
-      .mul((this.game.physics.tickDelta / 100) * currentSpeed);
+    const velocity = movement.normalize().mul((this.game.physics.tickDelta / 100) * currentSpeed);
 
-    this.entity.transform.position =
-      this.entity.transform.position.add(velocity);
+    this.entity.transform.position = this.entity.transform.position.add(velocity);
   }
 }
-
 ```

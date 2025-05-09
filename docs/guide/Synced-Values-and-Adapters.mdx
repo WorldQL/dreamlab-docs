@@ -15,11 +15,13 @@ export default class MyBehavior extends Behavior {
 This will cause the class property to be visible in the inspector when the Behavior is attached to an entity:
 ![](../../static/img/image-6.png)
 
-The changes made in the inspector will apply to the class instance and any syncedValue will also be replicated over the network.
+The changes made in the inspector will apply to the class instance and any syncedValue will also be replicated over the
+network.
 
 ## Adapters
 
-Adapters allow you to use more complex types with syncedValues. By default, Dreamlab only supports primitive types (number, string, boolean) in synced values.
+Adapters allow you to use more complex types with syncedValues. By default, Dreamlab only supports primitive types
+(number, string, boolean) in synced values.
 
 ### EntityRef
 
@@ -31,8 +33,7 @@ import { EntityRef, Entity } from "@dreamlab/engine";
 @syncedValue(EntityRef) myEntity: Entity | undefined;
 ```
 
-This will create a property which you can drag an entity into from the scene.
-![](../../static/img/image-5.png)
+This will create a property which you can drag an entity into from the scene. ![](../../static/img/image-5.png)
 
 ### RelativeEntity
 
@@ -42,8 +43,9 @@ import { RelativeEntity, Entity } from "@dreamlab/engine";
 @syncedValue(RelativeEntity) myEntity: Entity | undefined;
 ```
 
-Refer to an entity relative to this one. This is useful if you want to refer to a child of the entity. If the entity is copied, the RelativeEntity values will point to the new children and not the original entity.
-It works the same as `EntityRef` in the editor, simply drag an entity in to associate it.
+Refer to an entity relative to this one. This is useful if you want to refer to a child of the entity. If the entity is
+copied, the RelativeEntity values will point to the new children and not the original entity. It works the same as
+`EntityRef` in the editor, simply drag an entity in to associate it.
 
 ### Vector2Adapter
 
@@ -51,5 +53,6 @@ It works the same as `EntityRef` in the editor, simply drag an entity in to asso
 import { Vector2Adapter, Vector2 } from "@dreamlab/engine";
 @syncedValue(Vector2Adapter) myVector = new Vector2(42, -1)
 ```
+
 This will create a property that shows the vector components:  
 ![](../../static/img/image-7.png)

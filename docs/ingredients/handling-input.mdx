@@ -1,5 +1,7 @@
 # Handling Input
+
 Handling user input, keypresses and mouse input
+
 ```typescript
 import { Behavior, Vector2, syncedValue } from "@dreamlab/engine";
 /*
@@ -58,9 +60,7 @@ export default class Movement extends Behavior {
     if (this.#left.held) movement.x -= 1;
 
     // Calculate the velocity based on movement input and speed
-    this.velocity = movement
-      .normalize()
-      .mul((this.game.physics.tickDelta / 100) * currentSpeed);
+    this.velocity = movement.normalize().mul((this.game.physics.tickDelta / 100) * currentSpeed);
 
     // Update entity's position based on the input
     const newPosition = this.entity.transform.position.add(this.velocity);
@@ -68,7 +68,6 @@ export default class Movement extends Behavior {
     if (this.#fire.pressed) {
       // create a bullet
     }
-
 
     // look at cursor
     const cursorPosition = this.inputs.cursor.world;
@@ -81,5 +80,4 @@ export default class Movement extends Behavior {
     this.entity.transform.position = newPosition;
   }
 }
-
 ```

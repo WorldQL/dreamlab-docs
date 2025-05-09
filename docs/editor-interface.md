@@ -6,6 +6,4 @@ sidebar_position: 0.19
 
 <!-- TODO: Rip out some info from Step 2 of the quickstart tutorial -->
 
-:::info
-This page is a work-in-progress.
-:::
+:::info This page is a work-in-progress. :::

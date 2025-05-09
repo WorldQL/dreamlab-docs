@@ -1,5 +1,7 @@
 # Spawning Entities
+
 Spawning new entities into the world and attaching behaviors.
+
 ```typescript
 import { Behavior, Collider, Sprite } from "@dreamlab/engine";
 import BulletBehavior from "./bullet.ts"; // this import is not an API, the user will need to make this behavior
@@ -86,7 +88,7 @@ export default class EnemyMovement extends Behavior {
         speedFactor = (distance - this.minDistance) / 10;
       }
       this.entity.transform.position = this.entity.transform.position.add(
-        direction.mul((this.time.delta / 100) * this.speed * speedFactor)
+        direction.mul((this.time.delta / 100) * this.speed * speedFactor),
       );
     }
 
@@ -127,5 +129,4 @@ export default class EnemyMovement extends Behavior {
     });
   }
 }
-
 ```

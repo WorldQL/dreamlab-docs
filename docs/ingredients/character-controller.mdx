@@ -1,14 +1,10 @@
 # Character Controller
+
 Using the built-in character controller which handles collision detection. Great for any movement style.
+
 ```typescript
 // This is an example of how to implement a platformer controller using the CharacterController
-import {
-  Behavior,
-  CharacterController,
-  RichText,
-  Vector2,
-  syncedValue,
-} from "@dreamlab/engine";
+import { Behavior, CharacterController, RichText, Vector2, syncedValue } from "@dreamlab/engine";
 
 // A very simple platformer controller
 
@@ -61,15 +57,11 @@ export default class PlayerController extends Behavior {
     }
 
     // Create movement vector
-    const movement = new Vector2(
-      horizontalVelocity * deltaTime,
-      this.#verticalVelocity * deltaTime,
-    );
+    const movement = new Vector2(horizontalVelocity * deltaTime, this.#verticalVelocity * deltaTime);
 
     if (!this.#controller.isGrounded) this.#verticalVelocity -= this.gravity * deltaTime;
 
     this.entity.pos = this.entity.pos.add(movement);
   }
 }
-
 ```
