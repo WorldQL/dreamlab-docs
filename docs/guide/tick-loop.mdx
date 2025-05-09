@@ -1,8 +1,12 @@
+---
+sidebar_position: 4
+---
+
 # Tick Loop
 
 Dreamlab runs at a fixed, customizable tickrate. By default, the engine will tick 60 times a second. During a tick, the
-engine will update entities and run the `onTick` functions in your [Behavior scripts](Behaviors.md). A fixed tickrate is
-advantageous because it means you don't have to constantly refer to a delta time eveywhere in your scripts and makes
+engine will update entities and run the `onTick` functions in your [Behavior scripts](behaviors.mdx). A fixed tickrate
+is advantageous because it means you don't have to constantly refer to a delta time eveywhere in your scripts and makes
 networking simpler.
 
 ## Ordering
@@ -25,6 +29,7 @@ class BehaviorOne extends Behavior {
     this.prepareSomeData();
   }
 }
+
 class BehaviorTwo extends Behavior {
   onTick() {
     // BAD, not guaranteed to run after BehaviorOne.onTick!
