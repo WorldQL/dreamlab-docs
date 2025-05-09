@@ -9,7 +9,8 @@ attached to [Entities](./entities.mdx). If you are familiar with Unity then thes
 MonoBehaviors, or Scripts in Godot.
 
 Behaviors can implement various ["lifecycle" methods](#lifecycle-methods) that the engine will run automatically, such
-as the `onTick()` method which gets called every engine tick (60 TPS by default).
+as the `onTick()` method which gets called every engine tick (60 TPS by default). See [Tick Loop](./tick-loop.mdx) for
+more info on engine ticks.
 
 All behaviors also have access to some global properties (such as `.entity`) which let them interact with the game
 state. You can also define your own properties as [synced values](./synced-values.mdx) to automatically sync them over
@@ -66,7 +67,7 @@ server. These have the platform as the suffix, eg: `onInitializeServer()`. This 
 
 :::warning
 
-Due to a limitation in TypeScript using the platform-specific lifecycle methods will **not** narrow the type on
+Due to a limitation with TypeScript using the platform-specific lifecycle methods will **not** narrow the type on
 `this.game` to `ClientGame` or `ServerGame`.
 
 If you need this behavior you can still do it with a guard inside the non platform-specific method.

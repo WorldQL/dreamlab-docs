@@ -10,35 +10,53 @@ basic functionality, support nesting and hierarchy, and can be scripted using Be
 Entities can be spawned using the right-click menu in the Scene Graph:
 ![spawning entity menu](../../static/img/image-2.png)
 
-This page contains a list of every entity and what it's for.
+## Entity Catalog
 
-## Sprites
+:::note
 
-Rendering images to the world
+This list may not always be up-to-date. Refer to the Dreamlab Editor for a complete list of entities.
 
-### AnimatedSprite
+:::
 
-Takes a JSON spritesheet definition and can play an animation with configurable speed and frame range.  
-See [Platformer with Animations](../examples/platformer-with-animations.mdx) example to see this in action.
+### General
 
-### Sprite
+| Entity                | Usage                                                                                                                              |
+| --------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| `AudioSource`         | Play an audio clip. Optionally enable positional audio relative to the camera                                                      |
+| `Camera`              | Refer to the dedicated [Camera page](./camera.mdx) of the engine manual                                                            |
+| `CharacterController` | Collider with dedicated character movement checks that prevent collision                                                           |
+| `Clickable`           | Entity that emits a Signal when clicked on                                                                                         |
+| `Collider`            | Solid collision for character controllers and other physics bodies                                                                 |
+| `ComplexCollider`     | Complex collision shape. Attach three or more empties as children for this to work. Forms a polygon from the children in CCW order |
+| `Empty`               | Does nothing. Useful for attaching manager behaviors or marking positions (eg: spawnpoints)                                        |
+| `RichText`            | Draw Pixi.js Rich Text in the world                                                                                                |
+| `Rigidbody`           | Entity that has simulated physics. Attach one or more colliders as children for this to work.                                      |
 
-### TilingSprite
+### Sprites
 
-## UI
+| Entity           | Usage                                                                                  |
+| ---------------- | -------------------------------------------------------------------------------------- |
+| `AnimatedSprite` | Draws a JSON spritesheet as an animated image with configurable speed and frame range. |
+| `Sprite`         | Draw an image in the world                                                             |
+| `TilingSprite`   | Same as Sprite but with tiling options                                                 |
 
-Creating UI elements using HTML and CSS
+### UI
 
-### UIPanel
+:::info
 
-### UILayer
+Visit the [User Interface page](./user-interface.mdx) of the engine manual for more info on HTML UI.
 
-## Graphics
+:::
 
-Rendering primitives
+| Entity    | Usage                                                                                                                                             |
+| --------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `UILayer` | Create an HTML DOM tree that covers the entire game screen. Useful for static UI elements (eg: HUD)                                               |
+| `UIPanel` | Create an HTML DOM tree that exists in the world. Useful for UI elements that are fixed relative to the world (eg: signs, player nameplates, etc) |
 
-### RawPixi
+### Graphics
 
-### ColoredSquare
-
-### ColoredPolygon
+| Entity           | Usage                                                           |
+| ---------------- | --------------------------------------------------------------- |
+| `RawPixi`        | **Advanced:** Draw using Pixi.js using their Graphics primitive |
+| `ColoredSquare`  | Render a solid color rectangle in the world                     |
+| `ColoredPolygon` | Render a solid color regular polygon in the world               |
