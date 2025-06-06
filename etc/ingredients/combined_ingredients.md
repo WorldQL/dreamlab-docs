@@ -987,139 +987,121 @@ export default class PlayerController extends Behavior {
 # User Interfaces
 Creating GUIs (HUDs, health bars, etc)
 ```typescript
-import { Behavior, UILayer, syncedValue } from "@dreamlab/engine";
-import { element } from "@dreamlab/ui";
+import { UIBehavior, syncedValue } from "@dreamlab/engine";
 
 /*
   UI System Overview:
 
   The UI system in this project allows you to create and manage user interface elements
-  dynamically within the game using the `element` method from the "@dreamlab/ui" package.
+  dynamically within the game using JSX within a UIBehavior.
 
   - **Creating Elements:**
-    You can create HTML elements by calling the `element` function, which takes the
-    element's tag name, an object with properties/attributes, and an array of child elements or text.
+    In a UIBehavior, `render()` returns JSX describing all DOM nodes, attributes, styles, and event handlers.
 
   - **Appending to the UI Layer:**
-    Once created, elements are appended to the UI layer of an entity, making them visible
-    in the game's UI. This is typically done by accessing the `UILayer` component
-    of the current entity and using `appendChild` to add elements.
+    The returned JSX is automatically appended to the associated UI layer. You trigger this by calling `this.rerender()`
+    in your lifecycle methods (e.g., `onInitialize()` or state changes).
 
   - **Event Handling:**
-    You can attach event listeners to UI elements, such as buttons, to handle user interactions.
-    This allows you to create responsive and interactive UIs within the game.
+    Attach event listeners directly via JSX props (e.g., `onClick={...}`, `onMouseOver={...}`). This keeps markup and logic together.
 
-  - **Example Usage:**
-    In the example below, a "Death Screen" UI is created, which displays a game over message,
-    the player's final score, and a button to respawn the player. The UI is dynamically created
-    when the player dies and removed when they respawn.
-
-    - The `element` method is used to create the UI elements.
-    - CSS styling is applied by creating a `<style>` element.
-    - The UI is integrated into the game's UI layer, ensuring it appears on the screen.
+  - **Example Usage (Death Screen):**
+    Below is the same “Death Screen” implementation, now fully in JSX. It:
+      1. Holds a synced `score` value.
+      2. Renders a full-screen overlay with “Game Over”, the final score, and a “Respawn” button.
+      3. Cleans itself up by destroying the entity when “Respawn” is clicked.
 
   - **Best Practices:**
-    - Ensure to clean up any UI elements when they are no longer needed to avoid memory leaks.
-    - Use descriptive IDs and class names to maintain clarity in your UI components.
-    - Keep UI logic modular by separating the creation and management of UI elements into different methods.
-
-  Below is an example implementation of a death screen using this UI system.
+    - Always call `this.rerender()` after any state change (e.g., updating `score` or toggling visibility)
+    - File extension must be .tsx!
+    - Do not use fragments (e.g., <> </>)
+    - This is not react.
 */
 
-export default class DeathScreen extends Behavior {
-  // Reference to the UI layer associated with the entity
-  #ui = this.entity.cast(UILayer);
-  #element!: HTMLDivElement;
+import { UIBehavior, syncedValue } from "@dreamlab/engine";
 
+export default class DeathScreenUI extends UIBehavior {
   @syncedValue()
   score = 0;
 
-  onInitialize() {
-    // CSS for the death screen UI element
-    const css = `
-    #death-screen {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      background: rgb(0 0 0 / 85%);
-      font-family: "Inter", sans-serif;
-    }
-
-    h1 {
-      font-size: 3rem;
-      font-weight: bold;
-      margin-bottom: 0;
-    }
-
-    p {
-      font-size: 1.5rem;
-      margin-bottom: 1rem;
-    }
-
-    button {
-      padding: 1rem 2rem;
-      font-size: 1.5rem;
-      cursor: pointer;
-      border: none;
-      border-radius: 0.4rem;
-      color: white;
-      background-color: #ff6600;
-      transition: background-color 0.3s ease;
-    }
-
-    button:hover {
-      background-color: #e65c00;
-    }
-    `;
-
-    // Create a <style> element and add the CSS to it
-    const style = element("style", { textContent: css });
-    this.#ui.dom.appendChild(style);
-
-    // Create a "Respawn" button using the new `element` method
-    const button = element("button", { type: "button" }, ["Respawn"]);
-    button.addEventListener("click", () => this.#respawnPlayer());
-
-    // Create the main death screen UI container
-    this.#element = element(
-      "div",
-      {
-        id: "death-screen", // Set the ID for the main container
-      },
-      [
-        // Add an <h1> element for the "Game Over" title
-        element("h1", { className: "example-classname" }, ["Game Over"]),
-
-        // Add a <p> element to display the player's final score
-        element("p", {}, [`Final Score: ${this.score.toLocaleString()}`]),
-
-        // Add the "Respawn" button created earlier
-        button,
-      ]
-    );
-
-    // Append the death screen UI container to the UI layer
-    this.#ui.element.appendChild(this.#element);
+  override onInitialize(): void {
+    super.onInitialize();
+    if (!this.game.isClient()) return;
+    // Trigger to rerender()
+    this.rerender();
   }
 
-  #respawnPlayer() {
-    // spawnPlayer(this.game)
-
-    // Destroy the current entity, removing the death screen from the UI
+  private respawnPlayer(): void {
     this.entity.destroy();
   }
+
+  override render() {
+    return (
+      <div>
+        <div
+          id="death-screen"
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            color: "white",
+            background: "rgba(0, 0, 0, 0.85)",
+            fontFamily: '"Inter", sans-serif',
+          }}
+        >
+          <h1
+            style={{
+              fontSize: "3rem",
+              fontWeight: "bold",
+              marginBottom: 0,
+            }}
+          >
+            Game Over
+          </h1>
+          <p
+            style={{
+              fontSize: "1.5rem",
+              marginBottom: "1rem",
+            }}
+          >
+            Final Score: {this.score.toLocaleString()}
+          </p>
+          <button
+            type="button"
+            onClick={() => this.respawnPlayer()}
+            style={{
+              padding: "1rem 2rem",
+              fontSize: "1.5rem",
+              cursor: "pointer",
+              border: "none",
+              borderRadius: "0.4rem",
+              color: "white",
+              backgroundColor: "#ff6600",
+              transition: "background-color 0.3s ease",
+            }}
+            onMouseOver={(e) => {
+              const btn = e.currentTarget as HTMLElement;
+              btn.style.backgroundColor = "#e65c00";
+            }}
+            onMouseOut={(e) => {
+              const btn = e.currentTarget as HTMLElement;
+              btn.style.backgroundColor = "#ff6600";
+            }}
+          >
+            Respawn
+          </button>
+        </div>
+      </div>
+    );
+  }
 }
-
 ```
-
----
 
 # Interacting with Behaviors
 Fetching other behaviors attached to an entity.
