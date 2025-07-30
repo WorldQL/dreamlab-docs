@@ -1,10 +1,118 @@
 ---
 sidebar_position: 999
+title: Camera
 ---
 
 # Camera
 
-![Camera preview](../../static/img/image-3.png)
+![Camera bounds preview](../../static/img/image-3.png)
 
-When you select the camera you'll see a box representing the bounds. Things enclosed in this box are guaranteed to be
-visible regardless of screen aspect ratio when the game is running.
+The **Camera** entity controls what the player sees.  
+A white box shows its “guaranteed-visible” area—everything inside that box is on-screen no matter the monitor's aspect ratio.
+
+---
+## 1. Switching between multiple cameras
+
+When you place more than one **Camera** entity in a scene, only **one** of them can drive the viewport.  
+The `active` flag decides which camera is currently showing.  
+A simple pattern is:
+
+1.  Grab references to the cameras once (e.g. `game.local!._.CameraA` and `CameraB`).  
+2.  Set one `active = true` at startup.  
+3.  Flip the flags whenever you want to switch.
+
+```ts
+import { Behavior, Camera } from "@dreamlab/engine";
+
+/**
+ * Toggle between two editor‑placed cameras:
+ *   game.local
+ *   ├─ CameraA (🎥)
+ *   └─ CameraB (🎥)
+ */
+export default class CamToggle extends Behavior {
+  camA!: Camera;
+  camB!: Camera;
+
+  onInitializeClient() {
+    // 1) cache the camera references once.
+    // Can also use syncedValue(EntityRef) - see synced value docs for example
+    this.camA = this.game.local!._.CameraA.cast(Camera);
+    this.camB = this.game.local!._.CameraB.cast(Camera);
+
+    // 2) start on CameraA
+    this.camA.active = true;
+  }
+
+  /** 3) flip which camera is active */
+  swap() {
+    const aIsActive = this.camA.active;
+    this.camA.active = !aIsActive;
+    this.camB.active =  aIsActive;
+  }
+}
+```
+
+> **Tip:** setting `active = true` on a camera automatically sets `active = false` on any other cameras, so you never have two active at once.
+
+---
+
+## 2. Following an entity
+
+```ts
+// CameraFollow.ts
+import { Behavior, Camera, Vector2 } from "@dreamlab/engine";
+
+export default class CameraFollow extends Behavior {
+  onPostTick() {
+    if (!this.game.isClient()) return;                   // run on client only
+    if (this.entity.authority !== this.game.network.self) return;
+
+    const camera = Camera.getActive(this.game);
+    if (camera) {
+      const offset = new Vector2(5, 2);                 // look‑ahead offset
+      camera.pos.assign(this.entity.pos.clone().add(offset));
+    }
+  }
+}
+```
+
+Attach `CameraFollow` to a player entity; the camera will smoothly track it each tick.
+
+---
+
+## 3. Key properties
+
+| Property            | What it does                                                       |
+| ------------------- | ------------------------------------------------------------------ |
+| **active**          | Make / un-make this camera the view                                |
+| **smooth**          | How quickly it lerps to new position/rotation (0 = instant)        |
+| **zoom**            | World units per screen unit (1 = 1 meter → 100 px)                 |
+| **unlocked**        | Let the camera ignore the safety box and fill the whole canvas     |
+| **lockAspectRatio** | Freeze the aspect ratio to the value below                         |
+| **aspectRatio**     | `[width, height]` ratio when `lockAspectRatio = true`              |
+| **scaleFilterMode** | `"nearest"` or `"linear"` scaling for pixel-art vs smooth games    |
+
+> **Note:** Changing scale filter mode may require you to reload the website.
+
+---
+
+## 4. Common tricks
+
+| Want to…                               | Do this |
+| -------------------------------------- | ------- |
+| Instant snap instead of smooth lerp    | `camera.smooth = 0` |
+| Pixel-art crisp scaling                | `camera.scaleFilterMode = "nearest"` |
+| Lock game to 16:9                      | `camera.lockAspectRatio = true; camera.aspectRatio = [16,9];` |
+| Free-roam editor camera                | `camera.unlocked = true; camera.zoom = 0` |
+
+---
+
+## 5. Troubleshooting
+
+| Symptom                       | Likely cause / fix                                               |
+| ----------------------------- | ---------------------------------------------------------------- |
+| Camera shows nothing          | Make sure it's spawned **local**, not in `world`                 |
+| Camera won't activate         | Another camera's `active` is still `true`—deactivate that first  |
+| Scene blurry at pixel zoom    | Set `scaleFilterMode` to `"nearest"`                             |
+| Buttons inside UI not clickable| Ensure UI root has `pointer-events: auto` (see UI docs)         |
