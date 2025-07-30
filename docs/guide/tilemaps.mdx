@@ -1,6 +1,149 @@
+---
+sidebar_position: 1000
+title: Tilemaps
+---
+
 # Tilemaps
 
-Tilemaps allow you to quickly create maps using a predefined tileset.
+Tilemaps let you paint 2D levels quickly using a tileset (a grid of sprites).  
+A **Tilemap** entity is a regular entity, so you can move, scale, parent,  
+and duplicate it like anything else.
 
-## Creating New Tilemap And Assigning Pallete
 <video src="/img/liltilemapguide.mov" style={{ maxWidth: "100%" }} autoPlay controls></video>
+
+## Quick start
+
+1. **Create → Tilemap** in the scene graph.  
+2. Drag a spritesheet PNG onto **Atlas** in the Properties Panel.  
+   The editor auto-slices it into `resolution x resolution` squares  
+   (64 x 64 px by default).  
+3. Open the Tilemap tab on the bottom panel when the Tilemap entity is selected.
+4. Pick a tile and start painting.
+
+> **Tip — scale filtering**  
+> Set **Scale filter mode** to “nearest” for crisp pixel-art,  
+> or “linear” for smooth scaling.
+
+---
+
+## Scripting a tilemap
+
+Need procedural generation or an in-game brush?  
+Just ask the entity for its `Tilemap` component and call the helpers.
+
+```ts
+import { Behavior, Rng, syncedValue, Tilemap } from "@dreamlab/engine";
+
+/** Pick a random element from the array with the supplied PRNG. */
+function sampleArray<T>(array: readonly T[], prng: () => number): T {
+  const idx = Math.floor(Math.abs(prng()) % 1 * array.length);
+  return array[idx]!;
+}
+
+export default class Generate extends Behavior {
+  #tilemap = this.entity.cast(Tilemap);
+
+  @syncedValue()
+  seed: number = 0;
+
+  /** Grass‑only palette IDs. */
+  static readonly #GRASS = [1,2,3,8,9,10,11,16,17,18,19,24,25,26,27] as const;
+  /** Flower‑only palette IDs. */
+  static readonly #FLOWER = [4,5,6,7,12,13,14,20,21,22,23,28,29,30,31] as const;
+
+
+  /** Deterministic RNG tied to `seed`. */
+  #prng!: () => number;
+
+  #setRng(): void {
+    this.#prng = Rng.Seeded(BigInt(this.seed));
+  }
+
+  /** Decide which palette to use, then pick a sprite ID from it. */
+  #getTile(): number {
+    const roll = this.#prng(); // 0 … 1
+    if (roll < 0.05) return 0; // empty
+    if (roll < 0.8) { // grass
+      return sampleArray(Generate.#GRASS_TILES, this.#prng);
+    }
+    return sampleArray(Generate.#FLOWER_TILES, this.#prng);
+  }
+
+  clearData(): void {
+    this.#tilemap.clearTiles();
+  }
+
+  generateMap(size = 50): void {
+    for (let x = 0; x < size; x++) {
+      for (let y = 0; y < size; y++) {
+        this.#tilemap.setTile(x, y, this.#getTile());
+      }
+    }
+  }
+
+  onInitialize() {
+    // Re‑seed whenever the network‑synced seed value changes.
+    this.values.get("seed")?.onChanged(() => {
+      this.#setRng();
+      if (this.game.isServer()) this.generateMap();
+    });
+
+    this.#setRng();
+    if (this.game.isServer()) this.generateMap();
+  }
+
+  onFrame(): void {
+    if (!this.game.isClient()) return;
+
+    const world = this.inputs.cursor.world;
+    if (!world) return;
+
+    const left = this.inputs.getKey("MouseLeft");
+    const right = this.inputs.getKey("MouseRight");
+    if (!left && !right) return;
+
+    const tile = this.#tilemap.getTileAtPoint(world);
+    if (!tile) return;
+
+    const id = left ? 33 /* hard‑coded brush */ : this.#getTile();
+    this.#tilemap.setTile(tile.x, tile.y, id);
+  }
+}
+```
+
+---
+
+## Core API
+
+| Method                                   | Purpose                                                     |
+|------------------------------------------|-------------------------------------------------------------|
+| `getTile(x, y)`                          | Returns `TileData` \| `undefined` for that coordinate.      |
+| `getTilePaletteId(x, y)`                 | Returns palette index (`number`) or `undefined`.            |
+| `setTile(x, y, paletteId?)`              | Sets tile; pass `undefined` to erase.                       |
+| `getTileAtPoint(worldPos)`               | Ray-casts the cursor; returns `{ x, y, …tile }` or `undefined`. |
+| `clearTiles()`                           | Removes every tile from the map.                            |
+| `tiles()`                                | Generator that yields `{ x, y, tile }` for each filled cell.|
+| `bounds` *(getter)*                      | `{ width, height, offset }` in tile units.                  |
+
+### `TileData` union
+
+```ts
+type TileData =
+  | { type: "color";        color: string; alpha?: number }
+  | { type: "texture";      texture: string }
+  | { type: "spritesheet";  spritesheet: string; frame: number }
+  | { type: "texture-slice"; texture: string; x: number; y: number };
+```
+
+---
+
+### FAQ
+
+**How big can a tilemap be?**  
+Technically unlimited, but performance is tuned for ≤ 10 000 drawn tiles.
+
+**Can I swap atlases at runtime?**  
+Yes — just assign a new path to **Atlas**; all visuals update automatically.
+
+**How do I force pixel-perfect textures?**  
+Set **Scale filter mode** to “nearest” on the Tilemap *or* on the Camera.
