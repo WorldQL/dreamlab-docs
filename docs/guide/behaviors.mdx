@@ -1,88 +1,145 @@
 ---
 sidebar_position: 3
+title: Behaviors
 ---
 
 # Behaviors
 
-Behaviors are how you implement logic into your game. A behavior is a script file written in TypeScript that are
-attached to [Entities](./entities.mdx). If you are familiar with Unity then these are conceptually similar to
-MonoBehaviors, or Scripts in Godot.
+Behaviors are TypeScript classes that bring logic to an [Entity](./entities.mdx).  
+If you know Unity, think **MonoBehaviours**; in Godot, they're **Scripts**.
 
-Behaviors can implement various ["lifecycle" methods](#lifecycle-methods) that the engine will run automatically, such
-as the `onTick()` method which gets called every engine tick (60 TPS by default). See [Tick Loop](./tick-loop.mdx) for
-more info on engine ticks.
+A Behavior can
 
-All behaviors also have access to some global properties (such as `.entity`) which let them interact with the game
-state. You can also define your own properties as [synced values](./synced-values.mdx) to automatically sync them over
-the network, as well as make them available in the Dreamlab Editor.
+* react to **lifecycle callbacks** (`onInitialize`, `onTick`, …)  
+* read global helpers like `this.game` / `this.entity`  
+* declare **@value() / @syncedValue()** properties that show up in the editor and replicate over the network
 
-:::info
+---
 
-Marking a behavior property as a synced value is similar to the `[SerializeField]` annotation in Unity or the `@export`
-annotation in Godot, with the added benefit of enabling automatic network syncing.
+## 1. Defining a Behavior
 
-:::
-
-## Defining a Behavior
-
-Behavior script files must have a class that extends `Behavior` as the default export. Only the default export is
-required, other exports are allowed. Script files must also be inside the `src` folder of the project root. Scripts
-inside sub-folders of `src` are also allowed.
+Place the file inside your project's `src/` folder and export a class that extends `Behavior`:
 
 ```ts
-import { Behavior } from "@dreamlab/engine";
+import { Behavior, value } from "@dreamlab/engine";
 
-export default class MyBehavior extends Behavior {
-  // ...
-}
-```
+export default class Spinner extends Behavior {
+  /** degrees per second (auto-saved & editor-visible) */
+  @value()
+  speed = 90;
 
-### Properties
-
-| Property | Description                                    |
-| -------- | ---------------------------------------------- |
-| `game`   | The current game instance                      |
-| `entity` | The entity this behavior is attached to        |
-| `time`   | Game time info (current time, delta time, etc) |
-| `inputs` | Input manager                                  |
-
-### Lifecycle Methods
-
-:::info
-
-Not all methods are documented here. Some have specialized use cases and aren't generally useful in most cases.
-
-:::
-
-| Method           | When it is run                                                             | Use case                           |
-| ---------------- | -------------------------------------------------------------------------- | ---------------------------------- |
-| `onInitialize()` | When a behavior is initialized (created or attached to an existing entity) | Running initialization code        |
-| `onTick()`       | Every game tick, this is usually 60 TPS                                    | Running some repeated game logic   |
-| `onFrame()`      | Every render frame, only called on clients                                 | Running additional rendering logic |
-
-#### Platform Specific Methods
-
-Both `onInitialize()` and `onTick()` have extra lifecycle methods that only get called on either the client or the
-server. These have the platform as the suffix, eg: `onInitializeServer()`. This can be useful if
-
-:::warning
-
-Due to a limitation with TypeScript using the platform-specific lifecycle methods will **not** narrow the type on
-`this.game` to `ClientGame` or `ServerGame`.
-
-If you need this behavior you can still do it with a guard inside the non platform-specific method.
-
-```ts
-import { Behavior } from "@dreamlab/engine";
-
-export default class MyBehavior extends Behavior {
-  onInitialize(): void {
-    if (this.game.isServer()) {
-      // run server-only code here
-      // this.game will be of type ServerGame
-    }
+  onTick() {
+    this.entity.transform.rotation += this.speed * this.time.delta;
   }
 }
 ```
 
-:::
+> Marking a behavior property as a `@value()` or `@syncedValue()` is similar to the [SerializeField] annotation in Unity or the @export annotation in Godot, with the added benefit of enabling automatic network syncing.
+
+---
+
+## 2. Handy built-ins
+
+| Property / Helper     | What you get                                        |
+| --------------------- | --------------------------------------------------- |
+| `this.game`           | Current **Game** object (network, renderer, …)      |
+| `this.entity`         | The **Entity** this script sits on                  |
+| `this.time`           | Time helper (ticks, delta, frame counts)            |
+| `this.inputs`         | Input manager (keys, mouse, virtual joysticks)      |
+| `this.listen()`       | Sugar for `other.on(Event, handler)` + auto-cleanup |
+| `this.hasAuthority()` | `true` if this peer controls the entity             |
+
+---
+
+## 3. Lifecycle callbacks
+
+| Method                | Runs when…                                             | Typical use                                 |
+| --------------------- | ------------------------------------------------------ | ------------------------------------------- |
+| `setup()`             | **Immediately** after constructor—before hierarchy     | Rare edge-case initialisation               |
+| `onInitialize()`      | First frame the entity is alive                        | Allocate resources, attach listeners        |
+| `onTick()`            | Every **simulation tick** (60 TPS by default)         | Gameplay logic, physics, AI                 |
+| `onFrame()` *(client)*| Every **render frame**                                 | Extra visuals that don't need to sync       |
+| `onPreTick()`         | First phase of the tick (before physics)               | Input sampling, clear one-frame buffers     |
+| `onPostTick()`        | Last phase of the tick (after physics)                 | Camera follow, cleanup                      |
+
+### Platform-specific hooks
+
+Add **`Client`** or **`Server`** to restrict a hook:
+
+* `onInitializeClient`, `onInitializeServer`  
+* `onTickClient`, `onTickServer`
+
+> TypeScript can't yet narrow `this.game` automatically; guard with `this.game.isClient()` when you need the specialised type.
+
+---
+
+## 4. Typed access to other entities
+
+The dot-path proxy (`root._.<Name>`) returns a **generic `Entity`**.  
+Call `.cast(Type)` for full API & IntelliSense:
+
+```ts
+const cam = this.game.local._.Camera.cast(Camera);
+cam.zoom = 2;
+```
+
+Bracket syntax works for names with spaces:
+
+```ts
+const boss = game.world._["Final Boss"].cast(Rigidbody);
+```
+
+---
+
+## 5. Listening to signals
+
+Dreamlab uses an event-bus called **Signals**.  
+Subscribe with `this.listen()` (auto-unsubscribed on destroy):
+
+```ts
+onInitialize() {
+  // Stop the player when hitting this zone’s collider
+  this.listen(this.entity, EntityCollision, e => {
+    if (e.started) {
+      const player = e.other.getBehavior(Player);
+      player.speed = 0;
+    }
+  });
+}
+```
+
+Common Signals:
+
+| Signal                      | Fires when…                                   |
+| --------------------------- | --------------------------------------------- |
+| `EntitySpawned`             | Entity constructed & ready                    |
+| `EntityDestroyed`           | Entity about to disappear                     |
+| `EntityCollision`           | Two colliders begin / end overlap             |
+| `Value.onChanged`           | A `@value()` property changes                 |
+
+---
+
+## 6. Example - interactive zone
+
+```ts
+import { Behavior, EntityCollision, value } from "@dreamlab/engine";
+
+export default class Zone extends Behavior {
+  @value() zone = "shop";
+
+  onInitialize() {
+    if (!this.game.isClient()) return;
+
+    // Run when the zone collides with the player's hitbox
+    this.listen(this.entity, EntityCollision, e => {
+      if (!e.started && e.other.name !== 'Player') return;
+
+      this.game.fire(EnterZoneEvent, this.entity.id, e.other.id, this.zone);
+    });
+  }
+}
+```
+
+---
+
+Happy scripting!
