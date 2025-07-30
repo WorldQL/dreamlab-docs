@@ -1,21 +1,63 @@
 ---
 sidebar_position: 1
+title: Scenes & Roots
 ---
 
-# Scenes and Roots
+# Scenes & Roots
 
-Dreamlab has a scene hierarchy like most other game engines. However, it's divided into four "root" trees:
+Dreamlab's scene graph is split into **four top-level roots**.  
+Each root decides **where** an entity exists and **who** runs its Behaviors.
 
-| Root      | Description                                                                                                                                                                     |
-| --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `world`   | Entities and Behavior scripts under the world tree will be synced to all clients. Their positions, rotations, etc. all automatically sync.                                      |
-| `local`   | Only spawn on each player's client. The main Camera lives here and is also a good place to put HUD or other client-only components                                              |
-| `server`  | Behaviors and Scripts only spawn and tick on the server. Useful for game state managers you only need to spawn once over the lifetime of the entire game.                       |
-| `prefabs` | These entities are disabled at runtime but can be copied into other world roots via `cloneInto` in scripts or can be copy-pasted using the editor. Useful for reusable objects. |
+| Root         | Lives on…                 | What to put here                                           |
+| ------------ | ------------------------- | ---------------------------------------------------------- |
+| `world`      | _Everyone_ (server + all clients) | Network-synced gameplay objects (terrain, NPCs, pickups). |
+| `local`      | Each **client** only      | UI, the active `Camera`, client-side VFX, helper scripts.  |
+| `server`     | The **server** only       | Game-wide managers, match timers, scoreboards.             |
+| `prefabs`    | Editor-only (disabled at runtime) | Reusable blueprints you can `cloneInto` another root.      |
 
-For example, consider the following scene:
+> Think of roots like “layers”:  
+> - **`world`** is the shared game world  
+> - **`local`** is the player's personal overlay  
+> - **`server`** is the omniscient referee  
+> - **`prefabs`** are templates you can duplicate wherever you need them
 
-![Screenshot of the world tree roots](../../static/img/image-1.png)
+---
 
-In this example, `Sprite` would exist on all clients. `Camera` only exists on each client. `GameManager` is only spawned
-once and on the server. `Player` is a prefab that we can copy into the `world` tree when we need to spawn a player.
+## Example scene layout
+
+![Roots screenshot](../../static/img/image-1.png)
+
+| Label in screenshot | Root   | Reason it lives there                              |
+| ------------------- | ------ | -------------------------------------------------- |
+| `Sprite`            | world  | Everyone must see the same sprite                  |
+| `Camera`            | local  | Each client controls its own camera                |
+| `GameManager`       | server | Runs once on the server to track global state      |
+| `Player` prefab     | prefabs| Cloned into `world` when a player joins            |
+
+---
+
+### Spawning a prefab at runtime
+
+A prefab lives under **`prefabs`** until you copy it into another root with `cloneInto()`.
+
+```ts
+import { Behavior } from "@dreamlab/engine";
+
+export default class CrateSpawner extends Behavior {
+  spawnCrate() {
+    // 1) choose the prefab
+    const prefab   = this.game.prefabs._.Crate;
+
+    // 2) choose the destination root (can be an entity)
+    const parent   = this.game.world;
+
+    // 3) clone it in; you can override name, authority, etc.
+    const crate = prefab.cloneInto(parent, {
+      name:     "Crate." + crypto.randomUUID(),
+      authority: this.game.network.self,
+    });
+
+    // optional: move it somewhere
+    crate.pos.set(10, 0, 5);
+  }
+}
