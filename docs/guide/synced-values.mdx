@@ -1,62 +1,57 @@
 ---
 sidebar_position: 5
+title: Synced Values & Adapters
 ---
 
-# Synced Values and Adapters
+# Synced Values & Adapters
 
-In a Behavior class, you can define properties with the `@syncedValue` decorator:
+`@value()` (alias **`@syncedValue()`**) turns a field into …
 
-```typescript
-import { Behavior, syncedValue } from "@dreamlab/engine";
+* a network-replicated variable  
+* an observable you can `onChanged()`
+* a row in the Inspector (Properties Panel) 
+
+
+```ts
+import { Behavior, value } from "@dreamlab/engine";
 
 export default class MyBehavior extends Behavior {
-  @syncedValue() myNumber = 10;
-  @syncedValue() myBoolean = false;
-  @syncedValue() myString = "test"; // default values
+  @value() myNumber   = 10;
+  @value() myBoolean = false;
+  @value() myString  = "test";
 }
 ```
-
 This will cause the class property to be visible in the inspector when the Behavior is attached to an entity:
 ![](../../static/img/image-6.png)
 
 The changes made in the inspector will apply to the class instance and any syncedValue will also be replicated over the
 network.
 
-## Adapters
 
-Adapters allow you to use more complex types with syncedValues. By default, Dreamlab only supports primitive types
-(number, string, boolean) in synced values.
+## 1 · Listening for changes
 
-### EntityRef
-
-Refer to a specific entity in the world.
-
-```typescript
-import { EntityRef, Entity } from "@dreamlab/engine";
-
-@syncedValue(EntityRef) myEntity: Entity | undefined;
+```ts
+this.values.get("myNumber")?.onChanged((next, prev) => {
+  console.log(`+${next - prev} pts`);
+});
 ```
 
-This will create a property which you can drag an entity into from the scene. ![](../../static/img/image-5.png)
+## 2 · Built-in adapters
 
-### RelativeEntity
+Adapters allow you to use more complex types with syncedValues. 
+By default, Dreamlab only supports primitive types (number, string, boolean) in synced values. 
+Pass the adapter class as the first argument:
 
-```typescript
-import { RelativeEntity, Entity } from "@dreamlab/engine";
+| Adapter class            | Purpose / UI                       | Usage example                                                   |
+|--------------------------|------------------------------------|-----------------------------------------------------------------|
+| `EntityRef`              | Drag-drop any scene entity         | `@value(EntityRef) target?: Entity`                             |
+| `RelativeEntity`         | Prefab-safe child/sibling reference| `@value(RelativeEntity) child?: Entity`                         |
+| `Vector2Adapter`         | Two number inputs (X & Y)          | `@value(Vector2Adapter) dir = new Vector2(1, 0)`                |
+| `ColorAdapter`           | Hex picker                         | `@value(ColorAdapter) tint = "#ff00ffff"`                     |
+| `TextureAdapter`         | Texture path input + preview       | `@value(TextureAdapter) tex = "res://img.png"`                  |
+| `SpritesheetAdapter`     | JSON spritesheet picker            | `@value(SpritesheetAdapter) sheet = "res://hero.json"`          |
+| `AudioAdapter`           | Audio asset picker                 | `@value(AudioAdapter) sfx = "res://hit.ogg"`                    |
+| `AspectRatioAdapter`     | Two numbers (W x H)                | `@value(AspectRatioAdapter) ratio = [16, 9]`                    |
+| `new EnumAdapter([...])` | Dropdown enum                      | `@value(new EnumAdapter(["Idle","Walk"])) state = "Idle"`       |
 
-@syncedValue(RelativeEntity) myEntity: Entity | undefined;
-```
-
-Refer to an entity relative to this one. This is useful if you want to refer to a child of the entity. If the entity is
-copied, the RelativeEntity values will point to the new children and not the original entity. It works the same as
-`EntityRef` in the editor, simply drag an entity in to associate it.
-
-### Vector2Adapter
-
-```typescript
-import { Vector2Adapter, Vector2 } from "@dreamlab/engine";
-@syncedValue(Vector2Adapter) myVector = new Vector2(42, -1)
-```
-
-This will create a property that shows the vector components:  
-![](../../static/img/image-7.png)
+Need something else? Extend `ValueTypeAdapter`.
