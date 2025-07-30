@@ -1,26 +1,49 @@
 ---
 sidebar_position: 4
+title: Tick Loop
 ---
 
 # Tick Loop
 
-Dreamlab runs at a fixed, customizable tickrate. By default, the engine will tick 60 times a second. During a tick, the
-engine will update entities and run the `onTick` functions in your [Behavior scripts](behaviors.mdx). A fixed tickrate
-is advantageous because it means you don't have to constantly refer to a delta time eveywhere in your scripts and makes
-networking simpler.
+Dreamlab simulates the **game world** at a **fixed tick-rate** (60 TPS by default).  
+Every tick the engine
 
-## Ordering
+1. advances physics & transforms,  
+2. executes your **Behavior** callbacks,  
+3. sends a network snapshot, and then  
+4. uses **interpolation** to render buttery-smooth frames on any monitor refresh rate.
 
-During a tick, the following happens:
+A fixed tick-rate keeps gameplay deterministic and makes networking much simpler—most of the time you don't even need `deltaTime`; the engine handles it for you.
 
-1. All entities tick, updating their visuals, physics bodies, tranform, etc.
-2. All Behaviors run their `onTick` methods
-3. All Behaviors run their `onPostTick` methods
-4. Entities and their attached Behaviors under the `world` tree is synced over the network
 
-Behaviors do not tick in a guaranteed order. If you absolutely need to guarantee that one Behavior ticks before the
-other, it's recommended you refactor your code to enforce ordering using function calls; for example the following is
-incorrect:
+
+## 1 · What happens each tick?
+
+| Phase                  | Typical work                                       |
+| ---------------------- | -------------------------------------------------- |
+| **onPreTick**          | Read inputs, clear one-frame buffers               |
+| Physics & engine sims  | Move rigidbodies, resolve collisions               |
+| **onTick**             | Main gameplay logic                                |
+| **onPostTick**         | “Late update” logic (e.g., camera follow)          |
+| Network snapshot       | Sync entities in the **`world`** root              |
+| **onFrame** *(client)* | Extra rendering per display frame (optional)       |
+
+> The order **onPreTick → onTick → onPostTick** is guaranteed;  
+> within each band, Behaviors execute in an undefined order.
+
+
+
+### `onTick` vs `onPostTick`
+
+Think of a tick as “prepare the next world state”:
+
+* **`onTick`** - move players, run AI, update health bars.  
+* Physics resolves all overlaps.  
+* **`onPostTick`** - world state is final → update camera, parallax, etc.
+
+
+
+Behaviors do not tick in a guaranteed order. If you absolutely need to guarantee that one Behavior ticks before the other, it's recommended you refactor your code to enforce ordering using function calls; for example the following is **incorrect**:
 
 ```ts
 class BehaviorOne extends Behavior {
@@ -38,31 +61,49 @@ class BehaviorTwo extends Behavior {
 }
 ```
 
-The correct way to script this would be:
+The **correct** way to script this would be:
 
 ```ts
 class BehaviorOne extends Behavior {
   onTick() {
     // prepare some data that BehaviorTwo needs
     prepareSomeData();
-    this.game.entities.lookupByBehavior(BehaviorTwo).forEach((entity) => entity.getBehavior(BehaviorTwo).consumeData());
+    this.game.entities
+      .lookupByBehavior(BehaviorTwo)
+      .forEach(e => e.getBehavior(BehaviorTwo).consumeData());
   }
 }
 ```
 
-This is relatively niche and you probably won't need to do this. Most of the time, you'll be able to use `onTick` and
-`onPostTick`, detailed below, to solve ordering problems.
+---
 
-### `onTick` vs `onPostTick`
+Make dependencies explicit; don't rely on incidental ordering.
 
-`onPostTick` is always guaranteed to run after `onTick`. It's useful to think of your tick methods as _preparing the
-next world state_. `onTick` is the first step of preparing the next state and `onPostTick` is the second step.
+## 2 · Platform-specific hooks
 
-These are most useful when implementing things patterns like "camera that follows a player". If you move an entity in
-`onTick` methods, you want to wait for all of them to complete before you calculate the next camera position.
+| Hook                       | Runs on…      | Use for…                                 |
+| -------------------------- | ------------- | ---------------------------------------- |
+| `onInitializeClient`       | client only   | Play VFX, set up UI                      |
+| `onInitializeServer`       | server only   | Spawn match controller, load map file    |
+| `onTickClient` / `Server`  | each tick     | Divergent client/server logic            |
 
-## Interpolation
+TypeScript can't narrow `this.game` automatically; guard with `if (this.game.isClient())` when you need the specialised type.
 
-Dreamlab will render smooth visuals on monitors of any refresh rate. Any motion is smoothed over the appropriate amount
-of frames, meaning your game will take full advantage of even a 240hz monitor. This interpolation comes at the cost of 1
-tick of latency.
+
+
+## 3 · Interpolation
+
+After each tick, Dreamlab **interpolates** between the previous and current transforms so motion stays fluid on 144 Hz, 240 Hz, etc.
+
+* **+** Smooth visuals on any display  
+* **-** Adds ~1 tick (≈ 16 ms at 60 TPS) of visual latency
+
+
+
+## 4 · Quick troubleshooting
+
+| Symptom                     | Likely fix                                                   |
+| --------------------------- | ------------------------------------------------------------ |
+| Twitchy / jittery objects   | Ensure you update each entity's position only **once per tick**. |
+| Camera feels one-frame late | Move characters in `onTick`; update camera in **`onPostTick`**. |
+| Network rubber-banding      | Two peers share authority—call `takeAuthority()` on one side. |
