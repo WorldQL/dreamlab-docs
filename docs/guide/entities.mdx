@@ -25,7 +25,7 @@ Entities are usually added from the editor's right-click menu:
 
 ```ts
 // Spawn an Empty into the shared world root
-const pivot = game.world.spawn({
+const pivot = this.game.world.spawn({
   name: "Pivot",
   type: Empty,
   transform: { position: { x: 4, y: 1 } },
@@ -37,9 +37,9 @@ const pivot = game.world.spawn({
 ```ts
 // “Crate” lives under prefabs/
 // cloneInto returns the new instance
-const crate = game.prefabs._.Crate.cloneInto(game.world, {
+const crate = this.game.prefabs._.Crate.cloneInto(this.game.world, {
   name: "Crate." + crypto.randomUUID(),
-  authority: game.network.self,  // I control this crate
+  authority: this.game.network.self,  // I control this crate
 });
 crate.pos.set(2, 0);
 ```
@@ -64,7 +64,7 @@ crate.pos.set(2, 0);
 `root._.<Name>` gives you a quick reference to any **direct child** under a root:
 
 ```ts
-const cam   = game.local._.Camera;    // generic Entity
+const cam = this.game.local._.Camera; // generic Entity
 ```
 
 The proxy returns an **untyped** `Entity`, so if you want type-specific methods
@@ -72,7 +72,7 @@ The proxy returns an **untyped** `Entity`, so if you want type-specific methods
 
 ```ts
 // get the local camera with full IntelliSense
-const cam = game.local._.Camera.cast(Camera);
+const cam = this.game.local._.Camera.cast(Camera);
 
 cam.zoom = 2;            // Camera-only API
 ```
@@ -81,8 +81,16 @@ Dot-path chains work for grandchildren too:
 
 ```ts
 // Prefab » Player » Health
-const health = game.prefabs._.Player._.Health.cast(RichText);
+const health = this.game.prefabs._.Player._.Health.cast(RichText);
 health.text = "HP: 100";
+```
+
+Names with spaces or symbols-
+If the entity's name isn't a valid JavaScript identifier (contains spaces, hyphens, etc.)
+use bracket access:
+```ts
+// Entity is literally named “My Entity”
+const ent = this.game.world._["My Entity"];
 ```
 
 > The lookup throws if the child name is wrong, so check your spelling against the scene graph panel.
