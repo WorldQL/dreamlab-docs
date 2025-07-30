@@ -1,62 +1,151 @@
 ---
 sidebar_position: 2
+title: Entities
 ---
 
 # Entities
 
-Entities are the building blocks of games. They are similar to Unity's `GameObject` or Godot's `Node`. They implement
-basic functionality, support nesting and hierarchy, and can be scripted using Behavior classes.
+Entities are Dreamlab's fundamental game objects—similar to Unity **GameObjects** or Godot **Nodes**.  
+They
 
-Entities can be spawned using the right-click menu in the Scene Graph:
-![spawning entity menu](../../static/img/image-2.png)
+* own a **Transform** (position / rotation / scale / z-layer)  
+* can nest to form a hierarchy  
+* gain behavior through attached **Behavior** scripts  
+* sync automatically when placed under the shared **`world`** root
 
-## Entity Catalog
+Entities are usually added from the editor's right-click menu:
+
+![Spawn entity menu](../../static/img/image-2.png)
+
+---
+
+## 1. Quick start - spawning by script
+
+### Create a brand-new entity
+
+```ts
+// Spawn an Empty into the shared world root
+const pivot = game.world.spawn({
+  name: "Pivot",
+  type: Empty,
+  transform: { position: { x: 4, y: 1 } },
+});
+```
+
+### Clone a prefab at runtime
+
+```ts
+// “Crate” lives under prefabs/
+// cloneInto returns the new instance
+const crate = game.prefabs._.Crate.cloneInto(game.world, {
+  name: "Crate." + crypto.randomUUID(),
+  authority: game.network.self,  // I control this crate
+});
+crate.pos.set(2, 0);
+```
+
+> `cloneInto()` duplicates the entity (plus all children & behaviors) and registers it in the target root.
+
+---
+
+## 2. Core concepts
+
+| Feature            | What / Why                                                                                                      |
+| ------------------ | --------------------------------------------------------------------------------------------------------------- |
+| **Roots**          | Decide *where* an entity exists. See the  **[Scenes & Roots](./scenes-and-roots.mdx)** page.                    |
+| **Behaviors**      | Add logic to the entity. See the **[Behaviors](./behaviors.mdx)** page.                                         |
+| **Authority**      | Peer that owns simulation authority → `entity.authority` or `takeAuthority()`.                                  |
+| **Events**         | Pub-sub events such as `EntityDestroyed`, `EntityChildSpawned`.                                                 |
+| **Values**         | Strong-typed, optionally replicated props. See the  **[Synced Values and Adapters](./synced-values.mdx)** page. |
+| **Transform API**  | `entity.transform` or shortcuts `entity.pos`, `entity.z`.                                                       |
+
+### Accessing entities by name
+
+`root._.<Name>` gives you a quick reference to any **direct child** under a root:
+
+```ts
+const cam   = game.local._.Camera;    // generic Entity
+```
+
+The proxy returns an **untyped** `Entity`, so if you want type-specific methods
+(e.g. `Camera.zoom`), cast it:
+
+```ts
+// get the local camera with full IntelliSense
+const cam = game.local._.Camera.cast(Camera);
+
+cam.zoom = 2;            // Camera-only API
+```
+
+Dot-path chains work for grandchildren too:
+
+```ts
+// Prefab » Player » Health
+const health = game.prefabs._.Player._.Health.cast(RichText);
+health.text = "HP: 100";
+```
+
+> The lookup throws if the child name is wrong, so check your spelling against the scene graph panel.
+
+---
+
+## 3. Entity catalog (common types)
 
 :::note
-
-This list may not always be up-to-date. Refer to the Dreamlab Editor for a complete list of entities.
-
+This table is a quick reference—open the editor for the full, up-to-date list.
 :::
 
 ### General
 
-| Entity                | Usage                                                                                                                              |
-| --------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| `AudioSource`         | Play an audio clip. Optionally enable positional audio relative to the camera                                                      |
-| `Camera`              | Refer to the dedicated [Camera page](./camera.mdx) of the engine manual                                                            |
-| `CharacterController` | Collider with dedicated character movement checks that prevent collision                                                           |
-| `Clickable`           | Entity that emits a Signal when clicked on                                                                                         |
-| `Collider`            | Solid collision for character controllers and other physics bodies                                                                 |
-| `ComplexCollider`     | Complex collision shape. Attach three or more empties as children for this to work. Forms a polygon from the children in CCW order |
-| `Empty`               | Does nothing. Useful for attaching manager behaviors or marking positions (eg: spawnpoints)                                        |
-| `RichText`            | Draw Pixi.js Rich Text in the world                                                                                                |
-| `Rigidbody`           | Entity that has simulated physics. Attach one or more colliders as children for this to work.                                      |
+| Entity                | Purpose                                                      |
+| --------------------- | ------------------------------------------------------------ |
+| `AudioSource`         | Play sounds (optionally positional).                         |
+| `Camera`              | Viewport controller—see the [Camera](./camera.mdx) page.     |
+| `CharacterController` | Capsule collider with built-in movement checks.              |
+| `Clickable`           | Emits a signal when clicked.                                 |
+| `Collider`            | Basic physics collider.                                      |
+| `ComplexCollider`     | Polygon collider formed by 3 + child empties.                |
+| `Empty`               | Transform only—good for markers, parents, manager scripts.   |
+| `RichText`            | Draw PIXI rich text in-world.                                |
+| `Rigidbody`           | Simulated physics body; attach one or more colliders.        |
+| `Tilemap`             | Create [Tilemaps](./tilemaps.mdx) using a predefined tileset |
+
 
 ### Sprites
 
-| Entity           | Usage                                                                                  |
-| ---------------- | -------------------------------------------------------------------------------------- |
-| `AnimatedSprite` | Draws a JSON spritesheet as an animated image with configurable speed and frame range. |
-| `Sprite`         | Draw an image in the world                                                             |
-| `TilingSprite`   | Same as Sprite but with tiling options                                                 |
+| Entity           | Purpose                                              |
+| ---------------- | ---------------------------------------------------- |
+| `AnimatedSprite` | JSON spritesheet playback with speed / frame control |
+| `Sprite`         | Draw a single image                                  |
+| `TilingSprite`   | Sprite that tiles its texture                        |
 
 ### UI
 
-:::info
-
-Visit the [User Interface page](./user-interface.mdx) of the engine manual for more info on HTML UI.
-
-:::
-
-| Entity    | Usage                                                                                                                                             |
-| --------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `UILayer` | Create an HTML DOM tree that covers the entire game screen. Useful for static UI elements (eg: HUD)                                               |
-| `UIPanel` | Create an HTML DOM tree that exists in the world. Useful for UI elements that are fixed relative to the world (eg: signs, player nameplates, etc) |
+| Entity    | Purpose                                                        |
+| --------- | -------------------------------------------------------------- |
+| `UILayer` | Full-screen DOM tree—ideal for HUDs                            |
+| `UIPanel` | DOM tree fixed in world space (nameplates, signs, etc.)        |
 
 ### Graphics
 
-| Entity           | Usage                                                           |
-| ---------------- | --------------------------------------------------------------- |
-| `RawPixi`        | **Advanced:** Draw using Pixi.js using their Graphics primitive |
-| `ColoredSquare`  | Render a solid color rectangle in the world                     |
-| `ColoredPolygon` | Render a solid color regular polygon in the world               |
+| Entity          | Purpose                                  |
+| --------------- | ---------------------------------------- |
+| `RawPixi`       | Advanced: draw via PIXI `Graphics` API   |
+| `ColoredSquare` | Solid-color rectangle                    |
+| `ColoredPolygon`| Solid-color regular polygon              |
+
+---
+
+## 4. Common entity events
+
+Dreamlab uses events for entity lifecycle—subscribe with `entity.on(Event, handler)`.
+
+| Event                        | Fires when…                                        |
+| ---------------------------- | -------------------------------------------------- |
+| `EntitySpawned`              | the entity is first created (constructor done)     |
+| `EntityDestroyed`            | the entity is about to be removed                  |
+| `EntityChildSpawned`         | a direct child is added                            |
+| `EntityDescendantDestroyed`  | any level of descendant gets destroyed             |
+| `EntityRenamed`              | `entity.name` changes                              |
+| `EntityReparented`           | `entity.parent` changes                            |
+| `EntityEnableChanged`        | the effective `enabled` state toggles              |

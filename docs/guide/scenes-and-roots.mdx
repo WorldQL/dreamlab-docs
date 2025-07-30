@@ -36,28 +36,14 @@ Each root decides **where** an entity exists and **who** runs its Behaviors.
 
 ---
 
-### Spawning a prefab at runtime
+## Dot-path lookup (`root._.<Name>`)
 
-A prefab lives under **`prefabs`** until you copy it into another root with `cloneInto()`.
+Every root (`world`, `local`, `server`, `prefabs`) exposes a **proxy** called `_.` that lets you
+grab children by name with dot-syntax.
 
-```ts
-import { Behavior } from "@dreamlab/engine";
-
-export default class CrateSpawner extends Behavior {
-  spawnCrate() {
-    // 1) choose the prefab
-    const prefab   = this.game.prefabs._.Crate;
-
-    // 2) choose the destination root (can be an entity)
-    const parent   = this.game.world;
-
-    // 3) clone it in; you can override name, authority, etc.
-    const crate = prefab.cloneInto(parent, {
-      name:     "Crate." + crypto.randomUUID(),
-      authority: this.game.network.self,
-    });
-
-    // optional: move it somewhere
-    crate.pos.set(10, 0, 5);
-  }
-}
+| What you type                               | What it returns                    |
+| ------------------------------------------- | ---------------------------------- |
+| `game.prefabs._.Player`                     | The *Player* entity prefab         |
+| `game.prefabs._.Player._.Health`            | Child entity named *Health*      |
+| `game.world._.Enemy42`                      | Runtime instance called *Enemy42*  |
+| `game.local._.Camera`                       | The client-side camera             |
