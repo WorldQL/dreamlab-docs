@@ -4,8 +4,52 @@ sidebar_position: 999
 
 # Physics
 
-:::info
+:::note
 
-This page is a work-in-progress.
+**Physics entities do not render to the scene by default.**
+
+You can enable the physics debug overlay in the editor to show wireframe representations of colliders and rigidbodies.
+
+![Physics Debug Button](../../static/img/physics-debug-button.png)
 
 :::
+
+Physics entities in Dreamlab are simulated on at most one client (including the server) at a time, with the position and
+rotation being synced to all other connected clients. Entities in the `world` [root](./scenes-and-roots.mdx) default to
+being simulated on the server. When a client takes authority of an Entity, it will then be responsible for simulating
+its physics.
+
+## Colliders
+
+Colliders are static shapes that other physics entities will interact with. Colliders can be either rectangular or
+circular in shape, and do not move on their own. They are ideal for walls, floors, obstacles, etc.
+
+## Rigidbodies
+
+Rigidbody entities by themselves don't do anything, you must add one or more Collider entities as children to define the
+shape of the rigidbody. This is where the `mass` value of a collider is used.
+
+## Character Controller
+
+The character controller is a special kind of physics entity. Despite having "character" in the name it can be used for
+any kinematic (moving) object. These entities are not simulated by the physics engine and must be controlled by scripts.
+After setting the position of a character controller, the physics engine will compute and handle collisions and prevent
+the character controller from intersecting colliders.
+
+## Collision Events
+
+The physics system will emit `EntityCollision` events when two colliders (including rigidbody colliders and character
+controllers) start and stop colliding. The events are fired on both entities involved in the collision and report
+information about the collision.
+
+```ts
+import { Behavior, EntityCollision } from "@dreamlab/engine";
+
+export default class MyBehavior extends Behavior {
+  onInitialize(): void {
+    this.listen(this.entity, EntityCollision, ({ started, other, contactPoint, normal }) => {
+      // react to collision event
+    });
+  }
+}
+```
