@@ -109,43 +109,41 @@ This table is a quick reference—open the editor for the full, up-to-date list.
 
 ### General
 
-| Entity                | Purpose                                                      |
-| --------------------- | ------------------------------------------------------------ |
-| `AudioSource`         | Play sounds (optionally positional).                         |
-| `Camera`              | Viewport controller—see the [Camera](./camera.mdx) page.     |
-| `CharacterController` | Capsule collider with built-in movement checks.              |
-| `Clickable`           | Emits a signal when clicked.                                 |
-| `Collider`            | Basic physics collider.                                      |
-| `ComplexCollider`     | Polygon collider formed by 3 + child empties.                |
-| `Empty`               | Transform only—good for markers, parents, manager scripts.   |
-| `RichText`            | Draw PIXI rich text in-world.                                |
-| `Rigidbody`           | Simulated physics body; attach one or more colliders.        |
-| `Tilemap`             | Create [Tilemaps](./tilemaps.mdx) using a predefined tileset |
-
+| Entity | Purpose |
+|--------|---------|
+| [`AudioSource`](#-audiosource) | Play sounds (optionally positional). |
+| [`Camera`](#-camera) | Viewport controller—see the [Camera](./camera.mdx) page. |
+| [`CharacterController`](#-charactercontroller) | Capsule collider with built-in movement checks. |
+| [`Clickable`](#-clickable) | Emits a signal when clicked. |
+| [`Collider`](#-collider) | Basic physics collider. |
+| [`ComplexCollider`](#-complexcollider) | Polygon collider formed by 3 + child empties. |
+| [`Empty`](#-empty) | Transform only—good for markers, parents, manager scripts. |
+| [`RichText`](#-richtext) | Draw PIXI rich text in-world. |
+| [`Rigidbody`](#%EF%B8%8F-rigidbody) | Simulated physics body; attach one or more colliders. |
+| [`Tilemap`](#%EF%B8%8F-tilemap) | Create [Tilemaps](./tilemaps.mdx) using a predefined tileset |
 
 ### Sprites
 
-| Entity           | Purpose                                              |
-| ---------------- | ---------------------------------------------------- |
-| `AnimatedSprite` | JSON spritesheet playback with speed / frame control |
-| `Sprite`         | Draw a single image                                  |
-| `TilingSprite`   | Sprite that tiles its texture                        |
+| Entity | Purpose |
+|--------|---------|
+| [`AnimatedSprite`](#%EF%B8%8F-animatedsprite) | JSON spritesheet playback with speed / frame control |
+| [`Sprite`](#%EF%B8%8F-sprite) | Draw a single image |
+| [`TilingSprite`](#%EF%B8%8F-tilingsprite) | Sprite that tiles its texture |
 
 ### UI
 
-| Entity    | Purpose                                                        |
-| --------- | -------------------------------------------------------------- |
-| `UILayer` | Full-screen DOM tree—ideal for HUDs                            |
-| `UIPanel` | DOM tree fixed in world space (nameplates, signs, etc.)        |
+| Entity | Purpose |
+|--------|---------|
+| [`UILayer`](#-uilayer) | Full-screen DOM tree—ideal for HUDs |
+| [`UIPanel`](#-uipanel) | DOM tree fixed in world space (nameplates, signs, etc.) |
 
 ### Graphics
 
-| Entity          | Purpose                                  |
-| --------------- | ---------------------------------------- |
-| `RawPixi`       | Advanced: draw via PIXI `Graphics` API   |
-| `ColoredSquare` | Solid-color rectangle                    |
-| `ColoredPolygon`| Solid-color regular polygon              |
-
+| Entity | Purpose |
+|--------|---------|
+| [`RawPixi`](#%EF%B8%8F-rawpixi) | Advanced: draw via PIXI `Graphics` API |
+| [`ColoredSquare`](#-coloredsquare) | Solid-color rectangle |
+| [`ColoredPolygon`](#-coloredpolygon) | Solid-color regular polygon |
 ---
 
 ## 4. Common entity events
@@ -161,3 +159,328 @@ Dreamlab uses events for entity lifecycle—subscribe with `entity.on(Event, han
 | `EntityRenamed`              | `entity.name` changes                              |
 | `EntityReparented`           | `entity.parent` changes                            |
 | `EntityEnableChanged`        | the effective `enabled` state toggles              |
+
+## 6 · Entities
+:::note
+This is a quick reference—open the editor for the full, up-to-date entity list.
+:::
+
+### 🔊 AudioSource
+
+**Howler.js** under the hood—handles both UI SFX and positional audio.
+
+| Value        | Purpose                                                |
+|--------------|--------------------------------------------------------|
+| `clip`       | Path to OGG / MP3 / WAV.                               |
+| `volume`     | 0 … 1                                                  |
+| `loop`       | Loop forever.                                          |
+| `minRange`   | Distance (m) before attenuation starts.               |
+| `maxRange`   | Max audible distance; `-1` = infinite.                 |
+| `falloff`    | 0 … 1 how quickly volume drops off.                    |
+| `stream`     | Stream large music tracks vs. preloading.              |
+
+```ts
+const sfx = this.entity.cast(AudioSource);
+sfx.clip = "res://sfx/hit.ogg";
+sfx.play();
+```
+
+---
+
+### 🎥 Camera
+:::info Reference
+Detailed documentation is available on the [Camera](./camera.mdx) page.
+:::
+
+The **Camera** is a *local-only* entity that controls what the player sees.
+
+| Key value              | Purpose / default                               |
+|------------------------|-------------------------------------------------|
+| `active` *(bool)*      | When `true`, becomes the current viewport. Only **one** Camera can be active at a time. |
+| `zoom` *(number)*      | 1 = 1 unit ≈ 1 metre on screen. Higher zooms **in**. |
+| `smooth` *(seconds)*   | How long interpolation takes to catch up to the real transform. `0` = no smoothing. |
+| `lockAspectRatio`      | Lock vertical / horizontal FOV, e.g. `[16, 9]`. |
+| `scaleFilterMode`      | `"nearest"` or `"linear"`—overrides PIXI scale mode for crystal-clear pixel-art. |
+
+---
+
+### 🚶 CharacterController
+:::info Reference
+Detailed documentation is available on the [Physics](./physics.mdx) page.
+:::
+Kinematic platformer-style movement.
+
+| API                         | Description                           |
+|-----------------------------|---------------------------------------|
+| `.isGrounded` *(getter)*    | `true` when touching the ground.      |
+| `.correctedPosition`        | Position after resolving collisions.  |
+| `.teleport = true`          | Skip collision check on the next frame.|
+
+```ts
+const ctrl = this.entity.cast(CharacterController);
+
+if (ctrl.isGrounded && this.inputs.getKey("Space")) {
+  ctrl.pos.y += 3;          // jump impulse
+  ctrl.teleport = true;     // skip one collision frame
+}
+```
+
+---
+
+### 👆 Clickable
+
+Creates an invisible hit-box that turns any entity into a UI button or trigger.
+
+| Value / getter | Details |
+|----------------|---------|
+| `active`       | Disable to ignore cursor & clicks. |
+| `shape`        | `"Rectangle"` (default) or `"Circle"`. |
+| `width` / `height` | Rectangle size in metres. *(Only when `shape = "Rectangle"`)* |
+| `radius` / `innerRadius` | Outer & inner radii for ring-style targets. *(Only when `shape = "Circle"`)* |
+| `clicked` *(getter)* | `true` while the mouse button is held down over the entity. |
+| `hover`   *(getter)* | `true` when the cursor is inside the bounds. |
+
+
+> Note — Clickable automatically changes the game canvas cursor to a
+pointer when any active Clickable is under the mouse.
+
+---
+
+### 🧱 Collider
+:::info Reference
+Detailed documentation is available on the [Physics](./physics.mdx) page.
+:::
+A **Collider** is a shape the physics engine can query.  
+Attach to a `Rigidbody` **or** leave loose as a static trigger.
+
+| Key value      | Purpose                       |
+|----------------|------------------------------|
+| `shape`        | `"Rectangle"` \| `"Circle"` *(capsule WIP)* |
+| `isSensor`     | `true` → overlap events only; no collisions. |
+| `mass`         | Used *only* if parented to a `Rigidbody`. |
+
+---
+
+### 🧱 ComplexCollider
+:::info Reference
+Detailed documentation is available on the [Physics](./physics.mdx) page.
+:::
+A **concave** (multi-polygon) collider built from its children’s positions.  
+Perfect for arbitrary terrain outlines.
+
+| Value      | Purpose                               |
+|------------|---------------------------------------|
+| `isSensor` | Trigger only, no physical response.   |
+| `mass`     | Used if parented to a `Rigidbody`.    |
+
+**How it works**
+
+1. Sorts direct children (`Child.0`, `Child.1`, …).  
+2. Runs **poly-decomp** to split into convex pieces.  
+3. Creates one Rapier collider per piece (auto-updates on transform / re-parent).
+
+> **Tip:** Keep the child points roughly in order (clockwise or CCW) for best results.
+
+---
+
+### 📦 Empty
+
+An entity with **only a Transform**.  
+Use it as a pivot, folder, or to attach scripts that don't need graphics / physics.
+
+---
+
+### 🔡 RichText
+
+Renders a PIXI **Text** with full CSS-like styling.
+
+| Value              | Details                                                           |
+|--------------------|-------------------------------------------------------------------|
+| `text`             | Plain string or BBCode (*coming soon*).                           |
+| `fontFamily`       | Any web-safe or imported font (async-loads on first use).         |
+| `fontSize`         | In pixels. Remaps to metres via entity scale.                     |
+| `fontStyle`        | `"normal" \| `"italic"` \| `"oblique"`.                           |
+| `fontWeight`       | `"bold"` or numeric `100`–`900`.                                  |
+| `align`            | `"left"`, `"center"`, `"right"` (auto-sets anchor).               |
+| `color`            | Fill colour.                                                      |
+| `stroke`           | Toggle outline; reveals `strokeColor`, `strokeWidth`, `strokeJoin`.|
+| `scaleFilterMode`  | `"default"` → inherit Camera; otherwise `"nearest"` / `"linear"`. |
+
+```ts
+const label = this.game.local._.ui.spawn({ name: "label", type: RichText });
+label.text        = "FPS: 60";
+label.fontSize    = 24;
+label.color       = "#00ff00";
+label.stroke      = true;
+label.strokeColor = "black";
+```
+
+---
+
+### ⚙️ Rigidbody
+:::info Reference
+Detailed documentation is available on the [Physics](./physics.mdx) page.
+:::
+Creates a Rapier **RigidBody** and re-parents all child Colliders automatically.
+
+| Value | Description                     |
+|-------|---------------------------------|
+| `type`| `"dynamic"` (default) or `"fixed"`. |
+
+---
+
+### 🗺️ Tilemap
+:::info Reference
+Detailed documentation is available on the [Tilemap](./tilemaps.mdx) page.
+:::
+A grid of palette IDs rendered via an atlas. Great for terrains & dungeons.
+
+| Handy method                     | What it does                              |
+|----------------------------------|-------------------------------------------|
+| `setTile(x, y, paletteId?)`      | Draw / erase a cell (`undefined` = erase) |
+| `getTile(x, y)`                  | Return `TileData` or `undefined`.         |
+| `getTileAtPoint(worldPos)`       | Ray-cast the cursor to a tile.            |
+| `clearTiles()`                   | Erase everything.                         |
+| `tiles()` *(generator)*          | Iterate `{ x, y, tile }` of filled cells. |
+
+---
+
+### 🖼️ AnimatedSprite
+
+Plays frames from **JSON spritesheets** *or* chops a grid into frames on the fly.
+
+| Value                | Details                                                         |
+|----------------------|-----------------------------------------------------------------|
+| `jsonSpritesheet`    | Path to *.json* exported by Aseprite / TexturePacker.           |
+| `spritesheet`        | Plain PNG; sliced by `frameDimensions`.                         |
+| `speed`              | Frames per second (default `0.1`).                              |
+| `startFrame`/`endFrame` | Clamp playback range; `endFrame = -1` ➜ to last frame.       |
+| `loop`               | When `false`, stops on last frame.                              |
+
+```ts
+const anim = this.entity.cast(AnimatedSprite);
+anim.spritesheet = "res://run.png";
+anim.frameDimensions.set(128, 128);
+anim.speed = 0.2;
+```
+
+---
+
+### 🖼️ Sprite
+
+Draw a single texture, with optional **letter-box preserve-aspect**.
+
+| Value                  | Purpose                                                |
+|------------------------|--------------------------------------------------------|
+| `texture`              | Image path. Empty ⇒ white 1 × 1 pixel.                 |
+| `width` / `height`     | Target size in metres.                                 |
+| `preserveAspectRatio`  | `true` ⇒ maintains original proportions (letterbox).   |
+| `tint` / `alpha`       | Standard PIXI tint & transparency.                     |
+
+---
+
+### 🖼️ TilingSprite
+
+Repeats a texture infinitely—ideal for parallax backdrops, water, conveyor belts…
+
+| Value             | Details                                                      |
+|-------------------|--------------------------------------------------------------|
+| `texture`         | Tile image.                                                  |
+| `tilePosition`    | Scroll offset—animate for parallax.                          |
+| `tileScale`       | Per-axis scaling *before* fit into entity `width`/`height`.  |
+| `tileRotation`    | Rotation of the pattern in **radians**.                      |
+| `width` / `height`| Drawn size in metres.                                        |
+| `tint` / `alpha`  | Standard PIXI properties.                                    |
+
+```ts
+const water = this.game.local._.MyTilingSprite.cast(TilingSprite);
+water.onFrame = () => water.tilePosition.x += 0.02; // gentle flow
+```
+
+---
+
+### 🎨 UILayer
+:::info Reference
+Detailed documentation is available on the [User Interface](./user-interface.mdx) page.
+:::
+Full-screen DOM overlay—great for HUDs, menus, or drag-and-drop editors.
+
+* Lives in its own **Shadow DOM** to avoid CSS bleed.  
+* Pointer-events are disabled by default; enable per-element.  
+* `dom` → ShadowRoot, `element` → root `<div>` inside the layer.
+
+> Position & scale **follow the canvas**, not the world.
+
+---
+
+### 🎨 UIPanel
+
+DOM **anchored to an entity** in world space (nameplates, shop signs, speech bubbles).
+
+| Feature             | How it works                                             |
+|---------------------|----------------------------------------------------------|
+| **Screen lock**     | Re-projects each frame via `Camera.worldToScreen()`.     |
+| **Transform aware** | Honors entity position/rotation/scale (plus Camera zoom).|
+| **Shadow DOM**      | Same isolation as `UILayer`.                             |
+
+---
+
+### 🖌️ RawPixi
+:::info Reference
+Detailed documentation is available on the [Rendering with Pixi](./rendering.mdx) page.
+:::
+Low-level access to PIXI—attach your own `Graphics` / `Sprite` objects.
+
+```ts
+const raw = this.game.local.spawn({ name: "graphic", type: RawPixi });
+
+// Draw a circle each frame
+raw.onFrame = function () {
+  if (!this.container) return;
+  const g = this.container.getChildAt(0) as PIXI.Graphics ?? new PIXI.Graphics();
+  if (!g.parent) this.container.addChild(g);
+
+  g.clear().circle(0, 0, 0.5).fill("hotpink");
+};
+```
+
+`RawGraphics` is an alias kept for legacy scenes; new projects should use **RawPixi**.
+
+---
+
+### 🟩 ColoredSquare
+
+Simplest possible PIXI rectangle.
+
+| Value             | Details        |
+|-------------------|----------------|
+| `width` / `height`| Size in metres |
+| `color`           | Fill colour    |
+| `tint`            | Tint multiplier|
+
+```ts
+const box = this.game.world.spawn({ name: "square", type: ColoredSquare });
+box.width  = 5;
+box.height = 0.5;
+box.color  = "#ffffff";
+```
+---
+
+### 🟢 ColoredPolygon
+
+Draws a filled **n-gon** directly in PIXI. Great for quick proto art or hit flashes.
+
+| Value               | Details                                         |
+|---------------------|-------------------------------------------------|
+| `sides`             | 3 – 1000 edges.                                 |
+| `width` / `height`  | Size in metres (scales with entity transform).  |
+| `color`             | Fill colour (`#rrggbb`, `rgba()`, or CSS name). |
+| `tint`              | Post-multiply tint (palette swaps / hit-flash). |
+
+```ts
+const poly = this.game.local.spawn({ name: "hexagon", type: ColoredPolygon });
+poly.sides = 6;          // hexagon
+poly.width = poly.height = 2;
+poly.color = "#ffcc00";
+poly.tint  = "#ff8800";
+```
