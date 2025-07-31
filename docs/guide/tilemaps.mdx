@@ -13,7 +13,7 @@ and duplicate it like anything else.
 
 ## Quick start
 
-1. **Create → Tilemap** in the scene graph.  
+1. Right click on the *Scene Graph* and click **New Entity → Tilemap**.  
 2. Drag a spritesheet PNG onto **Atlas** in the Properties Panel.  
    The editor auto-slices it into `resolution x resolution` squares  
    (64 x 64 px by default).  
@@ -26,10 +26,10 @@ and duplicate it like anything else.
 
 ---
 
-## Scripting a tilemap
+## Scripting a Tilemap
 
 Need procedural generation or an in-game brush?  
-Just ask the entity for its `Tilemap` component and call the helpers.
+Just cast your entity as a Tilemap and call its helper methods.
 
 ```ts
 import { Behavior, Rng, syncedValue, Tilemap } from "@dreamlab/engine";
