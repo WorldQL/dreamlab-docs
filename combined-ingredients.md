@@ -946,7 +946,8 @@ export default class PlayerController extends Behavior {
     });
   }
 
-  onTickClient(): void {
+  onTick(): void {
+    if (!this.game.isClient()) return;
     if (!this.hasAuthority()) return;
 
     const deltaTime = this.game.physics.tickDelta / 1_000; // Convert to seconds
@@ -1370,6 +1371,121 @@ export default class Movement extends Behavior {
 
 ```
 
+Here's an example of an enemy that chases a player:
+```ts
+import {
+  Behavior,
+  ColoredSquare,
+  EntityCollision,
+  syncedValue,
+  Vector2,
+} from "@dreamlab/engine";
+import PlayerController from "./player-controller.ts";
+
+export default class Enemy extends Behavior {
+  @syncedValue()
+  speed = 3;
+
+  @syncedValue()
+  chaseRange = 15;
+
+  @syncedValue()
+  knockbackForce = 15;
+
+  @syncedValue()
+  color = "#ff4444";
+
+  private player: any = null;
+  private direction = new Vector2(1, 0); // Start moving right
+  private lastPlayerPosition = Vector2.ZERO;
+
+  onInitialize(): void {
+    if (!this.game.isClient()) return;
+
+    // Set enemy color
+    const coloredSquare = this.entity._.ColoredSquare?.cast(ColoredSquare);
+    if (coloredSquare) {
+      coloredSquare.color = this.color;
+    }
+
+    // Listen for collisions
+    this.listen(this.entity, EntityCollision, (e: EntityCollision) => {
+      if (e.started) this.onCollide(e.other);
+    });
+  }
+
+  onTickClient(): void {
+    if (!this.game.isClient()) return;
+
+    // Find the player
+    this.findPlayer();
+
+    if (this.player) {
+      const playerPos = this.player.pos;
+      const enemyPos = this.entity.pos;
+      const distance = playerPos.distance(enemyPos);
+
+      // Chase player if within range
+      if (distance <= this.chaseRange && distance > 0.5) {
+        this.direction = playerPos.sub(enemyPos).normalize();
+        this.lastPlayerPosition = playerPos;
+      } else if (distance > this.chaseRange) {
+        // Continue in last known direction if player is out of range
+        if (this.lastPlayerPosition.magnitude() > 0) {
+          this.direction = this.lastPlayerPosition.sub(enemyPos).normalize();
+        }
+      }
+    }
+
+    // Move the enemy
+    const movement = this.direction.mul(this.speed * (this.game.physics.tickDelta / 1000));
+    this.entity.pos = this.entity.pos.add(movement);
+  }
+
+  private findPlayer(): void {
+    if (!this.player) {
+      // Look for player in the world
+      const worldChildren = Array.from(this.game.world.children.values());
+      this.player = worldChildren.find(entity =>
+        entity.name.startsWith("Player") && entity.hasBehavior(PlayerController)
+      );
+
+      // If not found in world, look in local (for singleplayer)
+      if (!this.player) {
+        const localChildren = Array.from(this.game.local!.children.values());
+        this.player = localChildren.find(entity =>
+          entity.name.startsWith("Player") && entity.hasBehavior(PlayerController)
+        );
+      }
+    }
+  }
+
+  private onCollide(other: any): void {
+    if (!other.hasBehavior(PlayerController)) return;
+
+    const playerController = other.getBehavior(PlayerController);
+    const playerPos = other.pos;
+    const enemyPos = this.entity.pos;
+
+    // Check if player is above the enemy (jumping on head)
+    const verticalDiff = playerPos.y - enemyPos.y;
+    const horizontalDiff = Math.abs(playerPos.x - enemyPos.x);
+    console.log(verticalDiff, horizontalDiff);
+
+    // If player is significantly above and close horizontally, they jumped on the enemy
+    if (verticalDiff > 0.5 && horizontalDiff < 1.0) {
+      // Player jumped on enemy - destroy enemy and give player a small bounce
+      playerController.onEnemyDefeated();
+      this.entity.destroy();
+    } else {
+      // Enemy hits player - knock them back
+      const knockbackDirection = playerPos.sub(enemyPos).normalize();
+      playerController.onEnemyHit(knockbackDirection, this.knockbackForce);
+    }
+  }
+}
+```
+
 ---
 
 
@@ -1425,6 +1541,13 @@ Transform.position is relative to parent. .pos is absolute position in the world
 When answering, be sure to think about:
 1. Carefully consider whether you want your code running on the server or client.
 2. If you want server authority, run in onTickServer. If it's client-only, run in onTickClient. If it has anything to do with player control, you probably want to tick on the client.
+3. If you notice that most of the entities in the world are under "local" or you see the presence of a .singleplayer file, it means you are editing a singleplayer game. In this case, you should write client side code and create new entities under "local".
+
+for client side code, do the following at the top of any onTick, onInitialize
+if (!this.game.isClient()) return;
+
+for server side code, do the following:
+if (!this.game.isServer()) return;
 
 Additionally, think about what methods you are going to use/import. Only use methods that exist from other files or the Dreamlab API. Plan for everything you're going to need to do and what you have to import. If you need any sort of game engine feature, list it in your response and where it's going to be imported from. Do not invent new APIs.
 
@@ -1452,8 +1575,13 @@ addBehavior(newEntity, "src/something.ts", {someValue: 25});
 </editCode>
 </editor>
 
+If the player asks specifically for you to create a prefab, do not place it in the world or local roots, ONLY create an entity in "prefabs".
+
 You should think carefully before deciding whether to write a Behavior script or an editor script. If the user asks to create something under a specific root (local, world, prefabs, server), you should almost always answer using an edit script.
 Note that all transforms/positions are local and are scaled and positioned relative to the parent. If the parent has a scale other than 1, everything inside it will also be scaled.
+
+If you need to access the camera, use Camera.getActive(this.game) instead of a hard reference or a synced value.
+
 
 Notes:
 1. Entities cannot change type. If you want to add a Collider to an existing entity, create it as a child.
@@ -1481,3 +1609,5 @@ Notes:
 If you're simply modifying an existing script, this will not be needed.
 
 Feel free to ask the user questions before answering if you feel you do not have enough detail.
+
+If you have enough detail, do not ask for confirmation. Just go.
