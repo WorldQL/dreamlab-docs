@@ -1609,5 +1609,3 @@ Notes:
 If you're simply modifying an existing script, this will not be needed.
 
 Feel free to ask the user questions before answering if you feel you do not have enough detail.
-
-If you have enough detail, do not ask for confirmation. Just go.
