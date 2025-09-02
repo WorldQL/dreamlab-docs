@@ -1,0 +1,56 @@
+---
+sidebar_position: 2
+title: Version Control
+---
+
+# Version Control
+
+Dreamlab includes integrated, Git-style version control. Use it to track file changes, review diffs and history, and manage branches — all within the editor.
+
+---
+
+## Basic workflow
+
+1. **Click the Versions button** - Open the version control panel from the top bar.  
+   <img src="/img/version-control/nav.png" width="750" alt="Open Versions" />
+
+2. **Stage changes** - Edited files appear under **Unstaged Files**. Stage the files you want to include in the commit.  
+   <img src="/img/version-control/stage.png" width="750" alt="Stage changes" />
+
+3. **Commit** - Enter a concise message describing the change and click **Commit**.  
+   <img src="/img/version-control/commit.png" width="750" alt="Commit" />
+
+4. **Push** - Click **Push** (top right) to upload your commits to the remote. 
+   <img src="/img/version-control/push.png" width="750" alt="Push to remote" />
+
+> **Important:** Deployments read from the **remote main branch**. Committing is local; **your deployed game will not update until you Push**.
+
+---
+
+
+## Feature reference — where to find things
+
+- **Pull / Push** — Top-right of the Versions header.  
+  - Pull dropdown includes **Fetch & Hard Reset**.  
+  - Push dropdown includes **Force Push** (use with care).
+
+- **Create / Switch Branch** — Center **branch dropdown** (the one showing your current branch name).
+
+- **More options (⋯)** — Button **to the right of** the branch dropdown:  
+  - **Delete Branch**  
+  - **Tag actions** (Create Tag, Delete Tag)  
+  - **Stashing** (Stash Changes / manage stashes)  
+  - **View on Forgejo**  
+  - **Reset HEAD (Hard)**
+
+- **Merge / Rebase** — Button **to the left of** the branch dropdown:  
+  - Merge another branch into the current branch  
+  - Rebase the current branch onto another branch
+
+- **Commit history actions** — **Right-click any commit** in the history list to:  
+  - **Create branch at commit**  
+  - **Create tag at commit**  
+  - **Checkout this commit** (detached HEAD)  
+  - **Revert commit**  
+  - **Reset HEAD to this commit**
+
