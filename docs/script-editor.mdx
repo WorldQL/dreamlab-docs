@@ -1,0 +1,52 @@
+---
+sidebar_position: 3
+title: Script Editor
+---
+
+# Script Editor
+
+The Script Editor is where you write and organize your game code. It provides a project file tree, context menus for quick actions, TypeScript/TSX editing with diagnostics, and templates for Dreamlab behaviors — all inside the editor.
+
+<img src="/img/script-editor/overview.png" width="750" alt="Script Editor overview" />
+
+---
+
+## Project tree
+
+- Folders & files are listed under **Project** (left sidebar). Click a file to open it.
+- Right-click blank space, a folder, or a file for context actions (create, rename, delete, copy/paste).
+- Drag & drop to move files/folders. You can also drop files from your computer to upload.
+- Files with problems are marked in the tree until errors are fixed.
+- **F2** — rename the selected file or folder (Enter to confirm, Esc to cancel).
+- (Multi-select is currently disabled.)
+
+---
+
+## Collaboration
+<img src="/img/script-editor/collab.png" width="1000" alt="Script Editor Collab" />
+
+Creating, renaming, deleting and editing files broadcasts those changes to other users editing the same project, so teammates see updates in near real time.
+> If you encounter any issues, try closing file tabs and reloading the page. If the issue persists, go to the settings menu at (top-right) and reset collaborator sync.
+
+---
+
+## Pop-out editor
+
+Use **Pop Out Script Editor** (top-right) to open the editor in its own window.
+> Tip: If you pop-out the script editor, go to settings and disable Same-Window Script Editor to give you better performance.
+
+---
+
+## Important Notes
+
+- Must keep code in `src/` folder
+- UI logic in `.tsx` `UIBehavior` files.
+- You can upload files by dragging them into the project tree or dragging into the main editor tab.
+- After editing, open **Versions** and **Stage → Commit → Push**.  
+  If you plan to deploy, make sure **all changes are committed and pushed** so your live game includes your latest code.
+
+
+## Next Steps
+
+* Learn how to code with **[entities](./guide/entities.mdx)**.  
+* Dive into **[Behaviors](./guide/behaviors.mdx)** to add game logic that talks to your UI.  
