@@ -1,41 +1,42 @@
-import {themes as prismThemes} from 'prism-react-renderer';
-import type {Config} from '@docusaurus/types';
-import type * as Preset from '@docusaurus/preset-classic';
+import { themes as prismThemes } from "prism-react-renderer";
+import type { Config } from "@docusaurus/types";
+import type * as Preset from "@docusaurus/preset-classic";
 
 const config: Config = {
-  title: 'Dreamlab Docs',
-  tagline: 'Developer documentation for the Dreamlab game engine',
-  favicon: 'img/icon-64x64.png',
+  title: "Dreamlab Docs",
+  tagline: "Developer documentation for the Dreamlab game engine",
+  favicon: "img/icon-64x64.png",
 
   // Set the production url of your site here
-  url: 'https://docs.dreamlab.gg',
+  url: "https://docs.dreamlab.gg",
   // Set the /<baseUrl>/ pathname under which your site is served
   // For GitHub pages deployment, it is often '/<projectName>/'
-  baseUrl: '/',
+  baseUrl: "/",
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
-  organizationName: 'WorldQL', // Usually your GitHub org/user name.
-  projectName: 'dreamlab-docs', // Usually your repo name.
+  organizationName: "WorldQL", // Usually your GitHub org/user name.
+  projectName: "dreamlab-docs", // Usually your repo name.
 
-  onBrokenLinks: 'throw',
-  onBrokenMarkdownLinks: 'warn',
+  onBrokenLinks: "throw",
+  onBrokenMarkdownLinks: "warn",
 
   // Even if you don't use internationalization, you can use this field to set
   // useful metadata like html lang. For example, if your site is Chinese, you
   // may want to replace "en" with "zh-Hans".
   i18n: {
-    defaultLocale: 'en',
-    locales: ['en'],
+    defaultLocale: "en",
+    locales: ["en"],
   },
+  headTags: [{ tagName: "meta", attributes: { name: "algolia-site-verification", content: "124F48323C67E480" } }],
 
   presets: [
     [
-      'classic',
+      "classic",
       {
         docs: {
-          routeBasePath: '/',
-          sidebarPath: './sidebars.ts',
+          routeBasePath: "/",
+          sidebarPath: "./sidebars.ts",
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
           // editUrl:
@@ -43,7 +44,7 @@ const config: Config = {
         },
         blog: false,
         theme: {
-          customCss: './src/css/custom.css',
+          customCss: "./src/css/custom.css",
         },
       } satisfies Preset.Options,
     ],
@@ -53,45 +54,45 @@ const config: Config = {
     // Replace with your project's social card
     // image: 'img/docusaurus-social-card.jpg',
     navbar: {
-      title: 'Dreamlab Docs',
+      title: "Dreamlab Docs",
       logo: {
-        alt: 'My Site Logo',
-        src: 'img/icon-64x64.png',
+        alt: "My Site Logo",
+        src: "img/icon-64x64.png",
       },
       items: [
         {
-          href: 'https://app.dreamlab.gg/',
-          label: 'Open Dreamlab',
-          position: 'right',
+          href: "https://app.dreamlab.gg/",
+          label: "Open Dreamlab",
+          position: "right",
         },
       ],
     },
     footer: {
-      style: 'dark',
+      style: "dark",
       links: [
         {
-          title: 'Community',
+          title: "Community",
           items: [
             {
-              label: 'Discord',
-              href: 'https://discord.gg/nwXFvtJ92g',
+              label: "Discord",
+              href: "https://discord.gg/nwXFvtJ92g",
             },
             {
-              label: 'X / Twitter',
-              href: 'https://x.com/DreamlabEngine',
+              label: "X / Twitter",
+              href: "https://x.com/DreamlabEngine",
             },
           ],
         },
         {
-          title: 'More',
+          title: "More",
           items: [
             {
-              label: 'Blog',
-              to: 'https://dreamlab.gg/blog',
+              label: "Blog",
+              to: "https://dreamlab.gg/blog",
             },
             {
-              label: 'GitHub',
-              href: 'https://github.com/WorldQL/dreamlab-engine',
+              label: "GitHub",
+              href: "https://github.com/WorldQL/dreamlab-engine",
             },
           ],
         },
@@ -101,6 +102,11 @@ const config: Config = {
     prism: {
       theme: prismThemes.github,
       darkTheme: prismThemes.dracula,
+    },
+    algolia: {
+      appId: "HYJ95WQSTU",
+      apiKey: "e964405434b4849c9edc53323eeb5b29",
+      indexName: "Documentation Website",
     },
   } satisfies Preset.ThemeConfig,
 };
