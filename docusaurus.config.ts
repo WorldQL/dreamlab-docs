@@ -29,7 +29,7 @@ const config: Config = {
     locales: ["en"],
   },
   headTags: [{ tagName: "meta", attributes: { name: "algolia-site-verification", content: "124F48323C67E480" } }],
-
+  trailingSlash: true,
   presets: [
     [
       "classic",
