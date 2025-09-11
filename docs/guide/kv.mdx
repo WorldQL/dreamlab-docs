@@ -26,6 +26,7 @@ export default class KvDebugger extends UIBehavior {
   #players = new Set<string>();
   #list: Record<string, JsonValue> = {};
   #isVisible = true;
+  #editingKey = "";
 
   @rpc.server()
   async getKv(playerId: string) {
@@ -38,6 +39,33 @@ export default class KvDebugger extends UIBehavior {
     ]);
 
     return { players: [...players], list };
+  }
+
+  @rpc.server()
+  async #setValue(playerId: string, key: string, value: JsonValue): Promise<void> {
+    if (!this.game.isServer()) throw new Error("rpc not on server");
+    const kv = this.game.kv;
+
+    if (playerId === "") await kv.server.set(key, value);
+    else await kv.player.set(key, value, playerId);
+  }
+
+  @rpc.server()
+  async #deleteValue(playerId: string, key: string): Promise<void> {
+    if (!this.game.isServer()) throw new Error("rpc not on server");
+    const kv = this.game.kv;
+
+    if (playerId === "") await kv.server.delete(key);
+    else await kv.player.delete(key, playerId);
+  }
+
+  @rpc.server()
+  async #clearValues(playerId: string): Promise<void> {
+    if (!this.game.isServer()) throw new Error("rpc not on server");
+    const kv = this.game.kv;
+
+    if (playerId === "") await kv.server.clear();
+    else await kv.player.clear(playerId);
   }
 
   async #update(): Promise<void> {
@@ -56,6 +84,7 @@ export default class KvDebugger extends UIBehavior {
 
     const css = `
 div.container {
+  font-family: var(--font-sans);
   width: 100%;
   position: absolute;
   bottom: 0px;
@@ -83,10 +112,11 @@ div.container {
     }
 
     & select {
+      font-family: var(--font-sans);
       background: #1f2330;
       color: #e6e8ee;
-      border: 1px solid rgba(255,255,255,0.2);
-      border-radius: 8px;
+      border: 1px solid rgb(255 255 255 / 20%);
+      border-radius: 4px;
       padding: 0.35rem 0.5rem;
     }
   }
@@ -108,7 +138,7 @@ div.container {
       border-collapse: collapse;
       table-layout: fixed;
       background: #1f2330;
-      border-radius: 8px;
+      border-radius: 4px;
       overflow: hidden;
     }
 
@@ -119,11 +149,14 @@ div.container {
       z-index: 1;
     }
 
+    & tr:not(:last-child) {
+      border-bottom: 1px solid rgb(255 255 255 / 8%);
+    }
+
     & th, & td {
       text-align: left;
       vertical-align: top;
       padding: 0.6rem 0.8rem;
-      border-bottom: 1px solid rgba(255,255,255,0.08);
       color: #e6e8ee;
     }
 
@@ -157,10 +190,19 @@ div.container {
       background: transparent;
     }
 
+    & textarea {
+      border-radius: 4px;
+      border: 1px solid rgb(255 255 255 / 20%);
+      background: #2f3545;
+      color: #fff;
+      padding: 0.4rem;
+    }
+
     & button {
+    font-family: var(--font-sans);
       padding: 0.25rem 0.6rem;
-      border-radius: 6px;
-      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 4px;
+      border: 1px solid rgb(255 255 255 / 20%);
       background: #2f3545;
       color: #fff;
       font-size: 0.8rem;
@@ -180,12 +222,13 @@ div.container {
 }
 
 button.kv-toggle {
+  font-family: var(--font-sans);
   position: absolute;
   right: 12px;
   bottom: 12px;
   height: 30px;
-  border-radius: 9999px;
-  border: 1px solid rgba(255,255,255,0.25);
+  border-radius: 4px;
+  border: 1px solid rgb(255 255 255 / 25%);
   background: #1f2330;
   color: #fff;
   opacity: 0.7;
@@ -212,10 +255,7 @@ button.kv-toggle:active { transform: scale(0.96); }
 
     return (
       <div className="kv-root">
-        <div
-          className="container"
-          style={{ display: this.#isVisible ? undefined : "none" }}
-        >
+        <div className="container" style={{ display: this.#isVisible ? undefined : "none" }}>
           <h1>KV Debugger</h1>
 
           <div className="selector">
@@ -233,13 +273,17 @@ button.kv-toggle:active { transform: scale(0.96); }
             >
               <option value="">[server]</option>
               {[...this.#players].map((player) => (
-                <option id={player} value={player}>{player}</option>
+                <option id={player} value={player}>
+                  {player}
+                </option>
               ))}
             </select>
           </div>
 
           <div className="data">
-            {entries.length === 0 ? <span>No data stored.</span> : (
+            {entries.length === 0 ? (
+              <span>No data stored.</span>
+            ) : (
               <table>
                 <thead>
                   <tr>
@@ -256,13 +300,58 @@ button.kv-toggle:active { transform: scale(0.96); }
                         <code>{key}</code>
                       </td>
                       <td>
-                        <pre>{JSON.stringify(value, null, 2)}</pre>
+                        {this.#editingKey === key ? (
+                          <textarea data-editor data-key={key}>
+                            {JSON.stringify(value, null, 2)}
+                          </textarea>
+                        ) : (
+                          <pre>{JSON.stringify(value, null, 2)}</pre>
+                        )}
                       </td>
                       <td>
-                        <button>Edit</button>
+                        <button
+                          type="button"
+                          onClick={async () => {
+                            const query = `textarea[data-editor][data-key="${key}"]`;
+
+                            if (this.#editingKey !== key) {
+                              this.#editingKey = key;
+                              this.rerender();
+
+                              const textarea = this.ui.element.querySelector<HTMLTextAreaElement>(query);
+                              if (!textarea) return;
+
+                              textarea.focus();
+                              textarea.selectionStart = textarea.value.length;
+                              textarea.rows = textarea.value.split("\n").length;
+                            } else {
+                              const textarea = this.ui.element.querySelector<HTMLTextAreaElement>(query);
+
+                              if (!textarea) return;
+                              try {
+                                const newValue = JSON.parse(textarea.value);
+                                await this.#setValue(this.#player, key, newValue);
+                                this.#editingKey = "";
+                                await this.#update();
+                              } catch (err) {
+                                alert(err);
+                              }
+                            }
+                          }}
+                        >
+                          {this.#editingKey !== key ? "Edit" : "Save"}
+                        </button>
                       </td>
                       <td>
-                        <button>Delete</button>
+                        <button
+                          type="button"
+                          onClick={async () => {
+                            await this.#deleteValue(this.#player, key);
+                            await this.#update();
+                          }}
+                        >
+                          Delete
+                        </button>
                       </td>
                     </tr>
                   ))}
@@ -273,6 +362,7 @@ button.kv-toggle:active { transform: scale(0.96); }
         </div>
 
         <button
+          type="button"
           className="kv-toggle"
           aria-label={this.#isVisible ? "Hide KV Debugger" : "Show KV Debugger"}
           title={this.#isVisible ? "Hide KV Debugger" : "Show KV Debugger"}
@@ -287,5 +377,4 @@ button.kv-toggle:active { transform: scale(0.96); }
     );
   }
 }
-
 ```
