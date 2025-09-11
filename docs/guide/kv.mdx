@@ -20,12 +20,13 @@ must be of `string` type, and values can be any JSON serializable value.
 Attach this behavior script to a `UILayer` in the world root to debug the KV data stored in your project.
 
 ```tsx title="kv-debugger.tsx"
-import { JsonValue, rpc, UIBehavior } from "@dreamlab/engine";
+import { JsonValue, rpc, UIBehavior, UILayer } from "@dreamlab/engine";
 
 export default class KvDebugger extends UIBehavior {
   #player: string = "";
   #players = new Set<string>();
   #list: Record<string, JsonValue> = {};
+  #isVisible = true;
 
   @rpc.server()
   async getKv(playerId: string) {
@@ -100,9 +101,32 @@ div.container {
     }
   }
 }
+
+button.kv-toggle {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  height: 30px;
+  border-radius: 9999px;
+  border: 1px solid rgba(255,255,255,0.25);
+  background: #1f2330;
+  color: #fff;
+  opacity: 0.7;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  font-size: 0.9rem;
+  line-height: 1;
+  z-index: 1000;
+  transition: opacity 0.15s ease, transform 0.1s ease;
+}
+
+button.kv-toggle:hover { opacity: 1; }
+button.kv-toggle:active { transform: scale(0.96); }
 `;
 
     this.setCss(css);
+    this.entity.cast(UILayer).element.style.zIndex = "999";
     this.#update();
   }
 
@@ -110,47 +134,61 @@ div.container {
     const entries = Object.entries(this.#list);
 
     return (
-      <div className="container">
-        <h1>KV Debugger</h1>
+      <div className="kv-root">
+        <div
+          className="container"
+          style={{ display: this.#isVisible ? undefined : "none" }}
+        >
+          <h1>KV Debugger</h1>
 
-        <div className="selector">
-          <label htmlFor="player">Player Selector</label>
-          <select
-            id="player"
-            onChange={(ev) => {
-              if (!ev.target) return;
-              if (!(ev.target instanceof HTMLSelectElement)) return;
+          <div className="selector">
+            <label htmlFor="player">Player Selector</label>
+            <select
+              id="player"
+              onChange={(ev) => {
+                if (!ev.target) return;
+                if (!(ev.target instanceof HTMLSelectElement)) return;
 
-              this.#player = ev.target.value;
-              this.#update();
-            }}
-          >
-            <option value="">[server]</option>
-            {[...this.#players].map((player) => (
-              <option value={player}>{player}</option>
-            ))}
-          </select>
+                this.#player = ev.target.value;
+                this.#update();
+              }}
+            >
+              <option value="">[server]</option>
+              {[...this.#players].map((player) => <option value={player}>{player}</option>)}
+            </select>
+          </div>
+
+          <div className="data">
+            {entries.length === 0 ? <span>No data stored.</span> : (
+              <div>
+                <span>Key</span>
+                <span>Value</span>
+
+                {entries.map(([key, value]) => (
+                  <div style={{ display: "contents" }}>
+                    <code>{key}</code>
+                    <pre>{JSON.stringify(value)}</pre>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
 
-        <div className="data">
-          {entries.length === 0 ? (
-            <span>No data stored.</span>
-          ) : (
-            <div>
-              <span>Key</span>
-              <span>Value</span>
-
-              {entries.map(([key, value]) => (
-                <div style={{ display: "contents" }}>
-                  <code>{key}</code>
-                  <pre>{JSON.stringify(value)}</pre>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+        <button
+          className="kv-toggle"
+          aria-label={this.#isVisible ? "Hide KV Debugger" : "Show KV Debugger"}
+          title={this.#isVisible ? "Hide KV Debugger" : "Show KV Debugger"}
+          onClick={() => {
+            this.#isVisible = !this.#isVisible;
+            this.rerender();
+          }}
+        >
+          {this.#isVisible ? "Close KV" : "Open KV"}
+        </button>
       </div>
     );
   }
 }
+
 ```
