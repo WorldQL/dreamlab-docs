@@ -83,7 +83,7 @@ counter = 1;
 ```
 
 ### Alternative `@value` syntax
-You might have noticed the syntax for the counter above was gross because @syncedValue forces us to pass a type to access the overrides.
+You might have noticed the gross `Number as ValueTypeTag<number>` syntax above. This is because `@syncedValue` forces us to pass a type to access the overrides.
 If you want to override replicated on a primitive value, you can use `@value` which has a slightly different method signature of `{type, ...overrides}`
 
 For example:
@@ -104,4 +104,4 @@ counter = 1;
 ```
 
 The only difference between `@syncedValue` and `@value` is the arrangement of the arguments. `@value` allows you to set overrides without specifying a type.
-Both are valid ways of representing the same thing.
+**Both are valid** representations of the same thing.
