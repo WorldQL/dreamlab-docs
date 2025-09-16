@@ -1,0 +1,114 @@
+---
+sidebar_position: 999
+title: Remote Procedure Calls (RPC)
+---
+
+# Remote Procedure Calls
+
+You can use the `@rpc` decorators to mark behavior functions as remote procedures. RPC decorated functions **must** have
+all arguments (and in some cases return types) serializable to `JsonValue`.
+
+## Server
+
+Annotate a function with `@rpc.server` to mark it as server-only. Regardless of where this function is called, it will
+be ran on the server. Server RPC functions **must** be async (or return a promise) as they network the result back. This
+allows you to query for data that only the server is able to access (ie: [KV data](./kv.mdx)).
+
+### Examples
+
+Run a `hello` function on the server that logs out the client that called it.
+
+```ts
+import { Behavior, rpc } from "@dreamlab/engine";
+
+export default class RpcBehavior extends Behavior {
+  @rpc.server()
+  async hello(from: string): Promise<void> {
+    // check server logs to see these messages
+    console.log("hello from: " + target);
+  }
+
+  onInitialize(): void {
+    // get our own network id and run rpc function
+    const self = this.game.network.self;
+    this.hello(self);
+  }
+}
+```
+
+Get some server KV data and return it to the client.
+
+```ts
+import { Behavior, JsonValue, rpc } from "@dreamlab/engine";
+
+export default class RpcBehavior extends Behavior {
+  @rpc.server()
+  async getData(): Promise<JsonValue> {
+    // required type guard
+    // decorators are unable to do type narrowing so it must be done manually
+    if (!this.game.isServer()) throw new Error("rpc not on server");
+
+    // get data from server kv
+    const kv = this.game.kv.server;
+    const data: JsonValue = await kv.get("my-data");
+
+    return data;
+  }
+
+  onInitialize(): void {
+    // only run on client
+    if (!this.game.isClient()) return;
+
+    // get data from server
+    this.getData().then((data) => {
+      console.log(data);
+    });
+  }
+}
+```
+
+## Broadcast
+
+Annotate a function with `@rpc.broadcast` to mark it as broadcast. This will make all connected clients run the function
+at the same time whenever it is called. Broadcast functions **must** return `void` or `Promise<void>` as they cannot
+have return values. This allows you to synchronize actions between clients (ie: spawning effects locally, playing
+sounds, etc).
+
+:::info
+
+Broadcast functions can also define a target of either `all` or `only-clients` (default: `all`) which allows you to
+optionally omit the server from running the function.
+
+:::
+
+### Examples
+
+Spawn effect prefab on all clients.
+
+```ts
+import { Behavior, Entity, EntityRef, rpc, value } from "@dreamlab/engine";
+
+export default class RpcBehavior extends Behavior {
+  @value({ type: EntityRef })
+  effect: Entity;
+
+  @rpc.broadcast({ target: "only-clients" })
+  spawnEffect(): void {
+    // required type guard
+    // decorators are unable to do type narrowing so it must be done manually
+    if (!this.game.isClient()) return;
+
+    // spawn effect prefab into local root
+    // this assumes the prefab is responsible for its own cleanup
+    this.effect.cloneInto(this.game.local);
+  }
+
+  onInitialize(): void {
+    // only run on client
+    if (!this.game.isClient()) return;
+
+    // spawn effect on all clients
+    this.spawnEffect();
+  }
+}
+```
