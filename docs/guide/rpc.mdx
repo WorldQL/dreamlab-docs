@@ -8,6 +8,9 @@ title: Remote Procedure Calls (RPC)
 You can use the `@rpc` decorators to mark behavior functions as remote procedures. RPC decorated functions **must** have
 all arguments (and in some cases return types) serializable to `JsonValue`.
 
+You can access information about the RPC call by adding `ctx = rpc.DEFAULT_CONTEXT` as the final argument in an `@rpc`
+annotated function.
+
 ## Server
 
 Annotate a function with `@rpc.server` to mark it as server-only. Regardless of where this function is called, it will
@@ -23,15 +26,14 @@ import { Behavior, rpc } from "@dreamlab/engine";
 
 export default class RpcBehavior extends Behavior {
   @rpc.server()
-  async hello(from: string): Promise<void> {
+  async hello(ctx = rpc.DEFAULT_CONTEXT): Promise<void> {
     // check server logs to see these messages
-    console.log("hello from: " + target);
+    console.log("hello from: " + ctx.from);
   }
 
   onInitialize(): void {
-    // get our own network id and run rpc function
-    const self = this.game.network.self;
-    this.hello(self);
+    // run rpc function when this behavior initializes
+    this.hello();
   }
 }
 ```
