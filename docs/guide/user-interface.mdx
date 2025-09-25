@@ -214,11 +214,29 @@ render() {
 
 ---
 
+### Using external stylesheet
+
+```ts
+render() {
+
+  return (
+    <div className="box">
+      <link rel="stylesheet" href={this.game.resolveResource("res://assets/styles.css")} />
+      <p>Hello!</p>
+      <button>Click me</button>
+    </div>
+  );
+}
+```
+
+The stylesheet MUST be in the assets folder.
+
+---
+
 ### `<style>` tag inside JSX
 
 For more readable and scoped component styles:
 
-```ts
 render() {
   const styles = `
     .box {
@@ -244,7 +262,6 @@ render() {
     </div>
   );
 }
-```
 
 ---
 
