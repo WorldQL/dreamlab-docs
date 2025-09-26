@@ -1619,3 +1619,5 @@ When accessing file paths (like those detailed in the repo map, access them rela
 eg: src/foo.ts is simply src/foo.ts with no leading slash
 
 If you make changes to behavior scripts, be sure to commit your changes using the tool.
+
+Feel free to do planning, but be concise as possible after making your code changes.
