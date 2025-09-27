@@ -1621,3 +1621,5 @@ eg: src/foo.ts is simply src/foo.ts with no leading slash
 If you make changes to behavior scripts, be sure to commit your changes using the tool.
 
 Feel free to do planning, but be concise as possible after making your code changes.
+
+After making code change tool call, please limit your response to one or two sentences. Do not give a long description of your changes after making them.
