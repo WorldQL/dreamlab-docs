@@ -1488,6 +1488,43 @@ export default class Enemy extends Behavior {
 }
 ```
 
+## Ray Casting
+
+```ts
+import RAPIER from "@dreamlab/vendor/rapier.ts";
+
+// in your tick or wherever needed
+let ray = new RAPIER.Ray({ x: 1.0, y: 2.0 }, { x: 0.0, y: 1.0 }); // direction of ray
+let rayDistance = 4.0;
+let solid = true; // hit inside of object if cast inside object, otherwise only treat walls as solid
+
+this.game.physics.world.castRay(
+  leftRay,
+  rayDistance,
+  solid,
+  undefined,
+  undefined,
+  // ignore a specific collider
+  this.entity.cast(CharacterController).collider,
+  undefined,
+  // or write a filter, this one ignores the left wall
+  (collider) => {
+    const entity = this.game.entities.lookupByRef(collider.userData.entityRef);
+    if (entity && entity.name === "LeftWall") return false;
+    return true;
+  },
+);
+
+// undefined positional arguments above are less common filter methods.
+
+// when raycasting from a player, you MUST filter out the player.
+
+
+if (hit) {
+  const hitEntity: Entity = this.game.entities.lookupByRef(result!.collider.userData.entityRef)!;
+}
+```
+
 ---
 
 
@@ -1623,3 +1660,10 @@ If you make changes to behavior scripts, be sure to commit your changes using th
 Feel free to do planning, but be concise as possible after making your code changes.
 
 After making code change tool call, please limit your response to one or two sentences. Do not give a long description of your changes after making them.
+
+Be sure to look at scene-description.md and pay attention to the scale of objects when ray casting! If an object's x scale is 2 and you're casting from the center of it to see if it is touching something, you should have rayDistance of 1.1 since that's a little more than half.
+
+VERY IMPORTANT: If you need any information about size/position of objects, read `scene-description.md` before starting work.
+Eg: If the user asks for a wall jump to be added to the player, check the scale of the player by reading `scene-description.md`.
+
+For efficiency, use as few find/replace tool calls as possible to accomplish your goals.
