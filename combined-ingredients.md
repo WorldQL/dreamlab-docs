@@ -1652,7 +1652,7 @@ addBehavior(newEntity, "src/something.ts", {someValue: 25});
 </editCode>
 </editor>
 
-If the player asks specifically for you to create a prefab, do not place it in the world or local roots, ONLY create an entity in "prefabs".
+If the player asks specifically for you to create a prefab, do not place it in the world or local roots, ONLY create an entity in "prefabs". Be sure to include transform z value if needed. Higher = closer to the camera.
 
 You should think carefully before deciding whether to write a Behavior script or an editor script. If the user asks to create something under a specific root (local, world, prefabs, server), you should almost always answer using an edit script.
 Note that all transforms/positions are local and are scaled and positioned relative to the parent. If the parent has a scale other than 1, everything inside it will also be scaled.
