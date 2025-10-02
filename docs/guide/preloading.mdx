@@ -1,0 +1,14 @@
+# Preloading Assets
+
+
+Textures, sounds, and other assets can be preloaded by defining a `preload.ts` file in the root of your project
+
+```ts
+export default definePreload({
+  textures: ["res://assets/a.png"],
+  // ... sounds, etc
+  custom: async () => {
+    // custom preloading goes here
+  }
+});
+```
