@@ -54,19 +54,21 @@ export default class MyBehavior extends Behavior {
 ```
 
 ## Ray Casting
+
 ```ts
-let ray = new RAPIER.Ray({ x: 0, y: 0 }, {
-  x: 0.0,
-  y: 1,
-});
+let ray = new RAPIER.Ray(
+  { x: 0, y: 0 },
+  {
+    x: 0.0,
+    y: 1,
+  },
+);
 // an upward line four units long
 let maxToi = 4.0;
 let solid = true;
 const result = this.game.physics.world.castRay(ray, maxToi, solid);
 
 if (result) {
-  const hitEntity: Entity = this.game.entities.lookupByRef(
-    result!.collider.userData.entityRef,
-  )!;
+  const hitEntity: Entity = this.game.physics.lookupEntity(result!.collider)!;
 }
 ```
