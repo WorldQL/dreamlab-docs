@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Flashlight Test</title>
+    <style>
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        background: #0b0b12;
+      }
+      #game {
+        position: fixed;
+        inset: 0;
+      }
+      .tip {
+        position: fixed;
+        left: 12px;
+        top: 12px;
+        color: #e7e7ee;
+        font: 14px/1.3 Arial;
+        opacity: 0.85;
+        user-select: none;
+      }
+      .tip kbd {
+        background: #1f2030;
+        padding: 2px 6px;
+        border-radius: 6px;
+        border: 1px solid #2c2e44;
+      }
+      .tip .pill {
+        background: #1d2b43;
+        padding: 2px 6px;
+        border-radius: 999px;
+        border: 1px solid #2a3b5d;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="game"></div>
+    <div class="tip">
+      <div>
+        <strong>WASD</strong> to move • Flashlight points at your cursor
+      </div>
+      <div style="margin-top: 6px">
+        Press <kbd>R</kbd> to reroll obstacles
+      </div>
+      <div style="margin-top: 6px" class="pill">Pink = walls • Blue = you</div>
+    </div>
+    <div id="diag"></div>
+
+    <script type="module">
+      // Pixi v8 compatible: no deprecated API, no invalid imports
+      import {
+        Application,
+        Graphics,
+        Container,
+        Point,
+      } from "https://cdn.jsdelivr.net/npm/pixi.js@8.x/dist/pixi.mjs";
+
+      // ---- PIXI APP ----
+      const app = new Application();
+      await app.init({
+        backgroundAlpha: 0,
+        antialias: true,
+        resolution: Math.min(devicePixelRatio, 2),
+        resizeTo: window,
+      });
+      document.getElementById("game").appendChild(app.canvas);
+
+      const world = new Container();
+      app.stage.addChild(world);
+
+      const state = {
+        speed: 260,
+        coneLength: 520, // flashlight reach
+        coneWidthDeg: 46, // full width in degrees
+        obstacles: [],
+        keys: new Set(),
+        pointer: new Point(app.screen.width / 2, app.screen.height / 2),
+      };
+
+      // Player (blue square)
+      const player = new Graphics()
+        .rect(0, 0, 28, 28)
+        .fill({ color: 0x3b82f6 }); // blue
+      player.pivot.set(14, 14);
+      player.position.set(app.screen.width / 2, app.screen.height / 2);
+      world.addChild(player);
+
+      // Obstacles (random pink rectangles)
+      const obstaclesLayer = new Container();
+      world.addChild(obstaclesLayer);
+
+      function rerollObstacles() {
+        obstaclesLayer.removeChildren();
+        state.obstacles.length = 0;
+        const W = app.screen.width,
+          H = app.screen.height;
+        const count = Math.round((W * H) / 60000); // density scales with area
+        for (let i = 0; i < count; i++) {
+          const w = 50 + Math.random() * 140;
+          const h = 40 + Math.random() * 120;
+          const x = Math.random() * (W - w) + w / 2;
+          const y = Math.random() * (H - h) + h / 2;
+          // Avoid initial spawn too close to player
+          const dx = x - player.x,
+            dy = y - player.y;
+          if (Math.hypot(dx, dy) < 120) {
+            i--;
+            continue;
+          }
+
+          const r = new Graphics()
+            .roundRect(0, 0, w, h, 8)
+            .fill({ color: 0xff6bb3 }); // pink
+          r.pivot.set(w / 2, h / 2);
+          r.position.set(x, y);
+          obstaclesLayer.addChild(r);
+          state.obstacles.push(r);
+        }
+      }
+
+      rerollObstacles();
+
+      const visionMask = new Graphics();
+      const darkness = new Graphics();
+      darkness
+        .rect(0, 0, app.screen.width, app.screen.height)
+        .fill({ color: 0x000000, alpha: 0.95 });
+
+      darkness.setMask({ mask: visionMask, inverse: true });
+
+      app.stage.addChild(darkness, visionMask);
+
+      // ---- INPUT ----
+      window.addEventListener("keydown", (e) => {
+        const k = e.key.toLowerCase();
+        if (
+          [
+            "w",
+            "a",
+            "s",
+            "d",
+            "arrowup",
+            "arrowdown",
+            "arrowleft",
+            "arrowright",
+          ].includes(k)
+        ) {
+          state.keys.add(k);
+        }
+        if (k === "r") rerollObstacles();
+      });
+      window.addEventListener("keyup", (e) =>
+        state.keys.delete(e.key.toLowerCase())
+      );
+
+      // Pointer tracking
+      app.stage.eventMode = "static";
+      app.stage.hitArea = app.screen; // screen-sized interactive area
+      app.stage.on("pointermove", (e) => state.pointer.copyFrom(e.global));
+
+      // ---- UTILS ----
+      function clamp(v, min, max) {
+        return Math.max(min, Math.min(max, v));
+      }
+
+      function updatePlayer(dt) {
+        let vx = 0,
+          vy = 0;
+        if (state.keys.has("w") || state.keys.has("arrowup")) vy -= 1;
+        if (state.keys.has("s") || state.keys.has("arrowdown")) vy += 1;
+        if (state.keys.has("a") || state.keys.has("arrowleft")) vx -= 1;
+        if (state.keys.has("d") || state.keys.has("arrowright")) vx += 1;
+        if (vx || vy) {
+          const l = Math.hypot(vx, vy) || 1;
+          vx /= l;
+          vy /= l;
+          player.x += vx * state.speed * dt;
+          player.y += vy * state.speed * dt;
+        }
+        // Stay on screen
+        player.x = clamp(player.x, 14, app.screen.width - 14);
+        player.y = clamp(player.y, 14, app.screen.height - 14);
+      }
+
+      function redrawVisionMask() {
+        const ang = Math.atan2(
+          state.pointer.y - player.y,
+          state.pointer.x - player.x
+        );
+        const half = (state.coneWidthDeg * Math.PI) / 180 / 2;
+        const L = state.coneLength;
+
+        const leftX = player.x + Math.cos(ang - half) * L;
+        const leftY = player.y + Math.sin(ang - half) * L;
+
+        visionMask.clear();
+
+        // console.log(ang, half, ang - half, ang + half);
+
+        // Full screen darkness
+        visionMask
+          .moveTo(player.x, player.y)
+          .lineTo(leftX, leftY)
+          .arc(player.x, player.y, L, ang - half, ang + half, false)
+          .lineTo(player.x, player.y)
+          .fill({ color: 0x00ffcc, alpha: 1 });
+        // .cut(); // don't need anymore we are using inverse
+        visionMask.circle(player.x, player.y, 36).fill({ color: 0x00ffcc, alpha: 1 })
+      }
+
+      app.ticker.add(() => {
+        const dt = app.ticker.deltaMS / 1000;
+        updatePlayer(dt);
+        redrawVisionMask();
+      });
+
+
+
+    </script>
+  </body>
+</html>
