@@ -135,7 +135,7 @@ export default class Checkerboard extends Behavior {
   }
 
   onInitialize(): void {
-    if (this.game.isServer()) this.#fill();
+    if (this.game.isClient()) this.#fill(); // change to isServer() if you have this behavior in world/server root
   }
 }
 ```
