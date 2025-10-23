@@ -5,7 +5,7 @@ import type * as Preset from "@docusaurus/preset-classic";
 const config: Config = {
   title: "Dreamlab Docs",
   tagline: "Developer documentation for the Dreamlab game engine",
-  favicon: "img/icon-64x64.png",
+  favicon: "img/favicon-new.png",
 
   // Set the production url of your site here
   url: "https://docs.dreamlab.gg",
@@ -57,7 +57,7 @@ const config: Config = {
       title: "Dreamlab Docs",
       logo: {
         alt: "My Site Logo",
-        src: "img/icon-64x64.png",
+        src: "img/favicon-new.png",
       },
       items: [
         {
