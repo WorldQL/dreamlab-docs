@@ -1,0 +1,18 @@
+
+# Network Authority
+
+To prevent the client and server from fighting each other about the position / state of objects, Dreamlab has a way to explicitly declare the owner of an object.
+
+When spawning an object, you can do the following:
+
+```
+
+```
+
+
+## Standard Player Spawning Model
+To make interoperable development easier, Dreamlab has a standard procedure for spawning and managing the lifecycle of players in multiplayer games. A `PlayerSpawner` class (attached to an object in local) creates the player in the world under a PlayersContainer object in the world root with the authority set to the client which controls the player.
+
+When using this, the player can always be accessed with `PlayerSpawner.myLocalPlayer`. This idiom is useful as it allows enemies and other objects in the world to make assumptions about where to find players.
+
+Finally, this model includes a `CleanupOnLeave` behavior attached to an entity under the world root which is responsible for destroying entities when the player which owns them leaves.
