@@ -112,7 +112,7 @@ export default class Player extends Behavior {
 ### Overview
 This demo includes mobile joystick support for touch controls in addition to keyboard movement.
 
-### Code
+### Player Code
 ```typescript
 import { AnimatedSprite, Behavior, syncedValue, Vector2 } from "@dreamlab/engine";
 import Joystick from "./joystick.tsx";
@@ -244,6 +244,54 @@ export default class Player extends Behavior {
     } else {
       onComplete();
     }
+  }
+}
+```
+
+### Joystick Code
+
+Create a UILayer entity and attach this `Joystick` behavior to it.
+
+```typescript
+import { IVector2, UIBehavior } from "@dreamlab/engine";
+
+export default class Joystick extends UIBehavior {
+  private joystick;
+
+  static joystickMovement: IVector2;
+
+  onInitializeClient() {
+    // needed to wait for this.uiElement to be defined.
+
+    setTimeout(async () => {
+      const nipplejs = (await import("npm:nipplejs")).default;
+      this.joystick = nipplejs.create({
+        zone: this.uiElement as HTMLElement,
+        color: "white",
+        position: { left: "50%", bottom: "25%" },
+        mode: "dynamic",
+        size: 150,
+      });
+
+      // Add event listeners for joystick movement
+      this.joystick.on("move", (evt, data) => {
+        // Normalize the vector and store it
+        const force = data.force > 1 ? 1 : data.force;
+        Joystick.joystickMovement = {
+          x: Math.cos(data.angle.radian) * force,
+          y: Math.sin(data.angle.radian) * force,
+        };
+      });
+
+      // Reset movement when joystick is released
+      this.joystick.on("end", () => {
+        Joystick.joystickMovement = { x: 0, y: 0 };
+      });
+    });
+  }
+
+  render() {
+    return <div style={{ width: "100%", height: "100%", position: "relative" }}></div>;
   }
 }
 ```
