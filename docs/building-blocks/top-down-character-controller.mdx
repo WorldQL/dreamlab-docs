@@ -1,0 +1,297 @@
+---
+title: Top Down Character Controller
+---
+
+# Top Down Character Controller
+
+A simple 8-directional character controller for top-down games with animation support.
+
+This follows the [standard player spawning model](/guide/network-authority/#standard-player-spawning-model).
+
+---
+
+## Basic Top Down Controller
+
+Move in 8 directions with WASD controls and animation state handling.
+
+### Overview
+A straightforward top-down character controller with movement and idle animations.
+Supports directional sprites and smooth 8-directional movement.
+
+### Code
+```typescript
+import { AnimatedSprite, Behavior, syncedValue, Vector2 } from "@dreamlab/engine";
+
+export default class Player extends Behavior {
+  @syncedValue()
+  speed = 2.0;
+
+  #up = this.inputs.create("@movement/up", "Move Up", "KeyW");
+  #down = this.inputs.create("@movement/down", "Move Down", "KeyS");
+  #left = this.inputs.create("@movement/left", "Move Left", "KeyA");
+  #right = this.inputs.create("@movement/right", "Move Right", "KeyD");
+
+  private state: "idle" | "moving" = "idle";
+  @syncedValue()
+  public dir: "left" | "right" = "right";
+
+  onInitializeClient(): void {
+    super.onInitialize();
+    if (!this.hasAuthority()) return;
+
+    this.updateMovementAnim();
+  }
+
+  onTickClient(): void {
+    if (!this.hasAuthority()) return;
+
+    let dx = (this.#right.held ? 1 : 0) - (this.#left.held ? 1 : 0);
+    let dy = (this.#up.held ? 1 : 0) - (this.#down.held ? 1 : 0);
+
+    if (dx !== 0 || dy !== 0) {
+      this.state = "moving";
+      if (dx !== 0) {
+        this.dir = dx > 0 ? "right" : "left";
+      }
+
+      const dt = this.game.physics.tickDelta / 1000;
+      let movement = new Vector2(dx, dy);
+
+      // Normalize diagonal movement for consistent speed
+      this.entity.pos = this.entity.pos.add(
+        movement.normalize().mul(this.speed * dt)
+      );
+    } else {
+      this.state = "idle";
+    }
+
+    this.updateMovementAnim();
+  }
+
+  private updateMovementAnim(): void {
+    const A = this.entity._.Animations._ as Record<string, any>;
+    A.Walk.enabled = this.state === "moving";
+    A.Idle.enabled = this.state === "idle";
+
+    // Flip sprite based on direction
+    const sx = this.dir === "left" ? -1 : 1;
+    A.Walk.transform.scale = new Vector2(sx, 1);
+    A.Idle.transform.scale = new Vector2(sx, 1);
+  }
+}
+```
+
+---
+
+## Advanced Top Down Controller with Joystick Support
+
+**[Click here to clone project and view code](https://app.dreamlab.gg/project/fork/u_kxz3lbxkp19woxvxzo3niwbz/topdown-controller)**
+
+<div
+  style={{
+    position: "relative",
+    width: "100%",
+    height: 0,
+    paddingTop: "60%", // (3 / 5) * 100% to maintain 5:3 aspect ratio
+  }}
+>
+  <iframe
+    src="https://app.dreamlab.gg/play?gameId=u_kxz3lbxkp19woxvxzo3niwbz/topdown-controller&embed=true"
+    allowFullScreen
+    style={{
+      position: "absolute",
+      top: 0,
+      left: 0,
+      width: "100%",
+      height: "100%",
+      border: 0,
+    }}
+  ></iframe>
+</div>
+
+### Overview
+This demo includes mobile joystick support for touch controls in addition to keyboard movement.
+
+### Player Code
+```typescript
+import { AnimatedSprite, Behavior, syncedValue, Vector2 } from "@dreamlab/engine";
+import Joystick from "./joystick.tsx";
+
+export const ACTION_TYPES = [
+  "punch",
+  "attack",
+  "kick",
+  "stomp",
+  "grab",
+  "hit",
+  "entrance",
+  "leaving",
+] as const;
+
+export type ActionType = (typeof ACTION_TYPES)[number];
+
+export default class Player extends Behavior {
+  @syncedValue()
+  speed = 2.0;
+
+  #up = this.inputs.create("@movement/up", "Move Up", "KeyW");
+  #down = this.inputs.create("@movement/down", "Move Down", "KeyS");
+  #left = this.inputs.create("@movement/left", "Move Left", "KeyA");
+  #right = this.inputs.create("@movement/right", "Move Right", "KeyD");
+  #interact = this.inputs.create("@interaction/use", "Use/Workout", "KeyE");
+
+  private state: "idle" | "moving" = "idle";
+  @syncedValue()
+  public dir: "left" | "right" = "right";
+  private isPerformingAction = false;
+
+  onInitializeClient(): void {
+    super.onInitialize();
+    if (!this.hasAuthority()) return;
+
+    this.updateMovementAnim();
+  }
+
+  onTickClient(): void {
+    if (!this.hasAuthority() || this.isPerformingAction) return;
+
+    let dx = (this.#right.held ? 1 : 0) - (this.#left.held ? 1 : 0);
+    let dy = (this.#up.held ? 1 : 0) - (this.#down.held ? 1 : 0);
+
+    let joystickSpeedMultiplier = 1;
+    if (dx === 0 && dy === 0 && Joystick.joystickMovement) {
+      const movement = Joystick.joystickMovement;
+
+      dx = movement.x;
+      dy = movement.y;
+
+      joystickSpeedMultiplier = Math.abs(Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2)));
+    }
+
+    if (dx !== 0 || dy !== 0) {
+      this.state = "moving";
+      if (dx !== 0) {
+        this.dir = dx > 0 ? "right" : "left";
+      }
+
+      const dt = this.game.physics.tickDelta / 1000;
+
+      let movement = new Vector2(dx, dy);
+
+      this.entity.pos = this.entity.pos.add(
+        movement.normalize().mul(this.speed * dt).mul(joystickSpeedMultiplier),
+      );
+    } else {
+      this.state = "idle";
+    }
+
+    this.updateMovementAnim();
+  }
+
+  private updateMovementAnim(): void {
+    const A = this.entity._.Animations._ as Record<string, any>;
+    A.Walk.enabled = this.state === "moving";
+    A.Idle.enabled = this.state === "idle";
+    const sx = this.dir === "left" ? -1 : 1;
+    A.Walk.transform.scale = new Vector2(sx, 1);
+    A.Idle.transform.scale = new Vector2(sx, 1);
+  }
+
+  private performAction(action: ActionType): void {
+    this.isPerformingAction = true;
+    this.playAnimation(action, () => {
+      this.isPerformingAction = false;
+      this.state = "idle";
+      this.updateMovementAnim();
+    });
+  }
+
+  private playAnimation(action: ActionType, onComplete: () => void): void {
+    const A = this.entity._.Animations._ as Record<string, any>;
+    A.Walk.enabled = A.Idle.enabled = false;
+
+    const key = action.charAt(0).toUpperCase() + action.slice(1);
+    const animEnt = A[key];
+    if (!animEnt) {
+      onComplete();
+      return;
+    }
+
+    animEnt.enabled = true;
+    const sx = this.dir === "left" ? -1 : 1;
+    animEnt.transform.scale = new Vector2(sx, 1);
+
+    const spriteComp = animEnt.cast(AnimatedSprite);
+    const pixiSprite = spriteComp?.sprite;
+    if (pixiSprite) {
+      pixiSprite.loop = action.startsWith("workout") ? true : false;
+      let finished = false;
+      pixiSprite.onFrameChange = (frame: number) => {
+        if (!pixiSprite.loop && frame === pixiSprite.totalFrames - 1) {
+          finished = true;
+        }
+      };
+      const checkEnd = () => {
+        if (pixiSprite.loop || finished) {
+          pixiSprite.onFrameChange = null;
+          animEnt.enabled = false;
+          onComplete();
+        } else {
+          requestAnimationFrame(checkEnd);
+        }
+      };
+      requestAnimationFrame(checkEnd);
+    } else {
+      onComplete();
+    }
+  }
+}
+```
+
+### Joystick Code
+
+Create a UILayer entity and attach this `Joystick` behavior to it.
+
+```typescript
+import { IVector2, UIBehavior } from "@dreamlab/engine";
+
+export default class Joystick extends UIBehavior {
+  private joystick;
+
+  static joystickMovement: IVector2;
+
+  onInitializeClient() {
+    // needed to wait for this.uiElement to be defined.
+
+    setTimeout(async () => {
+      const nipplejs = (await import("npm:nipplejs")).default;
+      this.joystick = nipplejs.create({
+        zone: this.uiElement as HTMLElement,
+        color: "white",
+        position: { left: "50%", bottom: "25%" },
+        mode: "dynamic",
+        size: 150,
+      });
+
+      // Add event listeners for joystick movement
+      this.joystick.on("move", (evt, data) => {
+        // Normalize the vector and store it
+        const force = data.force > 1 ? 1 : data.force;
+        Joystick.joystickMovement = {
+          x: Math.cos(data.angle.radian) * force,
+          y: Math.sin(data.angle.radian) * force,
+        };
+      });
+
+      // Reset movement when joystick is released
+      this.joystick.on("end", () => {
+        Joystick.joystickMovement = { x: 0, y: 0 };
+      });
+    });
+  }
+
+  render() {
+    return <div style={{ width: "100%", height: "100%", position: "relative" }}></div>;
+  }
+}
+```

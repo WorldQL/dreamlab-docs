@@ -1,0 +1,136 @@
+---
+title: Users and Save Data
+---
+
+# Users and Save Data / Key-Value Database
+
+Learn how to identify players, persist data between game sessions, and manage user-specific information using Dreamlab's Key-Value (KV) storage system.
+
+---
+
+## Identifying Players
+
+Dreamlab automatically assigns each player a unique identifier when they connect. You can access player information through the network connection system.
+
+### Getting Player Information
+
+```typescript
+import { Behavior, PlayerJoined } from "@dreamlab/engine";
+
+export default class PlayerTracker extends Behavior {
+  onInitialize() {
+    // Get the local player's connection
+    const player = this.game.network.connections.find(
+      (conn) => conn.id === this.game.network.self
+    );
+
+    if (player) {
+      const playerId = player.connection.playerId;      // Unique player ID
+      const nickname = player.connection.nickname || "Unknown";  // Player's display name
+    }
+
+    // Listen for new players joining
+    this.listen(this.game, PlayerJoined, async (player) => {
+      const playerId = player.connection.playerId;
+      const nickname = player.connection.nickname || "Unknown";
+
+      console.log(`${nickname} joined! (ID: ${playerId})`);
+    });
+  }
+}
+```
+
+### Player Properties
+- **`playerId`** - Unique identifier for the player (persists across sessions)
+- **`nickname`** - Player's display name
+- **`connection.id`** - Network connection ID (unique per session)
+
+---
+
+## Key-Value (KV) Storage
+
+Dreamlab games are stateless by default. To persist data between game sessions, use the Key-Value (KV) API.
+
+### KV Scopes
+
+KV data is scoped in two ways:
+
+1. **Server Scope** - Data accessible only by the server
+   - Use for global game state, leaderboards, or admin data
+   - Access via `this.game.kv.server`
+
+2. **Player Scope** - Data specific to individual players
+   - Players can only read/write their own scope
+   - Server can read/write any player's scope
+   - Access via `this.game.kv.player`
+
+### Basic KV Operations
+
+```typescript
+import { Behavior, rpc } from "@dreamlab/engine";
+
+export default class SaveData extends Behavior {
+  async onInitialize() {
+    if (!this.game.isServer()) return;
+
+    // Server scope - get/set
+    await this.game.kv.server.set("totalClicks", 0);
+    const totalClicks = await this.game.kv.server.get("totalClicks");
+
+    // Player scope - get/set (server can access any player's data)
+    const playerId = "player_123";
+    await this.game.kv.player.set("score", 100, playerId);
+    const score = await this.game.kv.player.get("score", playerId);
+
+    // List all keys in a scope
+    const serverKeys = await this.game.kv.server.list();
+    const playerKeys = await this.game.kv.player.list(playerId);
+
+    // Delete a key
+    await this.game.kv.server.delete("someKey");
+    await this.game.kv.player.delete("score", playerId);
+
+    // Clear all keys in a scope
+    await this.game.kv.server.clear();
+    await this.game.kv.player.clear(playerId);
+
+    // Get list of all player IDs with stored data
+    const allPlayerIds = await this.game.kv.info.players();
+  }
+}
+```
+
+### Available Methods
+
+**Server Scope:**
+- `this.game.kv.server.get(key)` - Get a value
+- `this.game.kv.server.set(key, value)` - Set a value
+- `this.game.kv.server.list()` - List all keys
+- `this.game.kv.server.delete(key)` - Delete a key
+- `this.game.kv.server.clear()` - Clear all keys
+
+**Player Scope:**
+- `this.game.kv.player.get(key, playerId)` - Get a player's value
+- `this.game.kv.player.set(key, value, playerId)` - Set a player's value
+- `this.game.kv.player.list(playerId)` - List all keys for a player
+- `this.game.kv.player.delete(key, playerId)` - Delete a player's key
+- `this.game.kv.player.clear(playerId)` - Clear all keys for a player
+
+**Info:**
+- `this.game.kv.info.players()` - Get list of all player IDs with stored data
+
+---
+
+## Complete Example: Click Counter with Leaderboard
+
+This example demonstrates saving player data and maintaining a global leaderboard.
+
+**[See this example in action here](https://app.dreamlab.gg/play?gameId=u_d8qhgnqcwhahbhg0eqcuduu4/simple-clicker)**
+
+---
+
+## KV Debugger
+
+To view and edit the contents of your KV database during development, you can use the [Key-Value Debugger](/guide/kv/#kv-debugger).
+
+Attach the KV Debugger behavior to a `UILayer` in your game to get a visual interface for inspecting and modifying stored data.
