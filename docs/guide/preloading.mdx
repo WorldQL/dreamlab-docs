@@ -1,6 +1,5 @@
 # Preloading Assets
 
-
 Textures, sounds, and other assets can be preloaded by defining a `preload.ts` file in the root of your project
 
 ```ts
@@ -9,6 +8,17 @@ export default definePreload({
   // ... sounds, etc
   custom: async () => {
     // custom preloading goes here
-  }
+  },
 });
 ```
+
+## Importing npm Libraries
+
+You can import external npm packages in your scripts by using the `npm:` prefix before the package name:
+
+```ts
+import nipplejs from "npm:nipplejs";
+```
+
+This works with any npm package and allows you to use external libraries in your Dreamlab project. The package will be
+automatically fetched and loaded when your script runs.
