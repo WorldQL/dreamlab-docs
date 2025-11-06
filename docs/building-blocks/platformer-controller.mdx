@@ -4,8 +4,9 @@ title: Platform Player Controller
 
 # Platform Player Controllers
 
-These two example controllers give you everything from a simple jump-and-gravity player to a full-featured platformer with animation control and moving platform support.
-This follows the [standard player spawning model](/guide/network-authority/#standard-player-spawning-model).
+These two example controllers give you everything from a simple jump-and-gravity player to a full-featured platformer
+with animation control and moving platform support. This follows the
+[standard player spawning model](/guide/network-authority/#standard-player-spawning-model).
 
 ---
 
@@ -38,18 +39,12 @@ Move and jump with keyboard controls! Fully multiplayer!
 </div>
 
 ### Code
+
 ```typescript
-import {
-  Behavior,
-  CharacterController,
-  RichText,
-  Vector2,
-  syncedValue,
-} from "@dreamlab/engine";
+import { Behavior, CharacterController, RichText, Vector2, syncedValue } from "@dreamlab/engine";
 
 // A very simple platformer controller, attach to a PlayerController Entity.
 // This follows the https://docs.dreamlab.gg/guide/network-authority/#standard-player-spawning-model
-
 
 export default class PlayerController extends Behavior {
   #controller = this.entity.cast(CharacterController);
@@ -100,17 +95,13 @@ export default class PlayerController extends Behavior {
     }
 
     // Create movement vector
-    const movement = new Vector2(
-      horizontalVelocity * deltaTime,
-      this.#verticalVelocity * deltaTime,
-    );
+    const movement = new Vector2(horizontalVelocity * deltaTime, this.#verticalVelocity * deltaTime);
 
     if (!this.#controller.isGrounded) this.#verticalVelocity -= this.gravity * deltaTime;
 
     this.entity.pos = this.entity.pos.add(movement);
   }
 }
-
 ```
 
 ---
@@ -149,12 +140,15 @@ This demo is multiplayer! Try opening another browser tab to this page!
 :::
 
 ### Overview
-A complete 2D character controller for platformer games.
-Includes variable jump height, coyote time, head collision checks, and sticking to moving platforms.
 
-It uses Dreamlab's built-in `CharacterController` for physics and `Rapier` raycasts for grounded detection, plus animation references for idle/run/jump/fall states.
+A complete 2D character controller for platformer games. Includes variable jump height, coyote time, head collision
+checks, and sticking to moving platforms.
+
+It uses Dreamlab's built-in `CharacterController` for physics and `Rapier` raycasts for grounded detection, plus
+animation references for idle/run/jump/fall states.
 
 ### Code
+
 ```typescript
 // This follows the https://docs.dreamlab.gg/guide/network-authority/#standard-player-spawning-model
 
@@ -231,13 +225,10 @@ export default class PlatformPlayer extends Behavior {
     this.horizontalVelocity = horizontalInput * this.speed;
 
     if (horizontalInput > 0) {
-      this.animationsContainer.transform.scale.x = Math.abs(
-        this.animationsContainer.transform.scale.x,
-      );
+      this.animationsContainer.transform.scale.x = Math.abs(this.animationsContainer.transform.scale.x);
       this.runAnim.enabled = true;
     } else if (horizontalInput < 0) {
-      this.animationsContainer.transform.scale.x =
-        Math.abs(this.animationsContainer.transform.scale.x) * -1;
+      this.animationsContainer.transform.scale.x = Math.abs(this.animationsContainer.transform.scale.x) * -1;
       this.runAnim.enabled = true;
     } else {
       this.idleAnim.enabled = true;
@@ -257,10 +248,7 @@ export default class PlatformPlayer extends Behavior {
         this.#jumpTimeCounter = 0;
         this.coyoteTime = 0;
 
-        const jumpMovement = new Vector2(
-          this.horizontalVelocity * deltaTime,
-          this.verticalVelocity * deltaTime,
-        );
+        const jumpMovement = new Vector2(this.horizontalVelocity * deltaTime, this.verticalVelocity * deltaTime);
         this.entity.pos = this.entity.pos.add(jumpMovement);
         return;
       }
@@ -327,10 +315,7 @@ export default class PlatformPlayer extends Behavior {
     }
 
     // Apply final movement
-    const movement = new Vector2(
-      this.horizontalVelocity * deltaTime,
-      this.verticalVelocity * deltaTime,
-    );
+    const movement = new Vector2(this.horizontalVelocity * deltaTime, this.verticalVelocity * deltaTime);
 
     if (this.#isJumping) {
       this.jumpAnim.enabled = true;
@@ -358,14 +343,7 @@ export default class PlatformPlayer extends Behavior {
     let foundPlatform: Entity | undefined;
 
     // Left foot check
-    const leftHit = this.game.physics.world.castRay(
-      leftRay,
-      1,
-      true,
-      undefined,
-      undefined,
-      this.#character.collider,
-    );
+    const leftHit = this.game.physics.world.castRay(leftRay, 1, true, undefined, undefined, this.#character.collider);
     if (leftHit && this.grounded) {
       const body = this.game.physics.world.colliders.get(leftHit.collider.handle) as any;
       if (body) {
@@ -430,40 +408,16 @@ export default class PlatformPlayer extends Behavior {
       { x: this.entity.pos.x - halfExtents.x, y: this.entity.pos.y },
       { x: 0, y: halfExtents.y + 0.1 },
     );
-    const midHeadRay = new RAPIER.Ray(
-      { x: this.entity.pos.x, y: this.entity.pos.y },
-      { x: 0, y: halfExtents.y + 0.1 },
-    );
+    const midHeadRay = new RAPIER.Ray({ x: this.entity.pos.x, y: this.entity.pos.y }, { x: 0, y: halfExtents.y + 0.1 });
     const rightHeadRay = new RAPIER.Ray(
       { x: this.entity.pos.x + halfExtents.x, y: this.entity.pos.y },
       { x: 0, y: halfExtents.y + 0.1 },
     );
 
     // Cast each ray. If any hit, we clamp upward velocity.
-    const leftHit = world.castRay(
-      leftHeadRay,
-      1,
-      true,
-      undefined,
-      undefined,
-      this.#character.collider,
-    );
-    const midHit = world.castRay(
-      midHeadRay,
-      1,
-      true,
-      undefined,
-      undefined,
-      this.#character.collider,
-    );
-    const rightHit = world.castRay(
-      rightHeadRay,
-      1,
-      true,
-      undefined,
-      undefined,
-      this.#character.collider,
-    );
+    const leftHit = world.castRay(leftHeadRay, 1, true, undefined, undefined, this.#character.collider);
+    const midHit = world.castRay(midHeadRay, 1, true, undefined, undefined, this.#character.collider);
+    const rightHit = world.castRay(rightHeadRay, 1, true, undefined, undefined, this.#character.collider);
 
     if (leftHit || midHit || rightHit) {
       // Stop upward movement
@@ -504,14 +458,7 @@ export default class PlatformPlayer extends Behavior {
     );
 
     // Check left foot
-    const leftHit = this.game.physics.world.castRay(
-      leftRay,
-      1,
-      true,
-      undefined,
-      undefined,
-      this.#character.collider,
-    );
+    const leftHit = this.game.physics.world.castRay(leftRay, 1, true, undefined, undefined, this.#character.collider);
     if (leftHit) {
       const leftBody = this.game.physics.world.colliders.get(leftHit.collider.handle) as any;
       if (leftBody) {
@@ -523,14 +470,7 @@ export default class PlatformPlayer extends Behavior {
     }
 
     // Check right foot
-    const rightHit = this.game.physics.world.castRay(
-      rightRay,
-      1,
-      true,
-      undefined,
-      undefined,
-      this.#character.collider,
-    );
+    const rightHit = this.game.physics.world.castRay(rightRay, 1, true, undefined, undefined, this.#character.collider);
     if (rightHit) {
       const rightBody = this.game.physics.world.colliders.get(rightHit.collider.handle) as any;
       if (rightBody) {

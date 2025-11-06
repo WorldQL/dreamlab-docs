@@ -4,11 +4,12 @@ title: User Interface
 
 # User Interface
 
-Dreamlab's UI system lets you author fully-interactive game interfaces—HUDs, menus, inventory screens—directly in TypeScript **inside your game project**.
+Dreamlab's UI system lets you author fully-interactive game interfaces—HUDs, menus, inventory screens—directly in
+TypeScript **inside your game project**.
 
 Every interface lives in a **`UIBehavior`** that:
 
-1. **Renders JSX** into the engine's UI layer.  
+1. **Renders JSX** into the engine's UI layer.
 2. **Re-renders on demand** with `this.rerender()`.
 
 > **Heads-up**  
@@ -49,13 +50,13 @@ export default class MyUI extends UIBehavior {
 
 ### Key pieces
 
-| Member / Hook                  | Purpose                                                                                          |
-| ------------------------------ | ------------------------------------------------------------------------------------------------ |
-| `render()`                     | Pure function that returns JSX.                                                                  |
-| `this.rerender()`              | Schedule a call to `render()` on the next frame. Call it after _any_ state change.               |
-| `onTick()` / `onFrame()`       | Per-tick (logic) and per-frame (visual) hooks. Update state here; call `rerender()` if needed.   |
-| `this.setCss()`                | Inject a `<style>` tag for larger style sheets (see §4).                                         |
-| `this.hide() / this.show()`    | Detach / reattach the rendered tree without destroying it (see §5).                              |
+| Member / Hook               | Purpose                                                                                        |
+| --------------------------- | ---------------------------------------------------------------------------------------------- |
+| `render()`                  | Pure function that returns JSX.                                                                |
+| `this.rerender()`           | Schedule a call to `render()` on the next frame. Call it after _any_ state change.             |
+| `onTick()` / `onFrame()`    | Per-tick (logic) and per-frame (visual) hooks. Update state here; call `rerender()` if needed. |
+| `this.setCss()`             | Inject a `<style>` tag for larger style sheets (see §4).                                       |
+| `this.hide() / this.show()` | Detach / reattach the rendered tree without destroying it (see §5).                            |
 
 ---
 
@@ -129,10 +130,10 @@ export default class OnlinePlayersUI extends UIBehavior {
 
 Dreamlab supports both patterns:
 
-| Approach         | When to use                                                                                                             | How to opt in/out                                                                      |
-| ---------------- | ----------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
-| **Uncontrolled** | Simple fields where the browser keeps state. Query the DOM when you need the value.                                    | Add `data-uncontrolled="true"` to the element, e.g. `<input data-uncontrolled="true" …>` |
-| **Controlled**   | Inputs whose value affects other UI. Store the value on `this` and call `rerender()`.                                   | Manage `value` yourself and call `rerender()` whenever it changes.                     |
+| Approach         | When to use                                                                           | How to opt in/out                                                                        |
+| ---------------- | ------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| **Uncontrolled** | Simple fields where the browser keeps state. Query the DOM when you need the value.   | Add `data-uncontrolled="true"` to the element, e.g. `<input data-uncontrolled="true" …>` |
+| **Controlled**   | Inputs whose value affects other UI. Store the value on `this` and call `rerender()`. | Manage `value` yourself and call `rerender()` whenever it changes.                       |
 
 ```ts
 import { UIBehavior } from "@dreamlab/engine";
@@ -192,9 +193,9 @@ export default class InputDemoUI extends UIBehavior {
 
 Because UI renders straight to the DOM, you can style it just like any web app:
 
-- **Inline styles** - Quick & scoped  
-- **`<style>` tags** - Scoped to the behavior  
-- **`this.setCss()`** - Best for larger stylesheets  
+- **Inline styles** - Quick & scoped
+- **`<style>` tags** - Scoped to the behavior
+- **`this.setCss()`** - Best for larger stylesheets
 
 ---
 
@@ -289,11 +290,13 @@ onInitialize() {
   `);
 }
 ```
+
 ---
 
 ## 5. Importing Fonts
 
-There are two ways to import custom fonts into your UI. We recommend using the **custom CSS file** approach for clarity and reusability.
+There are two ways to import custom fonts into your UI. We recommend using the **custom CSS file** approach for clarity
+and reusability.
 
 ### Option 1: Preferred - `custom.css` at project root
 
@@ -301,7 +304,7 @@ Create a `custom.css` file at the root of your game project and include the font
 
 ```css
 /* custom.css */
-@import url('https://fonts.googleapis.com/css2?family=Playwrite+HU:wght@100..400&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Playwrite+HU:wght@100..400&display=swap");
 ```
 
 Then reference the font in your styles:
@@ -344,30 +347,30 @@ render() {
 }
 ```
 
-
 ---
 
 ## 6. Utilities
 
-| Helper             | Use-case                                            |
-| ------------------ | --------------------------------------------------- |
-| `this.hide()`      | Temporarily remove the UI from the DOM (no destroy) |
-| `this.show()`      | Re-attach after `hide()` and rerender               |
-| `this.setCss()`    | Inject or update component-scoped CSS               |
+| Helper          | Use-case                                            |
+| --------------- | --------------------------------------------------- |
+| `this.hide()`   | Temporarily remove the UI from the DOM (no destroy) |
+| `this.show()`   | Re-attach after `hide()` and rerender               |
+| `this.setCss()` | Inject or update component-scoped CSS               |
 
 ---
 
 ## 7. Troubleshooting
 
-| Symptom                        | Likely cause / fix                                                                 |
-| ------------------------------ | ---------------------------------------------------------------------------------- |
-| UI never appears               | Make sure to attach the `UIBehavior` to a `UILayer` or `UIPanel` entity            |
-| Changes not reflected visually | Forgot to call `this.rerender()` after updating internal state                     |
-| Buttons / inputs not clickable | Ensure your container has `pointer-events: auto` in its style                      |
-| Rendering issues               | Don't use React fragments (`<> </>`).                                              |
+| Symptom                        | Likely cause / fix                                                      |
+| ------------------------------ | ----------------------------------------------------------------------- |
+| UI never appears               | Make sure to attach the `UIBehavior` to a `UILayer` or `UIPanel` entity |
+| Changes not reflected visually | Forgot to call `this.rerender()` after updating internal state          |
+| Buttons / inputs not clickable | Ensure your container has `pointer-events: auto` in its style           |
+| Rendering issues               | Don't use React fragments (`<> </>`).                                   |
+
 ---
 
 ## Next Steps
 
-* Learn how to **[sync data](./synced-values.mdx)** between clients.  
-* Dive into **[Behaviors](./behaviors.mdx)** to add game logic that talks to your UI.  
+- Learn how to **[sync data](./synced-values.mdx)** between clients.
+- Dive into **[Behaviors](./behaviors.mdx)** to add game logic that talks to your UI.

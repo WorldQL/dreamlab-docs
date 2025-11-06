@@ -10,9 +10,9 @@ If you know Unity, think **MonoBehaviours**; in Godot, they're **Scripts**.
 
 A Behavior can
 
-* react to **lifecycle callbacks** (`onInitialize`, `onTick`, …)  
-* read global helpers like `this.game` / `this.entity`  
-* declare **@value() / @syncedValue()** properties that show up in the editor and replicate over the network
+- react to **lifecycle callbacks** (`onInitialize`, `onTick`, …)
+- read global helpers like `this.game` / `this.entity`
+- declare **@value() / @syncedValue()** properties that show up in the editor and replicate over the network
 
 ---
 
@@ -34,7 +34,8 @@ export default class Spinner extends Behavior {
 }
 ```
 
-> Marking a behavior property as a `@value()` or `@syncedValue()` is similar to the [SerializeField] annotation in Unity or the @export annotation in Godot, with the added benefit of enabling automatic network syncing.
+> Marking a behavior property as a `@value()` or `@syncedValue()` is similar to the [SerializeField] annotation in Unity
+> or the @export annotation in Godot, with the added benefit of enabling automatic network syncing.
 
 ---
 
@@ -53,23 +54,24 @@ export default class Spinner extends Behavior {
 
 ## 3. Lifecycle callbacks
 
-| Method                | Runs when…                                             | Typical use                                 |
-| --------------------- | ------------------------------------------------------ | ------------------------------------------- |
-| `setup()`             | **Immediately** after constructor—before hierarchy     | Rare edge-case initialisation               |
-| `onInitialize()`      | First frame the entity is alive                        | Allocate resources, attach listeners        |
-| `onTick()`            | Every **simulation tick** (60 TPS by default)         | Gameplay logic, physics, AI                 |
-| `onFrame()` *(client)*| Every **render frame**                                 | Extra visuals that don't need to sync       |
-| `onPreTick()`         | First phase of the tick (before physics)               | Input sampling, clear one-frame buffers     |
-| `onPostTick()`        | Last phase of the tick (after physics)                 | Camera follow, cleanup                      |
+| Method                 | Runs when…                                         | Typical use                             |
+| ---------------------- | -------------------------------------------------- | --------------------------------------- |
+| `setup()`              | **Immediately** after constructor—before hierarchy | Rare edge-case initialisation           |
+| `onInitialize()`       | First frame the entity is alive                    | Allocate resources, attach listeners    |
+| `onTick()`             | Every **simulation tick** (60 TPS by default)      | Gameplay logic, physics, AI             |
+| `onFrame()` _(client)_ | Every **render frame**                             | Extra visuals that don't need to sync   |
+| `onPreTick()`          | First phase of the tick (before physics)           | Input sampling, clear one-frame buffers |
+| `onPostTick()`         | Last phase of the tick (after physics)             | Camera follow, cleanup                  |
 
 ### Platform-specific hooks
 
 Add **`Client`** or **`Server`** to restrict a hook:
 
-* `onInitializeClient`, `onInitializeServer`  
-* `onTickClient`, `onTickServer`
+- `onInitializeClient`, `onInitializeServer`
+- `onTickClient`, `onTickServer`
 
-> TypeScript can't yet narrow `this.game` automatically; guard with `this.game.isClient()` when you need the specialised type.
+> TypeScript can't yet narrow `this.game` automatically; guard with `this.game.isClient()` when you need the specialised
+> type.
 
 ---
 
@@ -110,12 +112,12 @@ onInitialize() {
 
 Common Signals:
 
-| Signal                      | Fires when…                                   |
-| --------------------------- | --------------------------------------------- |
-| `EntitySpawned`             | Entity constructed & ready                    |
-| `EntityDestroyed`           | Entity about to disappear                     |
-| `EntityCollision`           | Two colliders begin / end overlap             |
-| `Value.onChanged`           | A `@value()` property changes                 |
+| Signal            | Fires when…                       |
+| ----------------- | --------------------------------- |
+| `EntitySpawned`   | Entity constructed & ready        |
+| `EntityDestroyed` | Entity about to disappear         |
+| `EntityCollision` | Two colliders begin / end overlap |
+| `Value.onChanged` | A `@value()` property changes     |
 
 ---
 
@@ -131,8 +133,8 @@ export default class Zone extends Behavior {
     if (!this.game.isClient()) return;
 
     // Run when the zone collides with the player's hitbox
-    this.listen(this.entity, EntityCollision, e => {
-      if (!e.started && e.other.name !== 'Player') return;
+    this.listen(this.entity, EntityCollision, (e) => {
+      if (!e.started && e.other.name !== "Player") return;
 
       this.game.fire(EnterZoneEvent, this.entity.id, e.other.id, this.zone);
     });

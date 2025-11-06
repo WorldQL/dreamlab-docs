@@ -8,42 +8,39 @@ title: Tick Loop
 Dreamlab simulates the **game world** at a **fixed tick-rate** (60 TPS by default).  
 Every tick the engine
 
-1. advances physics & transforms,  
-2. executes your **Behavior** callbacks,  
-3. sends a network snapshot, and then  
+1. advances physics & transforms,
+2. executes your **Behavior** callbacks,
+3. sends a network snapshot, and then
 4. uses **interpolation** to render buttery-smooth frames on any monitor refresh rate.
 
-A fixed tick-rate keeps gameplay deterministic and makes networking much simpler—most of the time you don't even need `deltaTime`; the engine handles it for you.
-
-
+A fixed tick-rate keeps gameplay deterministic and makes networking much simpler—most of the time you don't even need
+`deltaTime`; the engine handles it for you.
 
 ## 1 · What happens each tick?
 
-| Phase                  | Typical work                                       |
-| ---------------------- | -------------------------------------------------- |
-| **onPreTick**          | Read inputs, clear one-frame buffers               |
-| Physics & engine sims  | Move rigidbodies, resolve collisions               |
-| **onTick**             | Main gameplay logic                                |
-| **onPostTick**         | “Late update” logic (e.g., camera follow)          |
-| Network snapshot       | Sync entities in the **`world`** root              |
-| **onFrame** *(client)* | Extra rendering per display frame (optional)       |
+| Phase                  | Typical work                                 |
+| ---------------------- | -------------------------------------------- |
+| **onPreTick**          | Read inputs, clear one-frame buffers         |
+| Physics & engine sims  | Move rigidbodies, resolve collisions         |
+| **onTick**             | Main gameplay logic                          |
+| **onPostTick**         | “Late update” logic (e.g., camera follow)    |
+| Network snapshot       | Sync entities in the **`world`** root        |
+| **onFrame** _(client)_ | Extra rendering per display frame (optional) |
 
 > The order **onPreTick → onTick → onPostTick** is guaranteed;  
 > within each band, Behaviors execute in an undefined order.
-
-
 
 ### `onTick` vs `onPostTick`
 
 Think of a tick as “prepare the next world state”:
 
-* **`onTick`** - move players, run AI, update health bars.  
-* Physics resolves all overlaps.  
-* **`onPostTick`** - world state is final → update camera, parallax, etc.
+- **`onTick`** - move players, run AI, update health bars.
+- Physics resolves all overlaps.
+- **`onPostTick`** - world state is final → update camera, parallax, etc.
 
-
-
-Behaviors do not tick in a guaranteed order. If you absolutely need to guarantee that one Behavior ticks before the other, it's recommended you refactor your code to enforce ordering using function calls; for example the following is **incorrect**:
+Behaviors do not tick in a guaranteed order. If you absolutely need to guarantee that one Behavior ticks before the
+other, it's recommended you refactor your code to enforce ordering using function calls; for example the following is
+**incorrect**:
 
 ```ts
 class BehaviorOne extends Behavior {
@@ -68,9 +65,7 @@ class BehaviorOne extends Behavior {
   onTick() {
     // prepare some data that BehaviorTwo needs
     prepareSomeData();
-    this.game.entities
-      .lookupByBehavior(BehaviorTwo)
-      .forEach(e => e.getBehavior(BehaviorTwo).consumeData());
+    this.game.entities.lookupByBehavior(BehaviorTwo).forEach((e) => e.getBehavior(BehaviorTwo).consumeData());
   }
 }
 ```
@@ -81,29 +76,27 @@ Make dependencies explicit; don't rely on incidental ordering.
 
 ## 2 · Platform-specific hooks
 
-| Hook                       | Runs on…      | Use for…                                 |
-| -------------------------- | ------------- | ---------------------------------------- |
-| `onInitializeClient`       | client only   | Play VFX, set up UI                      |
-| `onInitializeServer`       | server only   | Spawn match controller, load map file    |
-| `onTickClient` / `Server`  | each tick     | Divergent client/server logic            |
+| Hook                      | Runs on…    | Use for…                              |
+| ------------------------- | ----------- | ------------------------------------- |
+| `onInitializeClient`      | client only | Play VFX, set up UI                   |
+| `onInitializeServer`      | server only | Spawn match controller, load map file |
+| `onTickClient` / `Server` | each tick   | Divergent client/server logic         |
 
-TypeScript can't narrow `this.game` automatically; guard with `if (this.game.isClient())` when you need the specialised type.
-
-
+TypeScript can't narrow `this.game` automatically; guard with `if (this.game.isClient())` when you need the specialised
+type.
 
 ## 3 · Interpolation
 
-After each tick, Dreamlab **interpolates** between the previous and current transforms so motion stays fluid on 144 Hz, 240 Hz, etc.
+After each tick, Dreamlab **interpolates** between the previous and current transforms so motion stays fluid on 144 Hz,
+240 Hz, etc.
 
-* **+** Smooth visuals on any display  
-* **-** Adds ~1 tick (≈ 16 ms at 60 TPS) of visual latency
-
-
+- **+** Smooth visuals on any display
+- **-** Adds ~1 tick (≈ 16 ms at 60 TPS) of visual latency
 
 ## 4 · Quick troubleshooting
 
-| Symptom                     | Likely fix                                                   |
-| --------------------------- | ------------------------------------------------------------ |
+| Symptom                     | Likely fix                                                       |
+| --------------------------- | ---------------------------------------------------------------- |
 | Twitchy / jittery objects   | Ensure you update each entity's position only **once per tick**. |
-| Camera feels one-frame late | Move characters in `onTick`; update camera in **`onPostTick`**. |
-| Network rubber-banding      | Two peers share authority—call `takeAuthority()` on one side. |
+| Camera feels one-frame late | Move characters in `onTick`; update camera in **`onPostTick`**.  |
+| Network rubber-banding      | Two peers share authority—call `takeAuthority()` on one side.    |

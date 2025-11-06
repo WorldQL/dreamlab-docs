@@ -15,10 +15,12 @@ This follows the [standard player spawning model](/guide/network-authority/#stan
 Move in 8 directions with WASD controls and animation state handling.
 
 ### Overview
-A straightforward top-down character controller with movement and idle animations.
-Supports directional sprites and smooth 8-directional movement.
+
+A straightforward top-down character controller with movement and idle animations. Supports directional sprites and
+smooth 8-directional movement.
 
 ### Code
+
 ```typescript
 import { AnimatedSprite, Behavior, syncedValue, Vector2 } from "@dreamlab/engine";
 
@@ -58,9 +60,7 @@ export default class Player extends Behavior {
       let movement = new Vector2(dx, dy);
 
       // Normalize diagonal movement for consistent speed
-      this.entity.pos = this.entity.pos.add(
-        movement.normalize().mul(this.speed * dt)
-      );
+      this.entity.pos = this.entity.pos.add(movement.normalize().mul(this.speed * dt));
     } else {
       this.state = "idle";
     }
@@ -110,23 +110,16 @@ export default class Player extends Behavior {
 </div>
 
 ### Overview
+
 This demo includes mobile joystick support for touch controls in addition to keyboard movement.
 
 ### Player Code
+
 ```typescript
 import { AnimatedSprite, Behavior, syncedValue, Vector2 } from "@dreamlab/engine";
 import Joystick from "./joystick.tsx";
 
-export const ACTION_TYPES = [
-  "punch",
-  "attack",
-  "kick",
-  "stomp",
-  "grab",
-  "hit",
-  "entrance",
-  "leaving",
-] as const;
+export const ACTION_TYPES = ["punch", "attack", "kick", "stomp", "grab", "hit", "entrance", "leaving"] as const;
 
 export type ActionType = (typeof ACTION_TYPES)[number];
 
@@ -179,7 +172,10 @@ export default class Player extends Behavior {
       let movement = new Vector2(dx, dy);
 
       this.entity.pos = this.entity.pos.add(
-        movement.normalize().mul(this.speed * dt).mul(joystickSpeedMultiplier),
+        movement
+          .normalize()
+          .mul(this.speed * dt)
+          .mul(joystickSpeedMultiplier),
       );
     } else {
       this.state = "idle";

@@ -7,11 +7,13 @@
 
 This page shows how to create dynamic lighting effects in Dreamlab using raycasting and PIXI graphics.
 
-There is no built-in lighting system in Dreamlab. Instead, you can create lighting effects by combining raycasting for line-of-sight calculations with PIXI graphics for rendering shadows and illuminated areas.
+There is no built-in lighting system in Dreamlab. Instead, you can create lighting effects by combining raycasting for
+line-of-sight calculations with PIXI graphics for rendering shadows and illuminated areas.
 
 ## Light Overlay Example
 
-Here's an example implementation of a lighting system using the `LightOverlay` behavior, which creates a dynamic shadow overlay that responds to the cursor position and world geometry.
+Here's an example implementation of a lighting system using the `LightOverlay` behavior, which creates a dynamic shadow
+overlay that responds to the cursor position and world geometry.
 
 ```ts
 import { Behavior, BehaviorDestroyed, Collider, RawPixi, value } from "@dreamlab/engine";
@@ -29,9 +31,7 @@ export default class LightOverlay extends Behavior {
   #overlay!: PIXI.Graphics;
   #mask!: PIXI.Graphics;
 
-  #overlayCtx = new PIXI.GraphicsContext()
-    .rect(-100, -100, 200, 200)
-    .fill({ color: "black", alpha: 0.8 });
+  #overlayCtx = new PIXI.GraphicsContext().rect(-100, -100, 200, 200).fill({ color: "black", alpha: 0.8 });
 
   onInitialize(): void {
     if (!this.game.isClient()) return;
@@ -61,9 +61,7 @@ export default class LightOverlay extends Behavior {
     const { world } = this.game.inputs.cursor;
     if (!world) return;
 
-    const colliders = this.game.entities
-      .lookupByPosition(world)
-      .filter(entity => entity instanceof Collider);
+    const colliders = this.game.entities.lookupByPosition(world).filter((entity) => entity instanceof Collider);
 
     if (colliders.length > 0) return;
 

@@ -13,10 +13,10 @@ and duplicate it like anything else.
 
 ## Quick start
 
-1. Right click on the *Scene Graph* and click **New Entity → Tilemap**.  
+1. Right click on the _Scene Graph_ and click **New Entity → Tilemap**.
 2. Drag a spritesheet PNG onto **Atlas** in the Properties Panel.  
    The editor auto-slices it into `resolution x resolution` squares  
-   (64 x 64 px by default).  
+   (64 x 64 px by default).
 3. Open the Tilemap tab on the bottom panel when the Tilemap entity is selected.
 4. Pick a tile and start painting.
 
@@ -30,12 +30,13 @@ and duplicate it like anything else.
 
 Need procedural generation or an in-game brush?  
 Just cast your entity as a Tilemap and call its helper methods.
+
 ```ts
 import { Behavior, Rng, syncedValue, Tilemap } from "@dreamlab/engine";
 
 /** Pick a random element from the array with the supplied PRNG. */
 function sampleArray<T>(array: readonly T[], prng: () => number): T {
-  const idx = Math.floor(Math.abs(prng()) % 1 * array.length);
+  const idx = Math.floor((Math.abs(prng()) % 1) * array.length);
   return array[idx]!;
 }
 
@@ -61,7 +62,8 @@ export default class Generate extends Behavior {
   #getTile(): number {
     const roll = this.#prng(); // 0 … 1
     if (roll < 0.05) return 0; // empty
-    if (roll < 0.8) { // grass
+    if (roll < 0.8) {
+      // grass
       return sampleArray(Generate.#GRASS, this.#prng);
     }
     return sampleArray(Generate.#FLOWER, this.#prng);
@@ -108,12 +110,14 @@ export default class Generate extends Behavior {
   }
 }
 ```
+
 ---
 
 ## Example — Colored Square Tilemap
 
 If you want a simple colored checkerboard pattern instead of an atlas,  
 you can set per-tile colors:
+
 ```ts
 import { Behavior, Tilemap } from "@dreamlab/engine";
 
@@ -139,30 +143,30 @@ export default class Checkerboard extends Behavior {
   }
 }
 ```
+
 ---
 
 ## Core API
 
-| Method                                         | Purpose |
-|-----------------------------------------------|---------|
-| `getTile(x, y)`                               | Get atlas tile ID at `(x, y)`, or `undefined`. |
-| `setTile(x, y, atlasId?)`                     | Set atlas tile ID; pass `undefined` to erase. |
-| `setTiles(xs[], ys[], atlasIds[])`            | Set multiple atlas tiles at once. |
-| `getColor(x, y)`                              | Get solid color at `(x, y)`, or `undefined`. |
-| `setColor(x, y, color?)`                      | Set solid color; pass `undefined` to erase. |
-| `getTileInfo(x, y)`                           | Get `TileInfo` (either `{ type: "atlas", id }` or `{ type: "color", color }`). |
-| `setTileInfo(x, y, info?)`                    | Set a full `TileInfo` object. |
-| `getTileCoordinatesAtPoint(worldPos)`         | Convert world coordinates to tile `(x, y)`. |
-| `clearTile(x, y)`                             | Remove any tile (atlas or color) at `(x, y)`. |
-| `clearTiles()`                                | Remove all tiles. |
-| `tiles()`                                     | Iterate all filled tiles. |
-| `bounds` *(getter)*                           | `{ width, height, offset }` in tile units. |
+| Method                                | Purpose                                                                        |
+| ------------------------------------- | ------------------------------------------------------------------------------ |
+| `getTile(x, y)`                       | Get atlas tile ID at `(x, y)`, or `undefined`.                                 |
+| `setTile(x, y, atlasId?)`             | Set atlas tile ID; pass `undefined` to erase.                                  |
+| `setTiles(xs[], ys[], atlasIds[])`    | Set multiple atlas tiles at once.                                              |
+| `getColor(x, y)`                      | Get solid color at `(x, y)`, or `undefined`.                                   |
+| `setColor(x, y, color?)`              | Set solid color; pass `undefined` to erase.                                    |
+| `getTileInfo(x, y)`                   | Get `TileInfo` (either `{ type: "atlas", id }` or `{ type: "color", color }`). |
+| `setTileInfo(x, y, info?)`            | Set a full `TileInfo` object.                                                  |
+| `getTileCoordinatesAtPoint(worldPos)` | Convert world coordinates to tile `(x, y)`.                                    |
+| `clearTile(x, y)`                     | Remove any tile (atlas or color) at `(x, y)`.                                  |
+| `clearTiles()`                        | Remove all tiles.                                                              |
+| `tiles()`                             | Iterate all filled tiles.                                                      |
+| `bounds` _(getter)_                   | `{ width, height, offset }` in tile units.                                     |
 
 ### `TileInfo` union
+
 ```ts
-type TileInfo =
-  | { type: "atlas"; id: number }
-  | { type: "color"; color: number };
+type TileInfo = { type: "atlas"; id: number } | { type: "color"; color: number };
 ```
 
 ---
@@ -176,4 +180,4 @@ Technically unlimited, but performance is optimized for ≤ 20 million drawn til
 Yes — assign a new path to **Atlas**; visuals update automatically.
 
 **How do I force pixel-perfect textures?**  
-Set **Scale filter mode** to "nearest" on the Tilemap *or* Camera.
+Set **Scale filter mode** to "nearest" on the Tilemap _or_ Camera.

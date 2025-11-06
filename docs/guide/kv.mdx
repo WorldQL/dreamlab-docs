@@ -289,7 +289,9 @@ button.kv-toggle:active { transform: scale(0.96); }
           </div>
 
           <div className="data">
-            {entries.length === 0 ? <span>No data stored.</span> : (
+            {entries.length === 0 ? (
+              <span>No data stored.</span>
+            ) : (
               <table>
                 <thead>
                   <tr>
@@ -306,13 +308,13 @@ button.kv-toggle:active { transform: scale(0.96); }
                         <code>{key}</code>
                       </td>
                       <td>
-                        {this.#editingKey === key
-                          ? (
-                            <textarea data-editor data-key={key}>
-                              {JSON.stringify(value, null, 2)}
-                            </textarea>
-                          )
-                          : <pre>{JSON.stringify(value, null, 2)}</pre>}
+                        {this.#editingKey === key ? (
+                          <textarea data-editor data-key={key}>
+                            {JSON.stringify(value, null, 2)}
+                          </textarea>
+                        ) : (
+                          <pre>{JSON.stringify(value, null, 2)}</pre>
+                        )}
                       </td>
                       <td>
                         <button
@@ -324,18 +326,14 @@ button.kv-toggle:active { transform: scale(0.96); }
                               this.#editingKey = key;
                               this.rerender();
 
-                              const textarea = this.ui.element.querySelector<
-                                HTMLTextAreaElement
-                              >(query);
+                              const textarea = this.ui.element.querySelector<HTMLTextAreaElement>(query);
                               if (!textarea) return;
 
                               textarea.focus();
                               textarea.selectionStart = textarea.value.length;
                               textarea.rows = textarea.value.split("\n").length;
                             } else {
-                              const textarea = this.ui.element.querySelector<
-                                HTMLTextAreaElement
-                              >(query);
+                              const textarea = this.ui.element.querySelector<HTMLTextAreaElement>(query);
 
                               if (!textarea) return;
                               try {

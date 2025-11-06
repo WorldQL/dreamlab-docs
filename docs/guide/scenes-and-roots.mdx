@@ -8,46 +8,43 @@ title: Scenes & Roots
 Dreamlab's scene graph is split into **four top-level roots**.  
 Each root decides **where** an entity exists and **who** runs its Behaviors.
 
-| Root         | Lives on…                 | What to put here                                           |
-| ------------ | ------------------------- | ---------------------------------------------------------- |
-| `world`      | _Everyone_ (server + all clients) | Network-synced gameplay objects (terrain, NPCs, pickups). |
-| `local`      | Each **client** only      | UI, the active `Camera`, client-side VFX, helper scripts.  |
-| `server`     | The **server** only       | Game-wide managers, match timers, scoreboards.             |
-| `prefabs`    | Editor-only (disabled at runtime) | Reusable blueprints you can `cloneInto` another root.      |
+| Root      | Lives on…                         | What to put here                                          |
+| --------- | --------------------------------- | --------------------------------------------------------- |
+| `world`   | _Everyone_ (server + all clients) | Network-synced gameplay objects (terrain, NPCs, pickups). |
+| `local`   | Each **client** only              | UI, the active `Camera`, client-side VFX, helper scripts. |
+| `server`  | The **server** only               | Game-wide managers, match timers, scoreboards.            |
+| `prefabs` | Editor-only (disabled at runtime) | Reusable blueprints you can `cloneInto` another root.     |
 
-> Think of roots like “layers”:  
-> - **`world`** is the shared game world  
-> - **`local`** is the player's personal overlay  
-> - **`server`** is the omniscient referee  
+> Think of roots like “layers”:
+>
+> - **`world`** is the shared game world
+> - **`local`** is the player's personal overlay
+> - **`server`** is the omniscient referee
 > - **`prefabs`** are templates you can duplicate wherever you need them
 
 ---
 
 ## Example scene layout
 
-<img
-  src={require("../../static/img/image-1.png").default}
-  alt="Roots screenshot"
-  width="250"
-/>
+<img src={require("../../static/img/image-1.png").default} alt="Roots screenshot" width="250" />
 
-| Label in screenshot | Root   | Reason it lives there                              |
-| ------------------- | ------ | -------------------------------------------------- |
-| `Sprite`            | world  | Everyone must see the same sprite                  |
-| `Camera`            | local  | Each client controls its own camera                |
-| `GameManager`       | server | Runs once on the server to track global state      |
-| `Player` prefab     | prefabs| Cloned into `world` when a player joins            |
+| Label in screenshot | Root    | Reason it lives there                         |
+| ------------------- | ------- | --------------------------------------------- |
+| `Sprite`            | world   | Everyone must see the same sprite             |
+| `Camera`            | local   | Each client controls its own camera           |
+| `GameManager`       | server  | Runs once on the server to track global state |
+| `Player` prefab     | prefabs | Cloned into `world` when a player joins       |
 
 ---
 
 ## Dot-path lookup (`root._.<Name>`)
 
-Every root (`world`, `local`, `server`, `prefabs`) exposes a **proxy** called `_.` that lets you
-grab children by name with dot-syntax.
+Every root (`world`, `local`, `server`, `prefabs`) exposes a **proxy** called `_.` that lets you grab children by name
+with dot-syntax.
 
-| What you type                               | What it returns                    |
-| ------------------------------------------- | ---------------------------------- |
-| `game.prefabs._.Player`                     | The *Player* entity prefab         |
-| `game.prefabs._.Player._.Health`            | Child entity named *Health*      |
-| `game.world._.Enemy42`                      | Runtime instance called *Enemy42*  |
-| `game.local._.Camera`                       | The client-side camera             |
+| What you type                    | What it returns                   |
+| -------------------------------- | --------------------------------- |
+| `game.prefabs._.Player`          | The _Player_ entity prefab        |
+| `game.prefabs._.Player._.Health` | Child entity named _Health_       |
+| `game.world._.Enemy42`           | Runtime instance called _Enemy42_ |
+| `game.local._.Camera`            | The client-side camera            |

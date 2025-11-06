@@ -2,11 +2,13 @@
 
 This page shows how to render 2D shapes in Dreamlab using the Pixi API.
 
-Pixi v8’s Graphics uses a chainable builder style (e.g. `.rect().fill().stroke()`), supports gradients/textures, SVG paths, and has great performance.
+Pixi v8’s Graphics uses a chainable builder style (e.g. `.rect().fill().stroke()`), supports gradients/textures, SVG
+paths, and has great performance.
 
 ## Getting Started: RawPixi and Graphics objects
 
 Try attaching this below script to any entity. This will draw a blue box that tracks the position of the entity.
+
 ```ts
 import { Behavior, RawPixi } from "@dreamlab/engine";
 import * as PIXI from "@dreamlab/vendor/pixi.ts";
@@ -28,9 +30,7 @@ export default class GraphicsDemo extends Behavior {
     this.rawPixi!.container!.addChild(this.g);
 
     // 3) Draw something simple
-    this.g
-      .rect(0, 0, 5, 5)
-      .fill("#00ffb7");
+    this.g.rect(0, 0, 5, 5).fill("#00ffb7");
   }
 
   onPostTick() {
@@ -79,30 +79,31 @@ const tex = await PIXI.Assets.load("ui/stripe.png");
 g.rect(0, 0, 200, 20).texture(tex).fill(); // apply texture, then fill
 ```
 
-`Graphics.texture()` lets you paint textures onto shapes before calling `fill()`. See the API for details. ([Pixi docs][3])
+`Graphics.texture()` lets you paint textures onto shapes before calling `fill()`. See the API for details. ([Pixi
+docs][3])
 
 #### Strokes (outlines)
 
 ```ts
-g.roundRect(0, 0, 120, 16, 4)
- .stroke({
-   color: "#2f3342",
-   width: 1,
-   alignment: 0.5, // 0=inside, 0.5=center, 1=outside (see notes below)
-   cap: "round",
-   join: "round",
-   miterLimit: 2,
- });
+g.roundRect(0, 0, 120, 16, 4).stroke({
+  color: "#2f3342",
+  width: 1,
+  alignment: 0.5, // 0=inside, 0.5=center, 1=outside (see notes below)
+  cap: "round",
+  join: "round",
+  miterLimit: 2,
+});
 ```
 
-Stroke properties in v8 are passed as a `StrokeStyle`/`StrokeAttributes` object (width, alignment, cap, join, miterLimit, etc.). ([Pixi docs][4])
+Stroke properties in v8 are passed as a `StrokeStyle`/`StrokeAttributes` object (width, alignment, cap, join,
+miterLimit, etc.). ([Pixi docs][4])
 
 #### Paths, curves, arcs
 
 ```ts
 g.moveTo(10, 10)
- .quadraticCurveTo(60, -20, 110, 10) // control (60,-20) → end (110,10)
- .stroke({ width: 2 });
+  .quadraticCurveTo(60, -20, 110, 10) // control (60,-20) → end (110,10)
+  .stroke({ width: 2 });
 
 g.arc(80, 80, 24, 0, Math.PI * 1.5).stroke({ width: 2 });
 ```
@@ -112,10 +113,10 @@ Curves (`quadraticCurveTo`, Bezier) and arcs are part of the v8 `Graphics`/`Grap
 #### Advanced shapes
 
 ```ts
-g.regularPoly(200, 60, 24, 6)     // hexagon
- .fill("#55b6ff")
- .star(80, 160, 5, 24, 12)        // 5-point star
- .fill("#ffd54d");
+g.regularPoly(200, 60, 24, 6) // hexagon
+  .fill("#55b6ff")
+  .star(80, 160, 5, 24, 12) // 5-point star
+  .fill("#ffd54d");
 ```
 
 See the API for `regularPoly`, `roundPoly`, `star`, etc. ([Pixi docs][3])
@@ -123,11 +124,11 @@ See the API for `regularPoly`, `roundPoly`, `star`, etc. ([Pixi docs][3])
 #### “Cutting” holes
 
 ```ts
-g.rect(0, 0, 100, 100).fill("#3ed36f")
- .circle(50, 50, 20).cut(); // removes the circle from the previous fill
+g.rect(0, 0, 100, 100).fill("#3ed36f").circle(50, 50, 20).cut(); // removes the circle from the previous fill
 ```
 
-Use `.cut()` to punch a hole out of the previous shape (ensure the hole stays enclosed for correct triangulation). ([Pixi docs][1])
+Use `.cut()` to punch a hole out of the previous shape (ensure the hole stays enclosed for correct triangulation).
+([Pixi docs][1])
 
 #### SVG path support
 
@@ -156,36 +157,41 @@ This is a common pattern for clipping UI/art. ([Pixi docs][7])
 
 ### Performance tips (v8)
 
-* **Build, don’t rebuild.** Avoid clearing and reconstructing complex geometry every frame. Prefer swapping prebuilt `GraphicsContext`s (`graphic.context = nextContext`) when animating. ([Pixi docs][1])
-* **Reuse contexts.** Multiple `Graphics` can share one `GraphicsContext` (great for repeated shapes). Destroying a shared context will destroy all dependents, so manage lifetime carefully. ([Pixi docs][1])
-* **Batching:** Many simple `Graphics` often batch better than one mega-shape. ([Pixi docs][1])
+- **Build, don’t rebuild.** Avoid clearing and reconstructing complex geometry every frame. Prefer swapping prebuilt
+  `GraphicsContext`s (`graphic.context = nextContext`) when animating. ([Pixi docs][1])
+- **Reuse contexts.** Multiple `Graphics` can share one `GraphicsContext` (great for repeated shapes). Destroying a
+  shared context will destroy all dependents, so manage lifetime carefully. ([Pixi docs][1])
+- **Batching:** Many simple `Graphics` often batch better than one mega-shape. ([Pixi docs][1])
 
 ```ts
 const barCtx = new PIXI.GraphicsContext().rect(0, 0, 64, 8).fill("#1e1f26");
-const outlineCtx = new PIXI.GraphicsContext().roundRect(0, 0, 64, 8, 3)
-                                        .stroke({ color: "#2f3342", width: 1 });
+const outlineCtx = new PIXI.GraphicsContext().roundRect(0, 0, 64, 8, 3).stroke({ color: "#2f3342", width: 1 });
 
 const barA = new PIXI.Graphics(barCtx);
 const barB = new PIXI.Graphics(barCtx); // cheap reuse
 ```
+
 ---
 
 ### Quick reference
 
-* **Shapes:** `.rect`, `.roundRect`, `.circle`, `.ellipse`, `.arc`, `.moveTo/.lineTo`, `.quadraticCurveTo`, `.regularPoly`, `.roundPoly`, `.star` ([Pixi docs][3])
-* **Fills:** `.fill(color|FillGradient|pattern)`, `.texture(texture)` (then `.fill()`) ([Pixi docs][2])
-* **Strokes:** `.stroke({ width, color, alignment, cap, join, miterLimit, ... })` ([Pixi docs][4])
-* **Holes:** `.cut()` (applies to the previous shape) ([Pixi docs][1])
-* **SVG:** `.svg("<svg>…</svg>")` ([Pixi docs][1])
-* **Context reuse:** `new GraphicsContext(...)` and pass it to `new Graphics(context)`; swap via `graphic.context = other` ([Pixi docs][1])
+- **Shapes:** `.rect`, `.roundRect`, `.circle`, `.ellipse`, `.arc`, `.moveTo/.lineTo`, `.quadraticCurveTo`,
+  `.regularPoly`, `.roundPoly`, `.star` ([Pixi docs][3])
+- **Fills:** `.fill(color|FillGradient|pattern)`, `.texture(texture)` (then `.fill()`) ([Pixi docs][2])
+- **Strokes:** `.stroke({ width, color, alignment, cap, join, miterLimit, ... })` ([Pixi docs][4])
+- **Holes:** `.cut()` (applies to the previous shape) ([Pixi docs][1])
+- **SVG:** `.svg("<svg>…</svg>")` ([Pixi docs][1])
+- **Context reuse:** `new GraphicsContext(...)` and pass it to `new Graphics(context)`; swap via
+  `graphic.context = other` ([Pixi docs][1])
 
 ---
 
 ### Further reading
 
-* **Graphics (v8 guide):** overview, shapes, SVG, holes, performance, gotchas. ([Pixi docs][1])
-* **Graphics API (v8):** full method list (`fill`, `stroke`, `regularPoly`, `star`, `texture`, transforms, etc.). ([Pixi docs][3])
-* **Fills (guide):** colors, textures, gradients (`FillGradient`, stops). ([Pixi docs][2])
+- **Graphics (v8 guide):** overview, shapes, SVG, holes, performance, gotchas. ([Pixi docs][1])
+- **Graphics API (v8):** full method list (`fill`, `stroke`, `regularPoly`, `star`, `texture`, transforms, etc.). ([Pixi
+  docs][3])
+- **Fills (guide):** colors, textures, gradients (`FillGradient`, stops). ([Pixi docs][2])
 
 [1]: https://pixijs.com/8.x/guides/components/scene-objects/graphics "Graphics | PixiJS"
 [2]: https://pixijs.com/8.x/guides/components/scene-objects/graphics/graphics-fill "Graphics Fill"
@@ -196,4 +202,3 @@ const barB = new PIXI.Graphics(barCtx); // cheap reuse
 [5]: https://github.com/pixijs/pixijs/issues/10950 "Hit test on strokes doesn't honor `alignment` StrokeStyle ..."
 [6]: https://pixijs.com/8.x/guides/components/scene-objects/graphics/graphics-pixel-line "Graphics Pixel Line"
 [7]: https://pixijs.download/v8.1.7/docs/scene.Graphics.html "Graphics"
-

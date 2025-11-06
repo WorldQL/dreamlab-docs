@@ -4,13 +4,15 @@ title: Users and Save Data
 
 # Users and Save Data / Key-Value Database
 
-Learn how to identify players, persist data between game sessions, and manage user-specific information using Dreamlab's Key-Value (KV) storage system.
+Learn how to identify players, persist data between game sessions, and manage user-specific information using Dreamlab's
+Key-Value (KV) storage system.
 
 ---
 
 ## Identifying Players
 
-Dreamlab automatically assigns each player a unique identifier when they connect. You can access player information through the network connection system.
+Dreamlab automatically assigns each player a unique identifier when they connect. You can access player information
+through the network connection system.
 
 ### Getting Player Information
 
@@ -20,13 +22,11 @@ import { Behavior, PlayerJoined } from "@dreamlab/engine";
 export default class PlayerTracker extends Behavior {
   onInitialize() {
     // Get the local player's connection
-    const player = this.game.network.connections.find(
-      (conn) => conn.id === this.game.network.self
-    );
+    const player = this.game.network.connections.find((conn) => conn.id === this.game.network.self);
 
     if (player) {
-      const playerId = player.connection.playerId;      // Unique player ID
-      const nickname = player.connection.nickname || "Unknown";  // Player's display name
+      const playerId = player.connection.playerId; // Unique player ID
+      const nickname = player.connection.nickname || "Unknown"; // Player's display name
     }
 
     // Listen for new players joining
@@ -41,6 +41,7 @@ export default class PlayerTracker extends Behavior {
 ```
 
 ### Player Properties
+
 - **`playerId`** - Unique identifier for the player (persists across sessions)
 - **`nickname`** - Player's display name
 - **`connection.id`** - Network connection ID (unique per session)
@@ -103,6 +104,7 @@ export default class SaveData extends Behavior {
 ### Available Methods
 
 **Server Scope:**
+
 - `this.game.kv.server.get(key)` - Get a value
 - `this.game.kv.server.set(key, value)` - Set a value
 - `this.game.kv.server.list()` - List all keys
@@ -110,6 +112,7 @@ export default class SaveData extends Behavior {
 - `this.game.kv.server.clear()` - Clear all keys
 
 **Player Scope:**
+
 - `this.game.kv.player.get(key, playerId)` - Get a player's value
 - `this.game.kv.player.set(key, value, playerId)` - Set a player's value
 - `this.game.kv.player.list(playerId)` - List all keys for a player
@@ -117,6 +120,7 @@ export default class SaveData extends Behavior {
 - `this.game.kv.player.clear(playerId)` - Clear all keys for a player
 
 **Info:**
+
 - `this.game.kv.info.players()` - Get list of all player IDs with stored data
 
 ---
@@ -131,6 +135,8 @@ This example demonstrates saving player data and maintaining a global leaderboar
 
 ## KV Debugger
 
-To view and edit the contents of your KV database during development, you can use the [Key-Value Debugger](/guide/kv/#kv-debugger).
+To view and edit the contents of your KV database during development, you can use the
+[Key-Value Debugger](/guide/kv/#kv-debugger).
 
-Attach the KV Debugger behavior to a `UILayer` in your game to get a visual interface for inspecting and modifying stored data.
+Attach the KV Debugger behavior to a `UILayer` in your game to get a visual interface for inspecting and modifying
+stored data.
