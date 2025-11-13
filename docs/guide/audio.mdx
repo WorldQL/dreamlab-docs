@@ -1,0 +1,215 @@
+---
+title: Audio & Sounds
+---
+
+# Audio & Sounds
+
+Dreamlab provides a powerful **AudioSource** system for playing sounds in your game.
+Audio can be **spatial** (positioned) or **global** (same volume everywhere), and works seamlessly in both single-player and multiplayer contexts.
+
+The engine handles audio playback through `AudioSource` entities that can be configured with clips, volumes, ranges, and more.
+
+## Adding Audio Assets
+
+### Basic Setup
+
+1. In the editor, create a new `AudioSource` entity under `local`
+2. Name it something descriptive (e.g., "JumpSound", "BackgroundMusic")
+3. Configure the audio properties:
+   - **clip** - The audio file to play
+   - **volume** - Base volume (0.0 to 1.0)
+   - **loop** - Whether the sound repeats
+
+### Accessing Audio in Code
+
+Reference your audio entity by name and cast it to `AudioSource`:
+
+```ts
+const audioSource = this.game.local!._["MyAudioEntity"].cast(AudioSource);
+audioSource.play();
+```
+
+> The `!` asserts that `local` exists (client-side).
+> On the server, `game.local` is `undefined`.
+
+## Spatial Audio
+
+AudioSource supports **spatial audio** with distance-based attenuation:
+
+| Property     | Description                                      |
+| ------------ | ------------------------------------------------ |
+| **minRange** | Distance where sound starts to fade (0 = disabled) |
+| **maxRange** | Distance where sound becomes inaudible (0 = disabled) |
+| **volume**   | Base volume multiplier (0.0 to 1.0)              |
+
+### Example: Spatial Footsteps
+
+```ts
+playFootstep(position: Vector2): void {
+  const audioSource = this.game.local!._.Audio._.Footstep.cast(AudioSource);
+
+  audioSource.minRange = 5;  // Start fading at 5 units
+  audioSource.maxRange = 20; // Inaudible after 20 units
+  audioSource.volume = 0.5;
+  audioSource.play();
+}
+```
+
+### Disabling Spatial Audio
+
+For UI sounds or player's own actions, you often want **full volume regardless of position**:
+
+```ts
+audioSource.minRange = 0;
+audioSource.maxRange = 0;
+audioSource.volume = 1.0;
+```
+
+## Multiplayer Audio
+
+In multiplayer games, **sounds should be heard by all players** at the correct position.
+
+### Solution: Centralized Sound System
+
+Use a **SoundSystem** behavior to broadcast sound events:
+
+```ts
+// In any behavior
+import SoundSystem from "./sound-system.ts";
+
+class Weapon extends Behavior {
+  fire(): void {
+    // This plays for everyone at the weapon's position
+    SoundSystem.play(this.game, "shot-sound", this.entity.transform.position);
+  }
+}
+```
+
+### SoundSystem Behavior
+
+Here's a complete system for networked audio with client prediction:
+
+```ts
+import { AudioSource, Behavior, Vector2 } from "@dreamlab/engine";
+import { SettingsManager } from "./settings-manager.ts";
+
+export default class SoundSystem extends Behavior {
+  onInitialize(): void {
+    this.game.network.onReceiveCustomMessage((senderId, channel, data) => {
+      if (channel === "playSound" && this.game.isServer()) {
+        // Broadcast to OTHER clients (sender already played it locally)
+        const connections = Array.from(this.game.network.connections) as any[];
+        for (const conn of connections) {
+          const clientId = typeof conn === "string" ? conn : (conn.id || conn.clientId || conn);
+          if (clientId !== senderId) {
+            this.game.network.sendCustomMessage(clientId, "playSoundLocal", data);
+          }
+        }
+      }
+
+      if (channel === "playSoundLocal" && this.game.isClient()) {
+        this.playLocalSound(data.soundName, data.position);
+      }
+    });
+  }
+
+  private playLocalSound(soundName: string, position: { x: number; y: number }): void {
+    const audioPath = this.game.local!._.Audio._[soundName];
+    if (!audioPath) return;
+
+    const sound = audioPath.cloneInto(this.game.local!, {
+      transform: { position: { x: position.x, y: position.y } },
+    });
+
+    const audioSource = sound.cast(AudioSource);
+    const userVolume = SettingsManager.getVolume();
+
+    setTimeout(() => {
+      audioSource.volume = audioSource.volume * userVolume;
+      audioSource.play();
+      setTimeout(() => sound.destroy(), 2000);
+    }, 0);
+  }
+
+  static play(game: any, soundName: string, position: Vector2): void {
+    if (game.isServer()) {
+      // Server broadcasts to all clients
+      const connections = Array.from(game.network.connections) as any[];
+      for (const conn of connections) {
+        const clientId = typeof conn === "string" ? conn : (conn.id || conn.clientId || conn);
+        game.network.sendCustomMessage(clientId, "playSoundLocal", {
+          soundName,
+          position: { x: position.x, y: position.y },
+        });
+      }
+      return;
+    }
+
+    if (game.isClient()) {
+      // Client plays sound locally immediately (no round-trip delay)
+      const audioPath = game.local?._.Audio?._?.[soundName];
+      if (audioPath) {
+        const sound = audioPath.cloneInto(game.local, {
+          transform: { position: { x: position.x, y: position.y } },
+        });
+
+        const audioSource = sound.cast(AudioSource);
+        const userVolume = SettingsManager.getVolume();
+
+        // For own sounds, override spatial settings to play at full volume
+        setTimeout(() => {
+          audioSource.minRange = 0;
+          audioSource.maxRange = 0;
+          audioSource.volume = 1.0 * userVolume;
+          audioSource.play();
+          setTimeout(() => sound.destroy(), 2000);
+        }, 0);
+      }
+
+      // Also tell server to broadcast to OTHER clients with entity position
+      game.network.sendCustomMessage("server", "playSound", {
+        soundName,
+        position: { x: position.x, y: position.y },
+      });
+    }
+  }
+}
+```
+
+### How it Works
+
+1. **Client triggers sound**: Calls `SoundSystem.play()` with sound name and position
+2. **Immediate local playback**: Client hears the sound instantly (no network delay)
+3. **Server broadcast**: Client tells server, which broadcasts to other clients
+4. **Remote playback**: Other clients play the sound at the specified position with spatial audio
+
+> This pattern eliminates latency for the player who triggered the sound while keeping everyone else in sync.
+
+## Quick Reference
+
+| Task                          | Code                                                                         |
+| ----------------------------- | ---------------------------------------------------------------------------- |
+| Play existing audio entity    | `this.game.local!._["MySound"].cast(AudioSource).play()`                     |
+| Set spatial range             | `audioSource.minRange = 5; audioSource.maxRange = 20;`                       |
+| Stop playing sound            | `audioSource.stop()`                                                         |
+| Loop background music         | Set `loop: true` on AudioSource component                                    |
+
+## Troubleshooting
+
+| Symptom                        | Likely fix                                                                 |
+| ------------------------------ | -------------------------------------------------------------------------- |
+| Sound doesn't play             | Verify sound entity name                                                   |
+| Can't hear sound far away      | Increase `maxRange` or disable spatial audio                               |
+| Sound plays twice in multiplayer | Use SoundSystem pattern to avoid echoes                                  |
+| Volume too quiet               | Check base volume, user settings, and spatial attenuation                  |
+| Overlapping sounds cut off     | Clone the audio entity instead of reusing the same instance                |
+
+---
+
+**Pro tip**: Keep all your audio entities organized under a single `Audio` container entity in `game.local` for easy reference:
+
+```ts
+const sounds = this.game.local!._.Audio._;
+sounds["Jump"].cast(AudioSource).play();
+sounds["Shoot"].cast(AudioSource).play();
+```
