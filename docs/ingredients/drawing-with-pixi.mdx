@@ -1,0 +1,35 @@
+# Drawing with Pixi
+Rendering shapes to the screen using pixi.js
+```typescript
+import { Behavior, RawPixi } from "@dreamlab/engine";
+import * as PIXI from "@dreamlab/vendor/pixi.ts";
+
+export default class GraphicsDemo extends Behavior {
+  rawPixi!: RawPixi;
+  g!: PIXI.Graphics;
+
+  onInitialize() {
+    if (!this.game.isClient()) return;
+    this.rawPixi = this.game.local.spawn({
+      type: RawPixi,
+      name: "GraphicsTest",
+      transform: { position: this.entity.pos, z: 5 },
+    });
+
+    // Create a PIXI.Graphics and add it to the RawPixi container
+    this.g = new PIXI.Graphics();
+    this.rawPixi!.container!.addChild(this.g);
+
+    // 3) Draw something simple
+    this.g.rect(0, 0, 5, 5).fill("#00ffb7");
+  }
+
+  onPostTick() {
+    if (!this.game.isClient()) return;
+    // Keep your graphics positioned relative to your entity
+    this.rawPixi.globalTransform.position.x = this.entity.pos.x;
+    this.rawPixi.globalTransform.position.y = this.entity.pos.y;
+  }
+}
+
+```

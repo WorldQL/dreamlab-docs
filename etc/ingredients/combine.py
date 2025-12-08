@@ -14,6 +14,8 @@ available_topics = {
     "Character Controller": "Using the built-in character controller which handles collision detection. Great for any movement style.",
     "Basic Structure": "Behavior classes are used to implement all game functionality.",
     "Message Channels and Key Value Database": "Facilitating communication between behaviors using custom messages and synced values to synchronize state or trigger actions.",
+    "Drawing with Pixi": "Rendering shapes to the screen using pixi.js",
+    "Ray Casting": "Casting rays to determine object presence in the world",
 }
 
 
@@ -126,6 +128,19 @@ def create_combined_doc(file_dict):
         combined_content += f"```typescript\n{file_contents}\n```\n\n"
         # Add a horizontal rule as a separator between ingredients
         combined_content += "---\n\n"
+
+    # Append the prompt-ending.md file after all ingredients
+    prompt_ending_path = os.path.join(os.getcwd(), "../prompt-ending.md")
+    if os.path.exists(prompt_ending_path):
+        try:
+            with open(prompt_ending_path, "r", encoding="utf-8") as prompt_file:
+                prompt_ending_content = prompt_file.read()
+                combined_content += prompt_ending_content
+            print(f"Appended content from: {prompt_ending_path}")
+        except Exception as e:
+            print(f"Error reading prompt-ending.md: {str(e)}")
+    else:
+        print(f"Warning: {prompt_ending_path} not found, skipping.")
 
     # Define the path for the combined document
     combined_filepath = "./combined_ingredients.md"

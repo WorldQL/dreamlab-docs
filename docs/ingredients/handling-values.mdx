@@ -1,8 +1,5 @@
 # Handling Values
-
-Updating the public variables associated with behaviors. These should be used to store state that can be inspected in
-the editor.
-
+Updating the public variables associated with behaviors. These should be used to store state that can be inspected in the editor.
 ```typescript
 import { Behavior, Vector2, Vector2Adapter, syncedValue } from "@dreamlab/engine";
 
@@ -34,6 +31,7 @@ import { Behavior, Vector2, Vector2Adapter, syncedValue } from "@dreamlab/engine
     - **Vector2Adapter:** For vector data, like positions or velocities.
       @syncedValue(Vector2Adapter)
       velocity = Vector2.ZERO;
+      You must include this adapter if using a Vector.
       
 
     - **TextureAdapter:** For textures that need preloading.
@@ -113,4 +111,5 @@ export default class PlayerMovement extends Behavior {
     this.entity.transform.position = this.entity.transform.position.add(velocity);
   }
 }
+
 ```

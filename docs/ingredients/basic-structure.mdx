@@ -1,9 +1,13 @@
 # Basic Structure
-
 Behavior classes are used to implement all game functionality.
-
 ```typescript
-import { Behavior, Vector2, Vector2Adapter, syncedValue, ColoredSquare } from "@dreamlab/engine";
+import {
+  Behavior,
+  Vector2,
+  Vector2Adapter,
+  syncedValue,
+  ColoredSquare,
+} from "@dreamlab/engine";
 /*
   In "@dreamlab/engine", a `Behavior` represents a modular piece of logic that can be attached to an entity.
   This allows you to encapsulate functionality, such as movement, health management, or AI, in reusable components.
@@ -85,9 +89,12 @@ export default class Movement extends Behavior {
     if (this.#right.held) movement.x += 1;
     if (this.#left.held) movement.x -= 1;
 
-    this.velocity = movement.normalize().mul((this.game.physics.tickDelta / 100) * currentSpeed);
+    this.velocity = movement
+      .normalize()
+      .mul((this.game.physics.tickDelta / 100) * currentSpeed);
 
     const newPosition = this.entity.transform.position.add(this.velocity);
   }
 }
+
 ```

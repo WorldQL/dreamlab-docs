@@ -1,9 +1,12 @@
 # Interacting with Behaviors
-
 Fetching other behaviors attached to an entity.
-
 ```typescript
-import { Behavior, Entity, EntityCollision, ColoredSquare } from "@dreamlab/engine";
+import {
+  Behavior,
+  Entity,
+  EntityCollision,
+  ColoredSquare,
+} from "@dreamlab/engine";
 import PlayerBehavior from "./player.ts"; // this import is not an api, the user will have to have or create a player behavior for this example.
 
 /*
@@ -66,7 +69,12 @@ export default class AsteroidBehavior extends Behavior {
 }
 
 // Health bar behavior for reference
-import { GamePostTick, Sprite, Vector2, syncedValue } from "@dreamlab/engine";
+import {
+  GamePostTick,
+  Sprite,
+  Vector2,
+  syncedValue,
+} from "@dreamlab/engine";
 
 export default class HealthBar extends Behavior {
   @syncedValue()
@@ -81,7 +89,7 @@ export default class HealthBar extends Behavior {
     this.healthBarEntity = this.game.world.spawn({
       type: Sprite,
       name: "HealthBar",
-      transform: { position: { x: 0, y: 1 }, scale: { x: 1, y: 0.1 } },
+      transform: { position: { x: 0, y: 1, }, scale: { x: 1, y: 0.1 } },
       values: { texture: "res://assets/healthbar.png" },
     });
 
@@ -132,4 +140,5 @@ export default class HealthBar extends Behavior {
     }
   }
 }
+
 ```

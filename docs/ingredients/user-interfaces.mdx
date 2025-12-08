@@ -1,10 +1,6 @@
 # User Interfaces
-
 Creating GUIs (HUDs, health bars, etc)
-
 ```typescript
-import { UIBehavior, syncedValue } from "@dreamlab/engine";
-
 /*
   UI System Overview:
 
@@ -31,6 +27,7 @@ import { UIBehavior, syncedValue } from "@dreamlab/engine";
     - Always call `this.rerender()` after any state change (e.g., updating `score` or toggling visibility)
     - File extension must be .tsx!
     - Do not use fragments (e.g., <> </>)
+    - This is not react.
 */
 
 import { UIBehavior, syncedValue } from "@dreamlab/engine";

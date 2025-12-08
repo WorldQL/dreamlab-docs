@@ -1,11 +1,5 @@
 // This is an example of how to implement a platformer controller using the CharacterController
-import {
-  Behavior,
-  CharacterController,
-  RichText,
-  Vector2,
-  syncedValue,
-} from "@dreamlab/engine";
+import { Behavior, CharacterController, RichText, Vector2, syncedValue } from "@dreamlab/engine";
 
 // A very simple platformer controller
 
@@ -30,12 +24,12 @@ export default class PlayerController extends Behavior {
   onInitializeClient() {
     if (!this.hasAuthority()) return;
     this.values.get("points")?.onChanged((newPoints: number) => {
-      this.game.local!._.CoinCounter.cast(RichText).text =
-        "Coins: " + newPoints;
+      this.game.local!._.CoinCounter.cast(RichText).text = "Coins: " + newPoints;
     });
   }
 
-  onTickClient(): void {
+  onTick(): void {
+    if (!this.game.isClient()) return;
     if (!this.hasAuthority()) return;
 
     const deltaTime = this.game.physics.tickDelta / 1_000; // Convert to seconds
@@ -59,13 +53,9 @@ export default class PlayerController extends Behavior {
     }
 
     // Create movement vector
-    const movement = new Vector2(
-      horizontalVelocity * deltaTime,
-      this.#verticalVelocity * deltaTime
-    );
+    const movement = new Vector2(horizontalVelocity * deltaTime, this.#verticalVelocity * deltaTime);
 
-    if (!this.#controller.isGrounded)
-      this.#verticalVelocity -= this.gravity * deltaTime;
+    if (!this.#controller.isGrounded) this.#verticalVelocity -= this.gravity * deltaTime;
 
     this.entity.pos = this.entity.pos.add(movement);
   }

@@ -1,8 +1,5 @@
 # Message Channels and Key Value Database
-
-Facilitating communication between behaviors using custom messages and synced values to synchronize state or trigger
-actions.
-
+Facilitating communication between behaviors using custom messages and synced values to synchronize state or trigger actions.
 ```typescript
 import { Behavior, ClickableEntity, MouseDown, Sprite } from "@dreamlab/engine";
 
@@ -41,7 +38,9 @@ export default class ClickableColorChanger extends Behavior {
     this.listen(this.#clickable, MouseDown, ({ button }) => {
       if (button !== "left") return;
 
-      const player = this.game.network.connections.find((conn) => conn.id === this.game.network.self);
+      const player = this.game.network.connections.find(
+        (conn) => conn.id === this.game.network.self
+      );
 
       if (!player) return;
 
@@ -84,7 +83,12 @@ export default class ClickableColorChanger extends Behavior {
   }
 }
 
-import { Behavior, ObjectAdapter, PlayerJoined, syncedValue } from "@dreamlab/engine";
+import {
+  Behavior,
+  ObjectAdapter,
+  PlayerJoined,
+  syncedValue,
+} from "@dreamlab/engine";
 import { z } from "@dreamlab/vendor/zod.ts";
 
 export default class GlobalStats extends Behavior {
@@ -94,7 +98,10 @@ export default class GlobalStats extends Behavior {
   @syncedValue()
   totalClicks = 0;
 
-  private playerClicks = new Map<string, { nickname: string; clicks: number }>();
+  private playerClicks = new Map<
+    string,
+    { nickname: string; clicks: number }
+  >();
   private playerIds = new Set<string>();
 
   async onInitialize() {
@@ -106,7 +113,9 @@ export default class GlobalStats extends Behavior {
     const savedPlayers = await this.game.kv.server.get("allPlayers");
     if (Array.isArray(savedPlayers)) {
       for (const { playerId, nickname } of savedPlayers) {
-        const storedClicks = await this.game.kv.server.get(`playerClicks:${playerId}`);
+        const storedClicks = await this.game.kv.server.get(
+          `playerClicks:${playerId}`
+        );
         const clicks = typeof storedClicks === "number" ? storedClicks : 0;
         this.playerClicks.set(playerId, { nickname, clicks });
         this.playerIds.add(playerId);
@@ -126,7 +135,9 @@ export default class GlobalStats extends Behavior {
         await this.persistPlayer(playerId, nickname);
       }
 
-      const storedClicks = await this.game.kv.server.get(`playerClicks:${playerId}`);
+      const storedClicks = await this.game.kv.server.get(
+        `playerClicks:${playerId}`
+      );
       const clicks = typeof storedClicks === "number" ? storedClicks : 0;
 
       this.playerClicks.set(playerId, { nickname, clicks });
@@ -169,7 +180,9 @@ export default class GlobalStats extends Behavior {
     const allPlayers = Array.isArray(allPlayersRaw) ? allPlayersRaw : [];
 
     const updatedPlayers = [
-      ...allPlayers.filter((player) => typeof player === "object" && player.playerId !== playerId),
+      ...allPlayers.filter(
+        (player) => typeof player === "object" && player.playerId !== playerId
+      ),
       { playerId, nickname },
     ];
 
@@ -180,4 +193,5 @@ export default class GlobalStats extends Behavior {
     this.leaderboard = Object.fromEntries(this.playerClicks.entries());
   }
 }
+
 ```

@@ -1,9 +1,4 @@
-import {
-  Behavior,
-  Vector2,
-  Vector2Adapter,
-  syncedValue,
-} from "@dreamlab/engine";
+import { Behavior, Vector2, Vector2Adapter, syncedValue } from "@dreamlab/engine";
 
 /*
   Handling Values in Behaviors:
@@ -33,6 +28,7 @@ import {
     - **Vector2Adapter:** For vector data, like positions or velocities.
       @syncedValue(Vector2Adapter)
       velocity = Vector2.ZERO;
+      You must include this adapter if using a Vector.
       
 
     - **TextureAdapter:** For textures that need preloading.
@@ -107,11 +103,8 @@ export default class PlayerMovement extends Behavior {
     let currentSpeed = this.speed;
     if (this.#boost.held) currentSpeed *= 2;
 
-    const velocity = movement
-      .normalize()
-      .mul((this.game.physics.tickDelta / 100) * currentSpeed);
+    const velocity = movement.normalize().mul((this.game.physics.tickDelta / 100) * currentSpeed);
 
-    this.entity.transform.position =
-      this.entity.transform.position.add(velocity);
+    this.entity.transform.position = this.entity.transform.position.add(velocity);
   }
 }

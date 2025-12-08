@@ -1,7 +1,5 @@
 # Handling Transforms
-
 Moving, scaling, and rotating objects
-
 ```typescript
 // Example of changing an entities position through a behavior. This one is more basic.
 import { Behavior, Vector2, syncedValue } from "@dreamlab/engine";
@@ -14,7 +12,10 @@ import { Behavior, Vector2, syncedValue } from "@dreamlab/engine";
   This example moves an asteroid in a random direction at a constant speed.
 */
 export default class AsteroidMovement extends Behavior {
-  readonly #direction = new Vector2(Math.random() * 2 - 1, Math.random() * 2 - 1).normalize();
+  readonly #direction = new Vector2(
+    Math.random() * 2 - 1,
+    Math.random() * 2 - 1
+  ).normalize();
 
   @syncedValue()
   speed = 0.2;
@@ -29,7 +30,7 @@ export default class AsteroidMovement extends Behavior {
 
   onTick(): void {
     this.entity.transform.position = this.entity.transform.position.add(
-      this.#direction.mul((this.time.delta / 100) * this.speed),
+      this.#direction.mul((this.time.delta / 100) * this.speed)
     );
   }
 }
@@ -61,7 +62,7 @@ export default class EnemyMovement extends Behavior {
         speedFactor = (distance - this.minDistance) / 10;
       }
       this.entity.transform.position = this.entity.transform.position.add(
-        direction.mul((this.time.delta / 100) * this.speed * speedFactor),
+        direction.mul((this.time.delta / 100) * this.speed * speedFactor)
       );
     }
 
@@ -102,4 +103,5 @@ export default class EnemyMovement extends Behavior {
     });
   }
 }
+
 ```

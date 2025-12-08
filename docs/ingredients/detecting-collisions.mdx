@@ -1,9 +1,12 @@
 # Detecting Collisions
-
 Running code when one entity collides with another
-
 ```typescript
-import { Behavior, Entity, EntityCollision, ColoredSquare } from "@dreamlab/engine";
+import {
+  Behavior,
+  Entity,
+  EntityCollision,
+  ColoredSquare,
+} from "@dreamlab/engine";
 import HealthBar from "./health-bar.ts"; // this import is not an api, the user will have to have or create a healthbar behavior for this example.
 import PlayerBehavior from "./player.ts"; // this import is not an api, the user will have to have or create a player behavior for this example.
 
@@ -59,4 +62,5 @@ export default class EnemyBehavior extends Behavior {
   //     this.entity._.ColoredSquare.cast(ColoredSquare).color;
   // }
 }
+
 ```
