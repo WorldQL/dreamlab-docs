@@ -11,3 +11,143 @@ Health has the following methods:
 - `setShield(number)` - Set the shield value
 - `showHealthbar()` - Show the health bar
 - `hideHealthbar()` - Hide the health bar
+
+```ts
+import { Behavior, EntityDestroyed, RawPixi, value } from "@dreamlab/engine";
+import * as PIXI from "@dreamlab/vendor/pixi.ts";
+
+export default class Health extends Behavior {
+  @value()
+  public health = 100;
+
+  @value()
+  public maxHealth = 100;
+
+  @value()
+  shield = 0;
+
+  @value()
+  xOffset = 0;
+
+  @value()
+  yOffset = 0;
+
+  @value()
+  scale = 1;
+
+  rawPixi!: RawPixi;
+  graphics!: PIXI.Graphics;
+
+  // Style knobs
+  private readonly BAR_WIDTH = 64; // total width of the bar (px)
+  private readonly BAR_HEIGHT = 8; // total height of the bar (px)
+  private readonly RADIUS = 3; // corner radius (px)
+  private readonly PADDING = 1; // inner padding between outline and fill (px)
+  private readonly OUTLINE = 1; // outline thickness (px)
+
+  // Colors
+  private readonly COLOR_BG = "#1e1f26";
+  private readonly COLOR_OUTLINE = "#2f3342";
+  private readonly COLOR_HEALTH = "#3ed36f";
+  private readonly COLOR_HEALTH_LOW = "#e55039";
+  private readonly COLOR_SHIELD = "#55b6ff";
+  private readonly CONST_SCALEDOWN_MULTIPLIER = 0.1; // so everything isn't huge;
+
+  onInitialize(): void {
+    if (!this.game.isClient()) return;
+    this.createHealthbarIfNotExists();
+  }
+
+  createHealthbarIfNotExists() {
+    if (!this.game.isClient()) return;
+    if (this.rawPixi) return;
+    this.rawPixi = this.game.local.spawn({ type: RawPixi, name: "HealthBar" });
+    this.graphics = new PIXI.Graphics();
+
+    // Add once; we'll just redraw the Graphics' geometry each change
+    this.rawPixi.container?.addChild(this.graphics);
+
+    this.values.get("health")?.onChanged(() => this.redrawHealthbar());
+    this.values.get("maxHealth")?.onChanged(() => this.redrawHealthbar());
+    this.values.get("shield")?.onChanged(() => this.redrawHealthbar());
+    this.redrawHealthbar();
+
+    this.listen(this.entity, EntityDestroyed, () => {
+      this.rawPixi.destroy();
+    });
+  }
+
+  updatePosition() {
+    this.rawPixi.globalTransform.position.x = this.entity.pos.x + this.xOffset;
+    this.rawPixi.globalTransform.position.y = this.entity.pos.y + this.yOffset;
+
+    this.rawPixi.globalTransform.position.x -= this.BAR_WIDTH
+      * (this.scale * this.CONST_SCALEDOWN_MULTIPLIER) / 2; // center it
+  }
+
+  onTick() {
+    if (!this.game.isClient()) return;
+    this.createHealthbarIfNotExists();
+    this.updatePosition();
+  }
+
+  redrawHealthbar(): void {
+    const max = Math.max(0, this.maxHealth);
+    const hp = Math.max(0, Math.min(this.health, max));
+    const hasShield = this.shield > 0 && max > 0;
+
+    // Avoid division by zero; if max is 0, show empty bar
+    const ratio = max > 0 ? hp / max : 0;
+
+    // Health bar fill color shifts when low
+    const healthColor = ratio <= 0.25 ? this.COLOR_HEALTH_LOW : this.COLOR_HEALTH;
+
+    const w = this.BAR_WIDTH;
+    const h = this.BAR_HEIGHT;
+    const innerW = w - 2 * (this.PADDING + this.OUTLINE);
+    const innerH = h - 2 * (this.PADDING + this.OUTLINE);
+
+    const healthFillW = Math.max(0, Math.min(innerW, Math.round(innerW * ratio)));
+
+    // Shield: show as a thin bar above health, proportional to shield/max
+    const shieldRatio = max > 0 ? Math.max(0, Math.min(1, this.shield / max)) : 0;
+    const shieldFillW = Math.max(0, Math.min(innerW, Math.round(innerW * shieldRatio)));
+    const shieldHeight = hasShield ? Math.max(2, Math.floor(innerH * 0.35)) : 0;
+
+    // Left-aligned means (0,0) is the top-left of the bar
+    this.graphics.clear();
+
+    // Background (rounded)
+    this.graphics
+      .roundRect(0, 0, w, h, this.RADIUS)
+      .fill({ color: this.COLOR_BG });
+
+    // Outline
+    this.graphics
+      .roundRect(0, 0, w, h, this.RADIUS)
+      .stroke({ color: this.COLOR_OUTLINE, width: this.OUTLINE });
+
+    // Health fill (rounded only on left; but Graphics API rounds all corners, so draw a plain rect inside padding)
+    if (healthFillW > 0) {
+      this.graphics
+        .rect(this.OUTLINE + this.PADDING, this.OUTLINE + this.PADDING, healthFillW, innerH)
+        .fill({ color: healthColor });
+    }
+
+    // Shield overlay as a slim strip at the top, left-aligned
+    if (shieldHeight > 0 && shieldFillW > 0) {
+      this.graphics
+        .rect(
+          this.OUTLINE + this.PADDING,
+          this.OUTLINE + this.PADDING,
+          shieldFillW,
+          shieldHeight,
+        )
+        .fill({ color: this.COLOR_SHIELD, alpha: 0.9 });
+    }
+
+    this.graphics.scale.set(this.scale * this.CONST_SCALEDOWN_MULTIPLIER);
+  }
+}
+
+```
